@@ -1,5 +1,5 @@
 import wx
-from numpy import arange, sin, pi
+from numpy import arange, sin, pi, genfromtxt
 import matplotlib
 matplotlib.use('WXAgg')
 
@@ -90,11 +90,47 @@ class CanvasPanelLowerStar(wx.Panel):
         self.axes1 = self.figure.add_subplot(111)
         self.axes2 = self.figure.add_subplot(121)
         self.canvas = FigureCanvas(self,-1,self.figure)
+        #---------------------SIZER-------------------------
+        self.open_btn = wx.Button(self,label="Load Data")
+        self.Bind(wx.EVT_BUTTON,self._on_load_data,self.open_btn)
+        self.label = wx.StaticText(self)
 
         self.sizer = wx.BoxSizer(wx.VERTICAL)
         self.sizer.Add(self.canvas, 1, wx.LEFT | wx.TOP | wx.GROW)
+        self.sizer.Add(self.open_btn, 2, wx.LEFT)
+        self.sizer.Add(self.label, 2, wx.LEFT)
         self.SetSizer(self.sizer)
         self.Fit()
+
+    def _on_load_data(self,event):
+
+        # otherwise ask the user what new file to open
+        with wx.FileDialog(self, "Open CSV file", wildcard="CSV files (*.csv)|*.csv|TXT files (*.txt)|*.txt",
+                        style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST) as fileDialog:
+
+            if fileDialog.ShowModal() == wx.ID_CANCEL:
+                return     # the user changed their mind
+
+            # Proceed loading the file chosen by the user
+            pathname = fileDialog.GetPath()
+            try:
+                with open(pathname, 'r') as file:
+                    self.data = genfromtxt(file,delimiter=',')
+                self.label.SetLabel(str(self.data.shape))
+            except IOError:
+                wx.LogError("Cannot open file '%s'." % newfile)
+
+class CanvasPanelRipser(wx.Panel):
+    pass
+
+class CanvasPanelCluster(wx.Panel):
+    pass
+
+class CanvasPanelCorrMatDist(wx.Panel):
+    pass
+
+class CanvasPanelCorrMatHoles(wx.Panel):
+    pass
 
 class MyApp(wx.App):
     def OnInit(self):
