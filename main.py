@@ -91,14 +91,19 @@ class CanvasPanelLowerStar(wx.Panel):
         self.axes2 = self.figure.add_subplot(121)
         self.canvas = FigureCanvas(self,-1,self.figure)
         #---------------------SIZER-------------------------
-        self.open_btn = wx.Button(self,label="Load Data")
+        self.box = wx.StaticBox(self, wx.ID_ANY, "Input Data")
+        self.open_btn = wx.Button(self.box,label="Load Data")
         self.Bind(wx.EVT_BUTTON,self._on_load_data,self.open_btn)
-        self.label = wx.StaticText(self)
+        self.label = wx.StaticText(self.box)
+        self.window_size = wx.TextCtrl(self)
 
         self.sizer = wx.BoxSizer(wx.VERTICAL)
+        self.sbsizer = wx.StaticBoxSizer(self.box,wx.VERTICAL)
         self.sizer.Add(self.canvas, 1, wx.LEFT | wx.TOP | wx.GROW)
-        self.sizer.Add(self.open_btn, 2, wx.LEFT)
-        self.sizer.Add(self.label, 2, wx.LEFT)
+        self.sizer.Add(self.sbsizer,0,wx.ALL | wx.LEFT)
+        #self.sizer.Add(self.open_btn, 2, wx.LEFT)
+        #self.sizer.Add(self.label, 2, wx.LEFT)
+        self.sizer.Add(self.window_size,1,wx.LEFT)
         self.SetSizer(self.sizer)
         self.Fit()
 
