@@ -77,7 +77,8 @@ def openCSVFile(file,dic):
 
 class AppCheckMenuItem(wx.MenuItem):
 	def __init__( self, parent, idx, text ):
-		wx.MenuItem.__init__(self, parent, id=idx, text=text, kind=wx.ITEM_CHECK)
+		wx.MenuItem.__init__(self, parentMenu=parent, id=idx, text=text, kind=wx.ITEM_CHECK)
+		self.parent = parent
 
 	def onMenuItemCheck( self, event ):
 		global Data
@@ -91,14 +92,14 @@ class AppCheckMenuItem(wx.MenuItem):
 					if dic["path"] != "":
 						with open(dic["path"],'r') as file:
 							openCSVFile(file,dic)
-							print("data loaded successfully")
 							file.close()
 						print("data reloaded successfully")
 		else: # item has just been unchecked thus data will be unloaded from memory and its value set to None
 			for dic in Data:
 				if dic["id"] == self.Id and dic["data"] is not None:
 					dic["data"] = None
-					print("data unloaded successfully")
+			self.parent.Window.updateOperationMenu()
+			print("data unloaded successfully")
 
 class AppPageMenuItem(wx.MenuItem):
 	def __init__(self, parent, id, text):
@@ -146,7 +147,7 @@ class AppFrame(MainFrame):
 		notebookSizer.Add(self.notebook, 1, wx.EXPAND)
 
 		self.panel.SetSizer( notebookSizer )
-		
+
 		self.Layout()
 		
 		self.Centre(wx.BOTH)
@@ -164,6 +165,7 @@ class AppFrame(MainFrame):
 			try:
 				with open(pathname, 'r') as file:
 					importCSVFile(file)
+					print("data loaded successfully")
 					file.close()
 				
 				
@@ -175,31 +177,37 @@ class AppFrame(MainFrame):
 					p = dic["path"]
 					# We add each entry to the file menu
 					entry = AppCheckMenuItem(self.file,dic["id"],p)
+					#print(entry.parent.Window.updateOperationMenu)
 					self.Bind(wx.EVT_MENU,entry.onMenuItemCheck,id=dic["id"])
 					self.file.AppendCheckItem(dic["id"],dic["path"])
-					entry.Check(True) #la tolgo perche tanto non fa partire in automatico l'handler
-
-				# Now for every item we have in file menu that is checked, create the operation entry for the 4 filtrations
-				# If the item is checked, data must be loaded inside the data label of the dictionary
-				# if the item is unchecked, data must be None and when it is checked, data must be loaded from path
-				for item in self.lowerStar.GetMenuItems():
-					self.lowerStar.DestroyItem(item.Id)
-				for item in self.ripser.GetMenuItems():
-					self.ripser.DestroyItem(item.Id)
-				for dic in Data:
-					if dic["data"] is not None: # dataset is loaded
-						id_lowerStar = inc_id_counter()
-						dataEntryLowerStar = AppPageMenuItem(self.lowerStar,id=id_lowerStar,text='-> ' + str(dic["path"]))
-						self.Bind(wx.EVT_MENU,dataEntryLowerStar.onMenuItemClickLowerStar,id=id_lowerStar)
-						self.lowerStar.Append(dataEntryLowerStar)
-						id_Ripser = inc_id_counter()
-						dataEntryRipser = AppPageMenuItem(self.ripser, id=id_Ripser,text='-> ' + str(dic["path"]))
-						self.Bind(wx.EVT_MENU,dataEntryRipser.onMenuItemClickRipser,id=id_Ripser)
-						self.ripser.Append(dataEntryRipser)
+					entry.Check(True) # after dataset is imported, is automatically loaded
+				
+				self.updateOperationMenu()
+				
 
 			except IOError and csv.Error:
 				print("Unable to import file")
 
-	# Now we override the behaviour of the lowerSar menu selection
+	def updateOperationMenu(self):
+		global Data
+		# Now for every item we have in file menu that is checked, create the operation entry for the 4 filtrations
+		# If the item is checked, data must be loaded inside the data label of the dictionary
+		# if the item is unchecked, data must be None and when it is checked, data must be loaded from path
+		for item in self.lowerStar.GetMenuItems():
+			self.lowerStar.DestroyItem(item.Id)
+		for item in self.ripser.GetMenuItems():
+			self.ripser.DestroyItem(item.Id)
+		for dic in Data:
+			if dic["data"] is not None: # dataset is loaded
+				id_lowerStar = inc_id_counter()
+				dataEntryLowerStar = AppPageMenuItem(self.lowerStar,id=id_lowerStar,text='-> ' + str(dic["path"]))
+				self.Bind(wx.EVT_MENU,dataEntryLowerStar.onMenuItemClickLowerStar,id=id_lowerStar)
+				self.lowerStar.Append(dataEntryLowerStar)
+				id_Ripser = inc_id_counter()
+				dataEntryRipser = AppPageMenuItem(self.ripser, id=id_Ripser,text='-> ' + str(dic["path"]))
+				self.Bind(wx.EVT_MENU,dataEntryRipser.onMenuItemClickRipser,id=id_Ripser)
+				self.ripser.Append(dataEntryRipser)
+
+	# Now we override the behaviour of the lowerStar menu selection
 	# The change here requires to select on which data to perform the filtration
 	
