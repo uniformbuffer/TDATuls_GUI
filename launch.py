@@ -1,9 +1,9 @@
 import wx
-from noname import MainFrame
+from app import AppFrame
 
 class TDATulsApp (wx.App):
     def OnInit(self):
-        self.frame = MainFrame(parent=None)
+        self.frame = AppFrame(parent=None)
         self.frame.Show()
 
         return True

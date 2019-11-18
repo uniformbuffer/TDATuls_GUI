@@ -12,12 +12,9 @@ import wx.xrc
 
 ID_IMPORT_DATA = 1000
 ID_AS_PNG = 1001
-ID_LOWER_STAR = 1002
-ID_RIPSER = 1003
-ID_DISTANCE_MATRIX = 1004
-ID_HOLES = 1005
-ID_CLUSTER = 1006
-ID_ABOUT = 1007
+ID_DELETEME = 1002
+ID_WARD = 1003
+ID_ABOUT = 1004
 
 ###########################################################################
 ## Class MainFrame
@@ -45,25 +42,40 @@ class MainFrame ( wx.Frame ):
 
 		self.newOperation = wx.Menu()
 		self.slidingWindow = wx.Menu()
-		self.lowerStar = wx.MenuItem( self.slidingWindow, ID_LOWER_STAR, u"Lower Star", wx.EmptyString, wx.ITEM_NORMAL )
-		self.slidingWindow.Append( self.lowerStar )
+		self.lowerStar = wx.Menu()
+		self.deleteme = wx.MenuItem( self.lowerStar, ID_DELETEME, u"DELETEME", wx.EmptyString, wx.ITEM_NORMAL )
+		self.lowerStar.Append( self.deleteme )
 
-		self.ripser = wx.MenuItem( self.slidingWindow, ID_RIPSER, u"Ripser", wx.EmptyString, wx.ITEM_NORMAL )
-		self.slidingWindow.Append( self.ripser )
+		self.slidingWindow.AppendSubMenu( self.lowerStar, u"Lower Star" )
+
+		self.ripser = wx.Menu()
+		self.deleteme = wx.MenuItem( self.ripser, ID_DELETEME, u"DELETEME", wx.EmptyString, wx.ITEM_NORMAL )
+		self.ripser.Append( self.deleteme )
+
+		self.slidingWindow.AppendSubMenu( self.ripser, u"Ripser" )
 
 		self.newOperation.AppendSubMenu( self.slidingWindow, u"Sliding Window" )
 
 		self.correlationMatrix = wx.Menu()
-		self.distanceMatrix = wx.MenuItem( self.correlationMatrix, ID_DISTANCE_MATRIX, u"Distance Matrix", wx.EmptyString, wx.ITEM_NORMAL )
-		self.correlationMatrix.Append( self.distanceMatrix )
+		self.distanceMatrix = wx.Menu()
+		self.deleteme = wx.MenuItem( self.distanceMatrix, ID_DELETEME, u"DELETEME", wx.EmptyString, wx.ITEM_NORMAL )
+		self.distanceMatrix.Append( self.deleteme )
 
-		self.holes = wx.MenuItem( self.correlationMatrix, ID_HOLES, u"Holes", wx.EmptyString, wx.ITEM_NORMAL )
-		self.correlationMatrix.Append( self.holes )
+		self.correlationMatrix.AppendSubMenu( self.distanceMatrix, u"Distance Matrix" )
+
+		self.holes = wx.Menu()
+		self.deleteme = wx.MenuItem( self.holes, ID_DELETEME, u"DELETEME", wx.EmptyString, wx.ITEM_NORMAL )
+		self.holes.Append( self.deleteme )
+
+		self.correlationMatrix.AppendSubMenu( self.holes, u"Holes" )
 
 		self.newOperation.AppendSubMenu( self.correlationMatrix, u"Correlation Matrix" )
 
-		self.cluster = wx.MenuItem( self.newOperation, ID_CLUSTER, u"Cluster", wx.EmptyString, wx.ITEM_CHECK )
-		self.newOperation.Append( self.cluster )
+		self.cluster = wx.Menu()
+		self.ward = wx.MenuItem( self.cluster, ID_WARD, u"Ward", wx.EmptyString, wx.ITEM_NORMAL )
+		self.cluster.Append( self.ward )
+
+		self.newOperation.AppendSubMenu( self.cluster, u"Cluster" )
 
 		self.m_menubar1.Append( self.newOperation, u"New Operation" )
 
@@ -75,37 +87,30 @@ class MainFrame ( wx.Frame ):
 
 		self.SetMenuBar( self.m_menubar1 )
 
+		#notebookSizerDELETEMEAFTER = wx.BoxSizer( wx.VERTICAL )
+
 		self.panel = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		#notebookSizerDELETEMEAFTER.Add( self.panel, 1, wx.EXPAND|wx.ALL, 5 )
 
-		self.notebook = wx.Notebook( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, 0 )
 
-
-		#self.SetSizer( notebookSizer )
+		#self.SetSizer( notebookSizerDELETEMEAFTER )
 		self.Layout()
 
 		self.Centre( wx.BOTH )
 
 		# Connect Events
-		self.Bind( wx.EVT_MENU, self.lowerStarOnMenuSelection, id = self.lowerStar.GetId() )
-		self.Bind( wx.EVT_MENU, self.ripserOnMenuSelection, id = self.ripser.GetId() )
-		self.Bind( wx.EVT_MENU, self.distanceMatrixOnMenuSelection, id = self.distanceMatrix.GetId() )
-		self.Bind( wx.EVT_MENU, self.holesOnMenuSelection, id = self.holes.GetId() )
+		self.Bind( wx.EVT_MENU, self.importDataOnMenuSelection, id = self.importData.GetId() )
+		self.Bind( wx.EVT_MENU, self.asPngOnMenuSelection, id = self.asPng.GetId() )
 
 	def __del__( self ):
 		pass
 
 
 	# Virtual event handlers, overide them in your derived class
-	def lowerStarOnMenuSelection( self, event ):
+	def importDataOnMenuSelection( self, event ):
 		event.Skip()
 
-	def ripserOnMenuSelection( self, event ):
-		event.Skip()
-
-	def distanceMatrixOnMenuSelection( self, event ):
-		event.Skip()
-
-	def holesOnMenuSelection( self, event ):
+	def asPngOnMenuSelection( self, event ):
 		event.Skip()
 
 
