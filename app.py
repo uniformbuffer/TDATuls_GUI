@@ -13,7 +13,7 @@ from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigureCanvas
 from matplotlib.backends.backend_wx import NavigationToolbar2Wx
 from matplotlib.figure import Figure
 
-#from TDATuls import doLowerStarFiltration
+from TDATuls import signal_window, doLowerStarFiltration
 from noname import MainFrame, PanelLowerStar
 
 ID_COUNTER = 2000
@@ -122,7 +122,7 @@ class AppPageMenuItem(wx.MenuItem):
 		# Max window size is the max value of the columns of the dataset
 		page.spn_window_size.SetRange(1,tuple(d["shape"][3]))
 		# Overlap can vary between no overlap (subsequent) or complete overlap (one window on top of the other)
-		page.sl_overlap.SetRange(0,1)
+		page.sl_overlap.SetRange(0,100)
 		self.parent.Window.notebook.AddPage(page,'Lower Star')
 		print("Lower Star tab created")
 
@@ -258,7 +258,12 @@ class AppPanelLowerStar(PanelLowerStar):
 		self.SetSizer(mainSizer)
 
 	def onExecuteButtonClick(self, event):
-		pass
+		windowSize = self.spn_window_size.GetValue()
+		overlap_pct = self.sl_overlap.GetValue()/100 # between 0 and 1
+		overlap = windowSize * overlap_pct
+		# Devo scegliere su quale segnale fare la finestra tramite un controllo
+		W = signal_window(self.dataDict["data"])
+		doLowerStarFiltration(self.dataDict["data"])
 	def onCloseButtonClick(self, event):
 		pass
 	def onEntropyCheck(self, event):
