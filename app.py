@@ -14,7 +14,7 @@ from matplotlib.backends.backend_wx import NavigationToolbar2Wx
 from matplotlib.figure import Figure
 
 #from TDATuls import doLowerStarFiltration
-from noname import MainFrame
+from noname import MainFrame, PanelLowerStar
 
 ID_COUNTER = 2000
 Data = []
@@ -43,6 +43,7 @@ def importCSVFile(file):
 			print("dataset is already loaded in TDATuls")
 			return False
 	dataDict["id"] = inc_id_counter()
+	dataDict["page_id"] = inc_id_counter()
 	data = genfromtxt(file,delimiter=dialect.delimiter)
 	if csv.Sniffer().has_header(sample): #if there is a header
 		data = data[1:,]
@@ -98,16 +99,32 @@ class AppCheckMenuItem(wx.MenuItem):
 			for dic in Data:
 				if dic["id"] == self.Id and dic["data"] is not None:
 					dic["data"] = None
-			self.parent.Window.updateOperationMenu()
 			print("data unloaded successfully")
+		self.parent.Window.updateOperationMenu()
 
 class AppPageMenuItem(wx.MenuItem):
 	def __init__(self, parent, id, text):
 		wx.MenuItem.__init__(self, parent, id=id, text=text)
+		self.parent = parent
 
 	def onMenuItemClickLowerStar(self, event):
-		# create the notebook page corresponding to that dataset
-		pass
+		global Data
+		d = None
+		for dic in Data:
+			if dic["path"] == self.Text: # corresponding data found
+				d = dic
+				break
+		# create the notebook page corresponding to the chosen dataset
+		page = AppPanelLowerStar(self.parent.Window.notebook)
+		page.dataDict = d
+		# label display the shape of the dataset
+		page.label_shape.SetLabel(d["shape"])
+		# Max window size is the max value of the columns of the dataset
+		page.spn_window_size.SetRange(1,tuple(d["shape"][3]))
+		# Overlap can vary between no overlap (subsequent) or complete overlap (one window on top of the other)
+		page.sl_overlap.SetRange(0,1)
+		self.parent.Window.notebook.AddPage(page,'Lower Star')
+		print("Lower Star tab created")
 
 	def onMenuItemClickRipser(self,event):
 		pass
@@ -135,6 +152,7 @@ class AppFrame(MainFrame):
 						path : "......",
 						shape : "(14x14)"
 						id : ID_ITEM
+						page_id : ID_ITEM
 						data : None
 					}
 		'''
@@ -200,14 +218,53 @@ class AppFrame(MainFrame):
 		for dic in Data:
 			if dic["data"] is not None: # dataset is loaded
 				id_lowerStar = inc_id_counter()
-				dataEntryLowerStar = AppPageMenuItem(self.lowerStar,id=id_lowerStar,text='-> ' + str(dic["path"]))
+				dataEntryLowerStar = AppPageMenuItem(self.lowerStar,id=id_lowerStar,text=str(dic["path"]))
 				self.Bind(wx.EVT_MENU,dataEntryLowerStar.onMenuItemClickLowerStar,id=id_lowerStar)
 				self.lowerStar.Append(dataEntryLowerStar)
 				id_Ripser = inc_id_counter()
-				dataEntryRipser = AppPageMenuItem(self.ripser, id=id_Ripser,text='-> ' + str(dic["path"]))
+				dataEntryRipser = AppPageMenuItem(self.ripser, id=id_Ripser,text=str(dic["path"]))
 				self.Bind(wx.EVT_MENU,dataEntryRipser.onMenuItemClickRipser,id=id_Ripser)
 				self.ripser.Append(dataEntryRipser)
 
 	# Now we override the behaviour of the lowerStar menu selection
 	# The change here requires to select on which data to perform the filtration
-	
+# Now we override the behaviour of the Panel page for lower star filtration
+class AppPanelLowerStar(PanelLowerStar):
+	def __init__(self, parent):
+		PanelLowerStar.__init__(self, parent=parent)
+		
+		self.dataDict = None
+
+		# Execute button
+		self.btn_execute.Bind(wx.EVT_BUTTON,self.onExecuteButtonClick)
+		# Close button
+		self.btn_close.Bind(wx.EVT_BUTTON,self.onCloseButtonClick)
+		# Entropy box
+		self.chx_entropy.Bind(wx.EVT_CHECKBOX,self.onEntropyCheck)
+		# Overlap slider
+		self.sl_overlap.Bind(wx.EVT_SCROLL,self.onPctSliderChange)
+		# SpinCtrl window size
+		self.spn_window_size.Bind(wx.EVT_SPINCTRL,self.onWindowSizeChange)
+
+		# Create the canvas in the upper part of the sizer
+		self.figure = Figure()
+		self.axes = self.figure.add_subplot(111)
+		self.canvas = FigureCanvas(self, -1, self.figure)
+
+		mainSizer = self.GetSizer()
+		# First child is canvasSizer, the second is settingsSizer
+		canvasSizer = mainSizer.GetChildren()[0].GetSizer()
+		canvasSizer.Add(self.canvas, 1, wx.ALL)
+		self.SetSizer(mainSizer)
+
+	def onExecuteButtonClick(self, event):
+		pass
+	def onCloseButtonClick(self, event):
+		pass
+	def onEntropyCheck(self, event):
+		pass
+	def onPctSliderChange(self,event):
+		pass
+	def onWindowSizeChange(self, event):
+		pass
+
