@@ -12,9 +12,13 @@ import wx.xrc
 
 ID_IMPORT_DATA = 1000
 ID_AS_PNG = 1001
-ID_DELETEME = 1002
-ID_WARD = 1003
-ID_ABOUT = 1004
+ID_ALL_DIAGRAMS = 1002
+ID_ALL_PERSISTENT_ENTROPIES = 1003
+ID_ALL_NORMALIZED_ENTROPIES = 1004
+ID_ALL_CORRELATION_MATRICES = 1005
+ID_ALL_CORRELATION_MATRICES_AS_EDGELIST = 1006
+ID_IMPORT_DATA_BEFORE_USE = 1007
+ID_ABOUT = 1008
 
 ###########################################################################
 ## Class MainFrame
@@ -33,24 +37,41 @@ class MainFrame ( wx.Frame ):
 		self.file.Append( self.importData )
 
 		self.export = wx.Menu()
-		self.asPng = wx.MenuItem( self.export, ID_AS_PNG, u"As .png", wx.EmptyString, wx.ITEM_NORMAL )
+		self.asPng = wx.MenuItem( self.export, ID_AS_PNG, u"As png", wx.EmptyString, wx.ITEM_NORMAL )
 		self.export.Append( self.asPng )
 
+		self.allDiagrams = wx.MenuItem( self.export, ID_ALL_DIAGRAMS, u"All Diagrams", wx.EmptyString, wx.ITEM_NORMAL )
+		self.export.Append( self.allDiagrams )
+
+		self.allPersistentEntropies = wx.MenuItem( self.export, ID_ALL_PERSISTENT_ENTROPIES, u"All Persistent Entropies", wx.EmptyString, wx.ITEM_NORMAL )
+		self.export.Append( self.allPersistentEntropies )
+
+		self.allNormalizedEntropies = wx.MenuItem( self.export, ID_ALL_NORMALIZED_ENTROPIES, u"All Normalized Entropies", wx.EmptyString, wx.ITEM_NORMAL )
+		self.export.Append( self.allNormalizedEntropies )
+
+		self.allCorrelationMatrices = wx.MenuItem( self.export, ID_ALL_CORRELATION_MATRICES, u"All Correlation Matrices", wx.EmptyString, wx.ITEM_NORMAL )
+		self.export.Append( self.allCorrelationMatrices )
+
+		self.allCorrelationMatricesAsEdgelist = wx.MenuItem( self.export, ID_ALL_CORRELATION_MATRICES_AS_EDGELIST, u"All Correlation Matrices as Edgelist", wx.EmptyString, wx.ITEM_NORMAL )
+		self.export.Append( self.allCorrelationMatricesAsEdgelist )
+
 		self.file.AppendSubMenu( self.export, u"Export" )
+
+		self.file.AppendSeparator()
 
 		self.m_menubar1.Append( self.file, u"File" )
 
 		self.newOperation = wx.Menu()
 		self.slidingWindow = wx.Menu()
 		self.lowerStar = wx.Menu()
-		self.deleteme = wx.MenuItem( self.lowerStar, ID_DELETEME, u"DELETEME", wx.EmptyString, wx.ITEM_NORMAL )
-		self.lowerStar.Append( self.deleteme )
+		self.importDataBeforeUse = wx.MenuItem( self.lowerStar, ID_IMPORT_DATA_BEFORE_USE, u"IMPORT DATA BEFORE USE", wx.EmptyString, wx.ITEM_NORMAL )
+		self.lowerStar.Append( self.importDataBeforeUse )
 
 		self.slidingWindow.AppendSubMenu( self.lowerStar, u"Lower Star" )
 
 		self.ripser = wx.Menu()
-		self.deleteme = wx.MenuItem( self.ripser, ID_DELETEME, u"DELETEME", wx.EmptyString, wx.ITEM_NORMAL )
-		self.ripser.Append( self.deleteme )
+		self.importDataBeforeUse = wx.MenuItem( self.ripser, ID_IMPORT_DATA_BEFORE_USE, u"IMPORT DATA BEFORE USE", wx.EmptyString, wx.ITEM_NORMAL )
+		self.ripser.Append( self.importDataBeforeUse )
 
 		self.slidingWindow.AppendSubMenu( self.ripser, u"Ripser" )
 
@@ -58,24 +79,18 @@ class MainFrame ( wx.Frame ):
 
 		self.correlationMatrix = wx.Menu()
 		self.distanceMatrix = wx.Menu()
-		self.deleteme = wx.MenuItem( self.distanceMatrix, ID_DELETEME, u"DELETEME", wx.EmptyString, wx.ITEM_NORMAL )
-		self.distanceMatrix.Append( self.deleteme )
+		self.importDataBeforeUse = wx.MenuItem( self.distanceMatrix, ID_IMPORT_DATA_BEFORE_USE, u"IMPORT DATA BEFORE USE", wx.EmptyString, wx.ITEM_NORMAL )
+		self.distanceMatrix.Append( self.importDataBeforeUse )
 
 		self.correlationMatrix.AppendSubMenu( self.distanceMatrix, u"Distance Matrix" )
 
 		self.holes = wx.Menu()
-		self.deleteme = wx.MenuItem( self.holes, ID_DELETEME, u"DELETEME", wx.EmptyString, wx.ITEM_NORMAL )
-		self.holes.Append( self.deleteme )
+		self.importDataBeforeUse = wx.MenuItem( self.holes, ID_IMPORT_DATA_BEFORE_USE, u"IMPORT DATA BEFORE USE", wx.EmptyString, wx.ITEM_NORMAL )
+		self.holes.Append( self.importDataBeforeUse )
 
 		self.correlationMatrix.AppendSubMenu( self.holes, u"Holes" )
 
 		self.newOperation.AppendSubMenu( self.correlationMatrix, u"Correlation Matrix" )
-
-		self.cluster = wx.Menu()
-		self.ward = wx.MenuItem( self.cluster, ID_WARD, u"Ward", wx.EmptyString, wx.ITEM_NORMAL )
-		self.cluster.Append( self.ward )
-
-		self.newOperation.AppendSubMenu( self.cluster, u"Cluster" )
 
 		self.m_menubar1.Append( self.newOperation, u"New Operation" )
 
@@ -87,20 +102,19 @@ class MainFrame ( wx.Frame ):
 
 		self.SetMenuBar( self.m_menubar1 )
 
-		#notebookSizerDELETEMEAFTER = wx.BoxSizer( wx.VERTICAL )
+		notebookSizerDELETEMEAFTER = wx.BoxSizer( wx.VERTICAL )
 
 		self.panel = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
-		#notebookSizerDELETEMEAFTER.Add( self.panel, 1, wx.EXPAND|wx.ALL, 5 )
+		notebookSizerDELETEMEAFTER.Add( self.panel, 1, wx.EXPAND|wx.ALL, 5 )
 
 
-		#self.SetSizer( notebookSizerDELETEMEAFTER )
+		self.SetSizer( notebookSizerDELETEMEAFTER )
 		self.Layout()
 
 		self.Centre( wx.BOTH )
 
 		# Connect Events
 		self.Bind( wx.EVT_MENU, self.importDataOnMenuSelection, id = self.importData.GetId() )
-		self.Bind( wx.EVT_MENU, self.asPngOnMenuSelection, id = self.asPng.GetId() )
 
 	def __del__( self ):
 		pass
@@ -108,9 +122,6 @@ class MainFrame ( wx.Frame ):
 
 	# Virtual event handlers, overide them in your derived class
 	def importDataOnMenuSelection( self, event ):
-		event.Skip()
-
-	def asPngOnMenuSelection( self, event ):
 		event.Skip()
 
 
@@ -127,9 +138,19 @@ class PanelLowerStar ( wx.Panel ):
 		mainSizer.SetFlexibleDirection( wx.BOTH )
 		mainSizer.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 
-		canvasSizer = wx.FlexGridSizer( 1, 1, 0, 10 )
+		canvasSizer = wx.FlexGridSizer( 0, 2, 0, 10 )
 		canvasSizer.SetFlexibleDirection( wx.BOTH )
 		canvasSizer.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+
+		mainCanvasSizer = wx.BoxSizer( wx.VERTICAL )
+
+
+		canvasSizer.Add( mainCanvasSizer, 1, wx.EXPAND, 5 )
+
+		optionalCanvasSizer = wx.BoxSizer( wx.VERTICAL )
+
+
+		canvasSizer.Add( optionalCanvasSizer, 1, wx.EXPAND, 5 )
 
 
 		mainSizer.Add( canvasSizer, 1, wx.EXPAND, 5 )
@@ -148,6 +169,16 @@ class PanelLowerStar ( wx.Panel ):
 
 		settingsSizer.Add( self.label_shape, 0, wx.ALL, 5 )
 
+		self.m_staticText19 = wx.StaticText( self, wx.ID_ANY, u"Select signal:", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText19.Wrap( -1 )
+
+		settingsSizer.Add( self.m_staticText19, 0, wx.ALL, 5 )
+
+		ch_signalChoices = []
+		self.ch_signal = wx.Choice( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, ch_signalChoices, 0 )
+		self.ch_signal.SetSelection( 0 )
+		settingsSizer.Add( self.ch_signal, 0, wx.ALL, 5 )
+
 		self.m_staticText1 = wx.StaticText( self, wx.ID_ANY, u"Window Size:", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText1.Wrap( -1 )
 
@@ -161,11 +192,26 @@ class PanelLowerStar ( wx.Panel ):
 
 		settingsSizer.Add( self.m_staticText2, 0, wx.ALL, 5 )
 
-		self.sl_overlap = wx.Slider( self, wx.ID_ANY, 50, 0, 100, wx.DefaultPosition, wx.DefaultSize, wx.SL_HORIZONTAL )
+		self.sl_overlap = wx.Slider( self, wx.ID_ANY, 50, 0, 100, wx.DefaultPosition, wx.DefaultSize, wx.SL_HORIZONTAL|wx.SL_VALUE_LABEL )
 		settingsSizer.Add( self.sl_overlap, 0, wx.ALL, 5 )
+
+		self.label_which = wx.StaticText( self, wx.ID_ANY, u"Which window:", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.label_which.Wrap( -1 )
+
+		settingsSizer.Add( self.label_which, 0, wx.ALL, 5 )
+
+		self.sl_which_window = wx.Slider( self, wx.ID_ANY, 50, 0, 100, wx.DefaultPosition, wx.DefaultSize, wx.SL_HORIZONTAL|wx.SL_VALUE_LABEL )
+		settingsSizer.Add( self.sl_which_window, 0, wx.ALL, 5 )
 
 		self.chx_entropy = wx.CheckBox( self, wx.ID_ANY, u"Pers. Entropy", wx.DefaultPosition, wx.DefaultSize, 0 )
 		settingsSizer.Add( self.chx_entropy, 0, wx.ALL, 5 )
+
+		ch_pe_signalChoices = []
+		self.ch_pe_signal = wx.Choice( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, ch_pe_signalChoices, 0 )
+		self.ch_pe_signal.SetSelection( 0 )
+		self.ch_pe_signal.Hide()
+
+		settingsSizer.Add( self.ch_pe_signal, 0, wx.ALL, 5 )
 
 		self.btn_execute = wx.Button( self, wx.ID_ANY, u"Execute", wx.DefaultPosition, wx.DefaultSize, 0 )
 		settingsSizer.Add( self.btn_execute, 0, wx.ALL, 5 )
@@ -237,6 +283,13 @@ class PanelRipser ( wx.Panel ):
 		self.chx_entropy = wx.CheckBox( self, wx.ID_ANY, u"Pers. Entropy", wx.DefaultPosition, wx.DefaultSize, 0 )
 		settingsSizer.Add( self.chx_entropy, 0, wx.ALL, 5 )
 
+		ch_pe_signalChoices = []
+		self.ch_pe_signal = wx.Choice( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, ch_pe_signalChoices, 0 )
+		self.ch_pe_signal.SetSelection( 0 )
+		self.ch_pe_signal.Hide()
+
+		settingsSizer.Add( self.ch_pe_signal, 0, wx.ALL, 5 )
+
 		self.btn_execute = wx.Button( self, wx.ID_ANY, u"Execute", wx.DefaultPosition, wx.DefaultSize, 0 )
 		settingsSizer.Add( self.btn_execute, 0, wx.ALL, 5 )
 
@@ -296,13 +349,21 @@ class PanelCorrMatDist ( wx.Panel ):
 		self.spn_window_size = wx.SpinCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 0, 10, 0 )
 		settingsSizer.Add( self.spn_window_size, 0, wx.ALL, 5 )
 
-		self.m_staticText6 = wx.StaticText( self, wx.ID_ANY, u"Overlap Pct", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText6 = wx.StaticText( self, wx.ID_ANY, u"Overlap %", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText6.Wrap( -1 )
 
 		settingsSizer.Add( self.m_staticText6, 0, wx.ALL, 5 )
 
 		self.sl_overlap = wx.Slider( self, wx.ID_ANY, 50, 0, 100, wx.DefaultPosition, wx.DefaultSize, wx.SL_HORIZONTAL )
 		settingsSizer.Add( self.sl_overlap, 0, wx.ALL, 5 )
+
+		self.m_staticText20 = wx.StaticText( self, wx.ID_ANY, u"Which window:", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText20.Wrap( -1 )
+
+		settingsSizer.Add( self.m_staticText20, 0, wx.ALL, 5 )
+
+		self.sl_which_window = wx.Slider( self, wx.ID_ANY, 50, 0, 100, wx.DefaultPosition, wx.DefaultSize, wx.SL_HORIZONTAL )
+		settingsSizer.Add( self.sl_which_window, 0, wx.ALL, 5 )
 
 		self.m_staticText9 = wx.StaticText( self, wx.ID_ANY, u"Distance Metric", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText9.Wrap( -1 )
@@ -313,9 +374,6 @@ class PanelCorrMatDist ( wx.Panel ):
 		self.ch_metric = wx.Choice( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, ch_metricChoices, 0 )
 		self.ch_metric.SetSelection( 0 )
 		settingsSizer.Add( self.ch_metric, 0, wx.ALL, 5 )
-
-		self.chx_entropy = wx.CheckBox( self, wx.ID_ANY, u"Pers. Entropy", wx.DefaultPosition, wx.DefaultSize, 0 )
-		settingsSizer.Add( self.chx_entropy, 0, wx.ALL, 5 )
 
 		self.btn_execute = wx.Button( self, wx.ID_ANY, u"Execute", wx.DefaultPosition, wx.DefaultSize, 0 )
 		settingsSizer.Add( self.btn_execute, 0, wx.ALL, 5 )
@@ -393,9 +451,6 @@ class PanelCorrMatHoles ( wx.Panel ):
 		self.ch_metric = wx.Choice( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, ch_metricChoices, 0 )
 		self.ch_metric.SetSelection( 0 )
 		settingsSizer.Add( self.ch_metric, 0, wx.ALL, 5 )
-
-		self.chx_entropy = wx.CheckBox( self, wx.ID_ANY, u"Pers. Entropy", wx.DefaultPosition, wx.DefaultSize, 0 )
-		settingsSizer.Add( self.chx_entropy, 0, wx.ALL, 5 )
 
 		self.btn_execute = wx.Button( self, wx.ID_ANY, u"Execute", wx.DefaultPosition, wx.DefaultSize, 0 )
 		settingsSizer.Add( self.btn_execute, 0, wx.ALL, 5 )

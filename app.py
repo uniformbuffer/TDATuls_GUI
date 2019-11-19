@@ -5,15 +5,16 @@ import csv
 import os
 import logging
 import numpy as np
-from numpy import arange, sin, pi, genfromtxt
+from numpy import arange, sin, pi, genfromtxt, floor
 import matplotlib
 matplotlib.use('WXAgg')
 
 from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigureCanvas
-from matplotlib.backends.backend_wx import NavigationToolbar2Wx
+from matplotlib.backends.backend_wx import NavigationToolbar2Wx as NavigationToolbar
 from matplotlib.figure import Figure
 
-from TDATuls import signal_window, doLowerStarFiltration
+from TDATuls import signal_window, doLowerStarFiltration, persentropy
+from persim import plot_diagrams
 from noname import MainFrame, PanelLowerStar
 
 ID_COUNTER = 2000
@@ -28,11 +29,11 @@ def inc_id_counter():
 def importCSVFile(file):
 	global Data
 	#check for file format with sniffer
-	dialect = csv.Sniffer().sniff(file.read(1024))
+	dialect = csv.Sniffer().sniff(file.readline())
 	file.seek(0)
 
 	#grab a sample and see if there is a header
-	sample=file.read(2048)
+	sample=file.readline()
 	file.seek(0)
 
 	dataDict = {}
@@ -120,10 +121,15 @@ class AppPageMenuItem(wx.MenuItem):
 		# label display the shape of the dataset
 		page.label_shape.SetLabel(d["shape"])
 		# Max window size is the max value of the columns of the dataset
-		page.spn_window_size.SetRange(1,tuple(d["shape"][3]))
+		maxval = int(str(d["shape"]).split(',')[1].strip(')'))
+		page.spn_window_size.SetRange(1,maxval)
 		# Overlap can vary between no overlap (subsequent) or complete overlap (one window on top of the other)
 		page.sl_overlap.SetRange(0,100)
-		self.parent.Window.notebook.AddPage(page,'Lower Star')
+		# Signal choice is equal to rows in data shape
+		maxSignal = int(str(d["shape"]).split(',')[0].strip('('))
+		page.ch_signal.SetItems([str(val) for val in range(maxSignal)])
+
+		self.parent.Window.notebook.AddPage(page,'Lower Star on ' + d["path"])
 		print("Lower Star tab created")
 
 	def onMenuItemClickRipser(self,event):
@@ -164,6 +170,7 @@ class AppFrame(MainFrame):
 		notebookSizer = wx.BoxSizer()
 		notebookSizer.Add(self.notebook, 1, wx.EXPAND)
 
+		self.SetSizer(None)
 		self.panel.SetSizer( notebookSizer )
 
 		self.Layout()
@@ -203,7 +210,7 @@ class AppFrame(MainFrame):
 				self.updateOperationMenu()
 				
 
-			except IOError and csv.Error:
+			except IOError or csv.Error:
 				print("Unable to import file")
 
 	def updateOperationMenu(self):
@@ -232,7 +239,7 @@ class AppFrame(MainFrame):
 class AppPanelLowerStar(PanelLowerStar):
 	def __init__(self, parent):
 		PanelLowerStar.__init__(self, parent=parent)
-		
+		self.parent = parent # parent is notebook whose parent is frame
 		self.dataDict = None
 
 		# Execute button
@@ -245,31 +252,82 @@ class AppPanelLowerStar(PanelLowerStar):
 		self.sl_overlap.Bind(wx.EVT_SCROLL,self.onPctSliderChange)
 		# SpinCtrl window size
 		self.spn_window_size.Bind(wx.EVT_SPINCTRL,self.onWindowSizeChange)
+		# Choice for selecting the signal
+		self.ch_signal.Bind(wx.EVT_CHOICE,self.onSignalSelectionChange)
 
 		# Create the canvas in the upper part of the sizer
 		self.figure = Figure()
 		self.axes = self.figure.add_subplot(111)
 		self.canvas = FigureCanvas(self, -1, self.figure)
+		self.toolbar = NavigationToolbar(self.canvas)
+		self.toolbar.Realize()
 
 		mainSizer = self.GetSizer()
 		# First child is canvasSizer, the second is settingsSizer
 		canvasSizer = mainSizer.GetChildren()[0].GetSizer()
-		canvasSizer.Add(self.canvas, 1, wx.ALL)
+		mainCanvasSizer = canvasSizer.GetChildren()[0].GetSizer()
+		mainCanvasSizer.Add(self.canvas, 1, wx.ALL)
+		mainCanvasSizer.Add(self.toolbar, 0, wx.LEFT | wx.EXPAND)
 		self.SetSizer(mainSizer)
 
 	def onExecuteButtonClick(self, event):
+		self.Pers = []
+		self.NormPers = []
+		self.Diags = []
 		windowSize = self.spn_window_size.GetValue()
 		overlap_pct = self.sl_overlap.GetValue()/100 # between 0 and 1
-		overlap = windowSize * overlap_pct
+		overlap = int(floor(windowSize * overlap_pct))
 		# Devo scegliere su quale segnale fare la finestra tramite un controllo
-		W = signal_window(self.dataDict["data"])
-		doLowerStarFiltration(self.dataDict["data"])
+		signal = self.ch_signal.GetSelection()
+		print(signal)
+		print(self.dataDict["data"][signal])
+		print(overlap)
+		if signal != wx.NOT_FOUND:
+			W = signal_window(self.dataDict["data"][signal],windowSize,overlap)
+			print(len(W))
+			for w in W:
+				lsf_dgm0 = doLowerStarFiltration(w)
+				# Prepare the diagram for computing PE
+				L = []
+				L.append(lsf_dgm0)
+				dmg = np.array(L)
+				# Diagram ready
+				ent = persentropy(lsf_dgm0)[0]
+				pent = persentropy(dmg,normalize=True)[0]
+				self.Diags.append(dmg)
+				self.Pers.append(ent)
+				self.Norm_Pers.append(pent)
+		which_one = self.sl_which_window.GetValue()
+		self.axes.plot(np.arange(windowSize-1),self.NormPers)
+		self.canvas.draw()
 	def onCloseButtonClick(self, event):
-		pass
+		index = self.parent.GetSelection()
+		self.parent.DeletePage(index)
+		self.parent.SendSizeEvent()
 	def onEntropyCheck(self, event):
-		pass
+		mainSizer = self.GetSizer()
+		# First child is canvasSizer, the second is settingsSizer
+		canvasSizer = mainSizer.GetChildren()[0].GetSizer()
+		optionalCanvasSizer = canvasSizer.GetChildren()[1].GetSizer()
+		if self.chx_entropy.IsChecked(): # Box is checked and I need to add the pe plot
+			self.pe_Figure = Figure()
+			self.pe_axes = self.pe_Figure.add_subplot(111)
+			self.pe_canvas = FigureCanvas(self, -1, self.pe_Figure)
+			self.pe_toolbar = NavigationToolbar(self.pe_canvas)
+			self.pe_toolbar.Realize()
+			
+			optionalCanvasSizer.Add(self.pe_canvas, 1, wx.ALL)
+			optionalCanvasSizer.Add(self.pe_toolbar, 0, wx.LEFT | wx.EXPAND)
+			self.SetSizer(mainSizer)
+			self.Layout() # automatically reshape the page to fit the pe plot
+		else: # Check is unchecked and I need to remove the pe plot
+			# i remove them by simply destroying children of the sizer
+			optionalCanvasSizer.Clear(True)
+			optionalCanvasSizer.Layout()
 	def onPctSliderChange(self,event):
 		pass
 	def onWindowSizeChange(self, event):
+		pass
+	def onSignalSelectionChange(self, event):
 		pass
 
