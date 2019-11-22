@@ -280,6 +280,16 @@ class PanelRipser ( wx.Panel ):
 		self.sl_overlap = wx.Slider( self, wx.ID_ANY, 50, 0, 100, wx.DefaultPosition, wx.DefaultSize, wx.SL_HORIZONTAL )
 		settingsSizer.Add( self.sl_overlap, 0, wx.ALL, 5 )
 
+		self.m_staticText31 = wx.StaticText( self, wx.ID_ANY, u"Metric:", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText31.Wrap( -1 )
+
+		settingsSizer.Add( self.m_staticText31, 0, wx.ALL, 5 )
+
+		ch_metricChoices = []
+		self.ch_metric = wx.Choice( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, ch_metricChoices, 0 )
+		self.ch_metric.SetSelection( 0 )
+		settingsSizer.Add( self.ch_metric, 0, wx.ALL, 5 )
+
 		self.chx_entropy = wx.CheckBox( self, wx.ID_ANY, u"Pers. Entropy", wx.DefaultPosition, wx.DefaultSize, 0 )
 		settingsSizer.Add( self.chx_entropy, 0, wx.ALL, 5 )
 

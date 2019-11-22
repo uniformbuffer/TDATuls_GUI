@@ -150,8 +150,6 @@ class AppPageMenuItem(wx.MenuItem):
 		# Overlap can vary between no overlap (subsequent) or complete overlap (one window on top of the other)
 		page.sl_overlap.SetRange(0,100)
 
-        page.ch_metric.SetItems(['euclidean','minkowski','chebyshev'])
-
 		self.parent.Window.notebook.AddPage(page,'Ripser on ' + d["path"])
 		print("Ripser tab created")
 
@@ -376,6 +374,9 @@ class AppPanelRipser(PanelLowerStar):
 		PanelLowerStar.__init__(self, parent=parent)
 		self.parent = parent # parent is notebook whose parent is frame
 		self.dataDict = None
+		self.metric = 'euclidean'
+		self.distance_matrix = self.chx_distance_matrix.IsChecked()
+        self.max_hom_dim = self.spn_max_hom_dim.GetValue()
 
 		# Execute button
 		self.btn_execute.Bind(wx.EVT_BUTTON,self.onExecuteButtonClick)
@@ -388,8 +389,9 @@ class AppPanelRipser(PanelLowerStar):
 		# SpinCtrl window size
 		self.spn_window_size.Bind(wx.EVT_SPINCTRL,self.onWindowSizeChange)
 		# Choice for selecting the signal
-		self.ch_signal.Bind(wx.EVT_CHOICE,self.onSignalSelectionChange)
-
+		self.ch_metric.Bind(wx.EVT_CHOICE,self.onMetricSelectionChange)
+		self.chx_distance_matrix.Bind(wx.EVT_CHECKBOX,self.onDistanceMatrixCheck)
+        self.spn_max_hom_dim.Bind(wx.EVT_SPINCTRL,self.onMaxHomDimChange)
 		# Create the canvas in the upper part of the sizer
 		self.figure = Figure()
 		self.axes = self.figure.add_subplot(111)
@@ -409,8 +411,8 @@ class AppPanelRipser(PanelLowerStar):
 
 
         X = self.dataDict["data"]
-        maxHomDim, distance_matrix=False, metric='euclidean'
-        doRipsFiltration(X)
+
+        doRipsFiltration(X,self.max_hom_dim, self.distance_matrix, self.metric)
 		self.Pers = []
 		self.NormPers = []
 		self.Diags = []
@@ -464,9 +466,13 @@ class AppPanelRipser(PanelLowerStar):
 			# i remove them by simply destroying children of the sizer
 			optionalCanvasSizer.Clear(True)
 			optionalCanvasSizer.Layout()
+    def onDistanceMatrixCheck(self, event):
+        self.distance_matrix = self.chx_distance_matrix.IsChecked()
+    def onMaxHomDimChange(self,event):
+        self.max_hom_dim = self.spn_max_hom_dim.GetValue()
 	def onPctSliderChange(self,event):
 		pass
 	def onWindowSizeChange(self, event):
 		pass
-	def onSignalSelectionChange(self, event):
+	def onMetricSelectionChange(self, event):
 		pass
