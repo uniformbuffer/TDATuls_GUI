@@ -15,7 +15,7 @@ from matplotlib.figure import Figure
 
 from TDATuls import signal_window, doLowerStarFiltration, persentropy
 from persim import plot_diagrams
-from noname import MainFrame, PanelLowerStar
+from noname import MainFrame, PanelLowerStar, PanelRipser
 
 ID_COUNTER = 2000
 Data = []
@@ -242,7 +242,7 @@ class AppFrame(MainFrame):
 					#print(entry.parent.Window.updateOperationMenu)
 					self.Bind(wx.EVT_MENU,entry.onMenuItemCheck,id=dic["id"])
 					self.file.AppendCheckItem(dic["id"],dic["path"])
-					entry.Check(True) # after dataset is imported, is automatically loaded
+					#entry.Check(True) # after dataset is imported, is automatically loaded
 				
 				self.updateOperationMenu()
 				
@@ -369,9 +369,9 @@ class AppPanelLowerStar(PanelLowerStar):
 		pass
 
 
-class AppPanelRipser(PanelLowerStar):
+class AppPanelRipser(PanelRipser):
 	def __init__(self, parent):
-		PanelLowerStar.__init__(self, parent=parent)
+		PanelRipser.__init__(self, parent=parent)
 		self.parent = parent # parent is notebook whose parent is frame
 		self.dataDict = None
 		self.metric = 'euclidean'

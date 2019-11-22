@@ -236,16 +236,26 @@ class PanelLowerStar ( wx.Panel ):
 
 class PanelRipser ( wx.Panel ):
 
-	def __init__( self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( 500,300 ), style = wx.TAB_TRAVERSAL, name = wx.EmptyString ):
+	def __init__( self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( 500,340 ), style = wx.TAB_TRAVERSAL, name = wx.EmptyString ):
 		wx.Panel.__init__ ( self, parent, id = id, pos = pos, size = size, style = style, name = name )
 
 		mainSizer = wx.FlexGridSizer( 0, 2, 0, 0 )
 		mainSizer.SetFlexibleDirection( wx.BOTH )
 		mainSizer.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 
-		canvasSizer = wx.FlexGridSizer( 1, 1, 0, 10 )
+		canvasSizer = wx.FlexGridSizer( 1, 2, 0, 10 )
 		canvasSizer.SetFlexibleDirection( wx.BOTH )
 		canvasSizer.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+
+		mainCanvasSizer = wx.BoxSizer( wx.VERTICAL )
+
+
+		canvasSizer.Add( mainCanvasSizer, 1, wx.EXPAND, 5 )
+
+		optionalCanvasSizer = wx.BoxSizer( wx.VERTICAL )
+
+
+		canvasSizer.Add( optionalCanvasSizer, 1, wx.EXPAND, 5 )
 
 
 		mainSizer.Add( canvasSizer, 1, wx.EXPAND, 5 )
