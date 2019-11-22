@@ -262,7 +262,7 @@ def persentropy(dgms, normalize=False):
         
         size = len(values)
         ret = 0
-        for e in values: #ogni valore e è un li e faccio la sommatoria come richiede la formula
+        for e in values: #ogni valore e e' un li e faccio la sommatoria come richiede la formula
             ret = ret + e/ltot * math.log(e/ltot)
         if size == 1 and normalize:
             result.append(-ret)
