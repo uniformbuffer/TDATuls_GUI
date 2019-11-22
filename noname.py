@@ -285,13 +285,34 @@ class PanelRipser ( wx.Panel ):
 
 		settingsSizer.Add( self.m_staticText31, 0, wx.ALL, 5 )
 
-		ch_metricChoices = []
+		ch_metricChoices = [ u"euclidean", u"minkowski", u"chebyshev" ]
 		self.ch_metric = wx.Choice( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, ch_metricChoices, 0 )
 		self.ch_metric.SetSelection( 0 )
 		settingsSizer.Add( self.ch_metric, 0, wx.ALL, 5 )
 
+		self.chx_distance_matrix = wx.CheckBox( self, wx.ID_ANY, u"Distance Matrix", wx.DefaultPosition, wx.DefaultSize, 0 )
+		settingsSizer.Add( self.chx_distance_matrix, 0, wx.ALL, 5 )
+
+		self.label_shape1 = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.label_shape1.Wrap( -1 )
+
+		settingsSizer.Add( self.label_shape1, 0, wx.ALL, 5 )
+
 		self.chx_entropy = wx.CheckBox( self, wx.ID_ANY, u"Pers. Entropy", wx.DefaultPosition, wx.DefaultSize, 0 )
 		settingsSizer.Add( self.chx_entropy, 0, wx.ALL, 5 )
+
+		self.label_shape11 = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.label_shape11.Wrap( -1 )
+
+		settingsSizer.Add( self.label_shape11, 0, wx.ALL, 5 )
+
+		self.m_staticText32 = wx.StaticText( self, wx.ID_ANY, u"Max Homology\nDimension:", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText32.Wrap( -1 )
+
+		settingsSizer.Add( self.m_staticText32, 0, wx.ALL, 5 )
+
+		self.spn_max_hom_dim = wx.SpinCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 0, 10, 2 )
+		settingsSizer.Add( self.spn_max_hom_dim, 0, wx.ALL, 5 )
 
 		ch_pe_signalChoices = []
 		self.ch_pe_signal = wx.Choice( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, ch_pe_signalChoices, 0 )
