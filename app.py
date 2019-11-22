@@ -376,7 +376,7 @@ class AppPanelRipser(PanelLowerStar):
 		self.dataDict = None
 		self.metric = 'euclidean'
 		self.distance_matrix = self.chx_distance_matrix.IsChecked()
-        self.max_hom_dim = self.spn_max_hom_dim.GetValue()
+		self.max_hom_dim = self.spn_max_hom_dim.GetValue()
 
 		# Execute button
 		self.btn_execute.Bind(wx.EVT_BUTTON,self.onExecuteButtonClick)
@@ -391,7 +391,7 @@ class AppPanelRipser(PanelLowerStar):
 		# Choice for selecting the signal
 		self.ch_metric.Bind(wx.EVT_CHOICE,self.onMetricSelectionChange)
 		self.chx_distance_matrix.Bind(wx.EVT_CHECKBOX,self.onDistanceMatrixCheck)
-        self.spn_max_hom_dim.Bind(wx.EVT_SPINCTRL,self.onMaxHomDimChange)
+		self.spn_max_hom_dim.Bind(wx.EVT_SPINCTRL,self.onMaxHomDimChange)
 		# Create the canvas in the upper part of the sizer
 		self.figure = Figure()
 		self.axes = self.figure.add_subplot(111)
@@ -408,11 +408,8 @@ class AppPanelRipser(PanelLowerStar):
 		self.SetSizer(mainSizer)
 
 	def onExecuteButtonClick(self, event):
-
-
-        X = self.dataDict["data"]
-
-        doRipsFiltration(X,self.max_hom_dim, self.distance_matrix, self.metric)
+		X = self.dataDict["data"]
+		doRipsFiltration(X,self.max_hom_dim, self.distance_matrix, self.metric)
 		self.Pers = []
 		self.NormPers = []
 		self.Diags = []
@@ -466,10 +463,10 @@ class AppPanelRipser(PanelLowerStar):
 			# i remove them by simply destroying children of the sizer
 			optionalCanvasSizer.Clear(True)
 			optionalCanvasSizer.Layout()
-    def onDistanceMatrixCheck(self, event):
-        self.distance_matrix = self.chx_distance_matrix.IsChecked()
-    def onMaxHomDimChange(self,event):
-        self.max_hom_dim = self.spn_max_hom_dim.GetValue()
+	def onDistanceMatrixCheck(self, event):
+		self.distance_matrix = self.chx_distance_matrix.IsChecked()
+	def onMaxHomDimChange(self,event):
+		self.max_hom_dim = self.spn_max_hom_dim.GetValue()
 	def onPctSliderChange(self,event):
 		pass
 	def onWindowSizeChange(self, event):
