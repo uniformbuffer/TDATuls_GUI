@@ -239,7 +239,7 @@ class PanelRipser ( wx.Panel ):
 	def __init__( self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( 500,340 ), style = wx.TAB_TRAVERSAL, name = wx.EmptyString ):
 		wx.Panel.__init__ ( self, parent, id = id, pos = pos, size = size, style = style, name = name )
 
-		mainSizer = wx.FlexGridSizer( 0, 2, 0, 0 )
+		mainSizer = wx.FlexGridSizer( 1, 2, 0, 0 )
 		mainSizer.SetFlexibleDirection( wx.BOTH )
 		mainSizer.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 
