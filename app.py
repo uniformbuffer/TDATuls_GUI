@@ -374,7 +374,7 @@ class AppPanelRipser(PanelRipser):
 		PanelRipser.__init__(self, parent=parent)
 		self.parent = parent # parent is notebook whose parent is frame
 		self.dataDict = None
-		self.metric = 'euclidean'
+		self.metric = self.ch_metric.GetString(self.ch_metric.GetCurrentSelection())
 		self.distance_matrix = self.chx_distance_matrix.IsChecked()
 		self.max_hom_dim = self.spn_max_hom_dim.GetValue()
 
@@ -472,4 +472,5 @@ class AppPanelRipser(PanelRipser):
 	def onWindowSizeChange(self, event):
 		pass
 	def onMetricSelectionChange(self, event):
+		self.metric = self.ch_metric.GetString(self.ch_metric.GetCurrentSelection())
 		pass
