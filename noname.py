@@ -236,12 +236,18 @@ class PanelLowerStar ( wx.Panel ):
 
 class PanelRipser ( wx.Panel ):
 
-	def __init__( self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( 500,340 ), style = wx.TAB_TRAVERSAL, name = wx.EmptyString ):
+	def __init__( self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( 500,340 ), style = wx.TAB_TRAVERSAL|wx.VSCROLL, name = wx.EmptyString ):
 		wx.Panel.__init__ ( self, parent, id = id, pos = pos, size = size, style = style, name = name )
 
-		mainSizer = wx.FlexGridSizer( 2, 1, 0, 0 )
+		mainSizer = wx.FlexGridSizer( 3, 1, 0, 0 )
 		mainSizer.SetFlexibleDirection( wx.BOTH )
 		mainSizer.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+
+		self.scrolled_window = wx.ScrolledWindow( self, wx.ID_ANY, wx.DefaultPosition, wx.Size( 1000,500 ), wx.VSCROLL )
+		self.scrolled_window.SetScrollRate( 5, 5 )
+		scrolled_sizer = wx.FlexGridSizer( 2, 1, 0, 0 )
+		scrolled_sizer.SetFlexibleDirection( wx.BOTH )
+		scrolled_sizer.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 
 		canvasSizer = wx.FlexGridSizer( 1, 2, 0, 10 )
 		canvasSizer.SetFlexibleDirection( wx.BOTH )
@@ -258,87 +264,92 @@ class PanelRipser ( wx.Panel ):
 		canvasSizer.Add( optionalCanvasSizer, 1, wx.EXPAND, 5 )
 
 
-		mainSizer.Add( canvasSizer, 1, wx.EXPAND, 5 )
+		scrolled_sizer.Add( canvasSizer, 1, wx.EXPAND, 5 )
 
 		settingsSizer = wx.FlexGridSizer( 0, 2, 0, 0 )
 		settingsSizer.SetFlexibleDirection( wx.BOTH )
 		settingsSizer.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 
-		self.m_staticText12 = wx.StaticText( self, wx.ID_ANY, u"Dataset shape:", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText12 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Dataset shape:", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText12.Wrap( -1 )
 
 		settingsSizer.Add( self.m_staticText12, 0, wx.ALL, 5 )
 
-		self.label_shape = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.label_shape = wx.StaticText( self.scrolled_window, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.label_shape.Wrap( -1 )
 
 		settingsSizer.Add( self.label_shape, 0, wx.ALL, 5 )
 
-		self.m_staticText3 = wx.StaticText( self, wx.ID_ANY, u"Window Size:", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText3 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Window Size:", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText3.Wrap( -1 )
 
 		settingsSizer.Add( self.m_staticText3, 0, wx.ALL, 5 )
 
-		self.spn_window_size = wx.SpinCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 0, 10, 0 )
+		self.spn_window_size = wx.SpinCtrl( self.scrolled_window, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 0, 10, 0 )
 		settingsSizer.Add( self.spn_window_size, 0, wx.ALL, 5 )
 
-		self.m_staticText4 = wx.StaticText( self, wx.ID_ANY, u"Overalp Pct", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText4 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Overalp Pct", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText4.Wrap( -1 )
 
 		settingsSizer.Add( self.m_staticText4, 0, wx.ALL, 5 )
 
-		self.sl_overlap = wx.Slider( self, wx.ID_ANY, 50, 0, 100, wx.DefaultPosition, wx.DefaultSize, wx.SL_HORIZONTAL )
+		self.sl_overlap = wx.Slider( self.scrolled_window, wx.ID_ANY, 50, 0, 100, wx.DefaultPosition, wx.DefaultSize, wx.SL_HORIZONTAL )
 		settingsSizer.Add( self.sl_overlap, 0, wx.ALL, 5 )
 
-		self.m_staticText31 = wx.StaticText( self, wx.ID_ANY, u"Metric:", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText31 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Metric:", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText31.Wrap( -1 )
 
 		settingsSizer.Add( self.m_staticText31, 0, wx.ALL, 5 )
 
 		ch_metricChoices = [ u"euclidean", u"minkowski", u"chebyshev" ]
-		self.ch_metric = wx.Choice( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, ch_metricChoices, 0 )
+		self.ch_metric = wx.Choice( self.scrolled_window, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, ch_metricChoices, 0 )
 		self.ch_metric.SetSelection( 0 )
 		settingsSizer.Add( self.ch_metric, 0, wx.ALL, 5 )
 
-		self.chx_distance_matrix = wx.CheckBox( self, wx.ID_ANY, u"Distance Matrix", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.chx_distance_matrix = wx.CheckBox( self.scrolled_window, wx.ID_ANY, u"Distance Matrix", wx.DefaultPosition, wx.DefaultSize, 0 )
 		settingsSizer.Add( self.chx_distance_matrix, 0, wx.ALL, 5 )
 
-		self.label_shape1 = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.label_shape1 = wx.StaticText( self.scrolled_window, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.label_shape1.Wrap( -1 )
 
 		settingsSizer.Add( self.label_shape1, 0, wx.ALL, 5 )
 
-		self.chx_entropy = wx.CheckBox( self, wx.ID_ANY, u"Pers. Entropy", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.chx_entropy = wx.CheckBox( self.scrolled_window, wx.ID_ANY, u"Pers. Entropy", wx.DefaultPosition, wx.DefaultSize, 0 )
 		settingsSizer.Add( self.chx_entropy, 0, wx.ALL, 5 )
 
-		self.label_shape11 = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.label_shape11 = wx.StaticText( self.scrolled_window, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.label_shape11.Wrap( -1 )
 
 		settingsSizer.Add( self.label_shape11, 0, wx.ALL, 5 )
 
-		self.m_staticText32 = wx.StaticText( self, wx.ID_ANY, u"Max Homology\nDimension:", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText32 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Max Homology\nDimension:", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText32.Wrap( -1 )
 
 		settingsSizer.Add( self.m_staticText32, 0, wx.ALL, 5 )
 
-		self.spn_max_hom_dim = wx.SpinCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 0, 10, 2 )
+		self.spn_max_hom_dim = wx.SpinCtrl( self.scrolled_window, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 0, 10, 6 )
 		settingsSizer.Add( self.spn_max_hom_dim, 0, wx.ALL, 5 )
 
 		ch_pe_signalChoices = []
-		self.ch_pe_signal = wx.Choice( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, ch_pe_signalChoices, 0 )
+		self.ch_pe_signal = wx.Choice( self.scrolled_window, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, ch_pe_signalChoices, 0 )
 		self.ch_pe_signal.SetSelection( 0 )
 		self.ch_pe_signal.Hide()
 
 		settingsSizer.Add( self.ch_pe_signal, 0, wx.ALL, 5 )
 
-		self.btn_execute = wx.Button( self, wx.ID_ANY, u"Execute", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.btn_execute = wx.Button( self.scrolled_window, wx.ID_ANY, u"Execute", wx.DefaultPosition, wx.DefaultSize, 0 )
 		settingsSizer.Add( self.btn_execute, 0, wx.ALL, 5 )
 
-		self.btn_close = wx.Button( self, wx.ID_ANY, u"Close Tab", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.btn_close = wx.Button( self.scrolled_window, wx.ID_ANY, u"Close Tab", wx.DefaultPosition, wx.DefaultSize, 0 )
 		settingsSizer.Add( self.btn_close, 0, wx.ALL, 5 )
 
 
-		mainSizer.Add( settingsSizer, 1, wx.EXPAND, 5 )
+		scrolled_sizer.Add( settingsSizer, 1, wx.EXPAND, 5 )
+
+
+		self.scrolled_window.SetSizer( scrolled_sizer )
+		self.scrolled_window.Layout()
+		mainSizer.Add( self.scrolled_window, 1, wx.EXPAND |wx.ALL, 5 )
 
 
 		self.SetSizer( mainSizer )
@@ -516,7 +527,7 @@ class PanelCorrMatHoles ( wx.Panel ):
 
 class GenericCanvasPanel ( wx.Panel ):
 
-	def __init__( self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( 500,300 ), style = wx.TAB_TRAVERSAL, name = wx.EmptyString ):
+	def __init__( self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( 500,300 ), style = wx.TAB_TRAVERSAL|wx.VSCROLL, name = wx.EmptyString ):
 		wx.Panel.__init__ ( self, parent, id = id, pos = pos, size = size, style = style, name = name )
 
 		genericSizer = wx.BoxSizer( wx.VERTICAL )
