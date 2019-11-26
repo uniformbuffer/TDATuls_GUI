@@ -134,9 +134,13 @@ class PanelLowerStar ( wx.Panel ):
 	def __init__( self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( 500,300 ), style = wx.TAB_TRAVERSAL, name = wx.EmptyString ):
 		wx.Panel.__init__ ( self, parent, id = id, pos = pos, size = size, style = style, name = name )
 
-		mainSizer = wx.FlexGridSizer( 2, 1, 30, 30 )
-		mainSizer.SetFlexibleDirection( wx.BOTH )
-		mainSizer.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		mainSizer = wx.BoxSizer( wx.VERTICAL )
+
+		self.scrolled_window = wx.ScrolledWindow( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.HSCROLL|wx.VSCROLL )
+		self.scrolled_window.SetScrollRate( 5, 5 )
+		scrolled_sizer = wx.FlexGridSizer( 2, 1, 30, 30 )
+		scrolled_sizer.SetFlexibleDirection( wx.BOTH )
+		scrolled_sizer.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 
 		canvasSizer = wx.FlexGridSizer( 0, 2, 0, 10 )
 		canvasSizer.SetFlexibleDirection( wx.BOTH )
@@ -153,74 +157,80 @@ class PanelLowerStar ( wx.Panel ):
 		canvasSizer.Add( optionalCanvasSizer, 1, wx.EXPAND, 5 )
 
 
-		mainSizer.Add( canvasSizer, 1, wx.EXPAND, 5 )
+		scrolled_sizer.Add( canvasSizer, 1, wx.EXPAND, 5 )
 
 		settingsSizer = wx.FlexGridSizer( 0, 2, 0, 0 )
 		settingsSizer.SetFlexibleDirection( wx.BOTH )
 		settingsSizer.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 
-		self.m_staticText10 = wx.StaticText( self, wx.ID_ANY, u"Dataset shape:", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText10 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Dataset shape:", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText10.Wrap( -1 )
 
 		settingsSizer.Add( self.m_staticText10, 0, wx.ALL, 5 )
 
-		self.label_shape = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.label_shape = wx.StaticText( self.scrolled_window, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.label_shape.Wrap( -1 )
 
 		settingsSizer.Add( self.label_shape, 0, wx.ALL, 5 )
 
-		self.m_staticText19 = wx.StaticText( self, wx.ID_ANY, u"Select signal:", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText19 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Select signal:", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText19.Wrap( -1 )
 
 		settingsSizer.Add( self.m_staticText19, 0, wx.ALL, 5 )
 
 		ch_signalChoices = []
-		self.ch_signal = wx.Choice( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, ch_signalChoices, 0 )
+		self.ch_signal = wx.Choice( self.scrolled_window, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, ch_signalChoices, 0 )
 		self.ch_signal.SetSelection( 0 )
 		settingsSizer.Add( self.ch_signal, 0, wx.ALL, 5 )
 
-		self.m_staticText1 = wx.StaticText( self, wx.ID_ANY, u"Window Size:", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText1 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Window Size:", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText1.Wrap( -1 )
 
 		settingsSizer.Add( self.m_staticText1, 0, wx.ALL, 5 )
 
-		self.spn_window_size = wx.SpinCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 0, 10, 2 )
+		self.spn_window_size = wx.SpinCtrl( self.scrolled_window, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 0, 10, 2 )
 		settingsSizer.Add( self.spn_window_size, 0, wx.ALL, 5 )
 
-		self.m_staticText2 = wx.StaticText( self, wx.ID_ANY, u"Overlap Pct:", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText2 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Overlap Pct:", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText2.Wrap( -1 )
 
 		settingsSizer.Add( self.m_staticText2, 0, wx.ALL, 5 )
 
-		self.sl_overlap = wx.Slider( self, wx.ID_ANY, 50, 0, 100, wx.DefaultPosition, wx.DefaultSize, wx.SL_HORIZONTAL|wx.SL_VALUE_LABEL )
+		self.sl_overlap = wx.Slider( self.scrolled_window, wx.ID_ANY, 50, 0, 100, wx.DefaultPosition, wx.DefaultSize, wx.SL_HORIZONTAL|wx.SL_VALUE_LABEL )
 		settingsSizer.Add( self.sl_overlap, 0, wx.ALL, 5 )
 
-		self.label_which = wx.StaticText( self, wx.ID_ANY, u"Which window:", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.label_which = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Which window:", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.label_which.Wrap( -1 )
 
 		settingsSizer.Add( self.label_which, 0, wx.ALL, 5 )
 
-		self.sl_which_window = wx.Slider( self, wx.ID_ANY, 50, 0, 100, wx.DefaultPosition, wx.DefaultSize, wx.SL_HORIZONTAL|wx.SL_VALUE_LABEL )
+		self.sl_which_window = wx.Slider( self.scrolled_window, wx.ID_ANY, 50, 0, 100, wx.DefaultPosition, wx.DefaultSize, wx.SL_HORIZONTAL|wx.SL_VALUE_LABEL )
 		settingsSizer.Add( self.sl_which_window, 0, wx.ALL, 5 )
 
-		self.chx_entropy = wx.CheckBox( self, wx.ID_ANY, u"Pers. Entropy", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.chx_entropy = wx.CheckBox( self.scrolled_window, wx.ID_ANY, u"Pers. Entropy", wx.DefaultPosition, wx.DefaultSize, 0 )
 		settingsSizer.Add( self.chx_entropy, 0, wx.ALL, 5 )
 
 		ch_pe_signalChoices = []
-		self.ch_pe_signal = wx.Choice( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, ch_pe_signalChoices, 0 )
+		self.ch_pe_signal = wx.Choice( self.scrolled_window, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, ch_pe_signalChoices, 0 )
 		self.ch_pe_signal.SetSelection( 0 )
 		self.ch_pe_signal.Hide()
 
 		settingsSizer.Add( self.ch_pe_signal, 0, wx.ALL, 5 )
 
-		self.btn_execute = wx.Button( self, wx.ID_ANY, u"Execute", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.btn_execute = wx.Button( self.scrolled_window, wx.ID_ANY, u"Execute", wx.DefaultPosition, wx.DefaultSize, 0 )
 		settingsSizer.Add( self.btn_execute, 0, wx.ALL, 5 )
 
-		self.btn_close = wx.Button( self, wx.ID_ANY, u"Close Tab", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.btn_close = wx.Button( self.scrolled_window, wx.ID_ANY, u"Close Tab", wx.DefaultPosition, wx.DefaultSize, 0 )
 		settingsSizer.Add( self.btn_close, 0, wx.ALL, 5 )
 
 
-		mainSizer.Add( settingsSizer, 1, wx.EXPAND, 5 )
+		scrolled_sizer.Add( settingsSizer, 1, wx.EXPAND, 5 )
+
+
+		self.scrolled_window.SetSizer( scrolled_sizer )
+		self.scrolled_window.Layout()
+		scrolled_sizer.Fit( self.scrolled_window )
+		mainSizer.Add( self.scrolled_window, 1, wx.EXPAND |wx.ALL, 5 )
 
 
 		self.SetSizer( mainSizer )

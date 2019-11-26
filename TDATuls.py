@@ -139,6 +139,9 @@ def doRipsFiltration(X, maxHomDim, distance_matrix=False, metric='euclidean'):
         dgms = ripser(X,maxdim = maxHomDim,distance_matrix=False)["dgms"]
     return dgms
 
+#def doWindowedRipsFiltration(X, maxHomDim, distance_matrix=False, metric='euclidean'):
+
+
 def doLowerStarFiltration(x):
     N = x.shape[0]
     I = np.arange(N-1)

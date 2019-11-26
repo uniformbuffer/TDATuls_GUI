@@ -13,7 +13,7 @@ from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigureCanvas
 from matplotlib.backends.backend_wx import NavigationToolbar2Wx as NavigationToolbar
 from matplotlib.figure import Figure
 
-from TDATuls import signal_window, doLowerStarFiltration, persentropy
+from TDATuls import signal_window,matrix_window, doRipsFiltration, doLowerStarFiltration, persentropy
 from persim import plot_diagrams
 from noname import MainFrame, PanelLowerStar, PanelRipser
 
@@ -295,17 +295,16 @@ class AppPanelLowerStar(PanelLowerStar):
 		# Create the canvas in the upper part of the sizer
 		self.figure = Figure()
 		self.axes = self.figure.add_subplot(111)
-		self.canvas = FigureCanvas(self, -1, self.figure)
+		self.canvas = FigureCanvas(self.scrolled_window, -1, self.figure)
 		self.toolbar = NavigationToolbar(self.canvas)
 		self.toolbar.Realize()
 
-		mainSizer = self.GetSizer()
+		scrolled_sizer = self.scrolled_window.GetSizer()
 		# First child is canvasSizer, the second is settingsSizer
-		canvasSizer = mainSizer.GetChildren()[0].GetSizer()
+		canvasSizer = scrolled_sizer.GetChildren()[0].GetSizer()
 		mainCanvasSizer = canvasSizer.GetChildren()[0].GetSizer()
 		mainCanvasSizer.Add(self.canvas, 1, wx.ALL)
 		mainCanvasSizer.Add(self.toolbar, 0, wx.LEFT | wx.EXPAND)
-		self.SetSizer(mainSizer)
 
 	def onExecuteButtonClick(self, event):
 		self.Pers = []
@@ -411,8 +410,6 @@ class AppPanelRipser(PanelRipser):
 		#self.SetSizer(mainSizer)
 
 	def onExecuteButtonClick(self, event):
-		X = self.dataDict["data"]
-		doRipsFiltration(X,self.max_hom_dim, self.distance_matrix, self.metric)
 		self.Pers = []
 		self.NormPers = []
 		self.Diags = []
@@ -420,25 +417,24 @@ class AppPanelRipser(PanelRipser):
 		overlap_pct = self.sl_overlap.GetValue()/100 # between 0 and 1
 		overlap = int(floor(windowSize * overlap_pct))
 		# Devo scegliere su quale segnale fare la finestra tramite un controllo
-		signal = self.ch_signal.GetSelection()
-		print(signal)
-		print(self.dataDict["data"][signal])
+		#signal = self.ch_signal.GetSelection()
+		#print(signal)
+		print(self.dataDict["data"])
 		print(overlap)
-		if signal != wx.NOT_FOUND:
-			W = signal_window(self.dataDict["data"][signal],windowSize,overlap)
-			print(len(W))
-			for w in W:
-				lsf_dgm0 = doLowerStarFiltration(w)
-				# Prepare the diagram for computing PE
-				L = []
-				L.append(lsf_dgm0)
-				dmg = np.array(L)
-				# Diagram ready
-				ent = persentropy(lsf_dgm0)[0]
-				pent = persentropy(dmg,normalize=True)[0]
-				self.Diags.append(dmg)
-				self.Pers.append(ent)
-				self.Norm_Pers.append(pent)
+		W = matrix_window(self.dataDict["data"],windowSize,overlap)
+		print(len(W))
+		for w in W:
+			lsf_dgm0 = doRipsFiltration(w,self.max_hom_dim, self.distance_matrix, self.metric)
+			# Prepare the diagram for computing PE
+			L = []
+			L.append(lsf_dgm0)
+			dmg = np.array(L)
+			# Diagram ready
+			ent = persentropy(lsf_dgm0)[0]
+			pent = persentropy(dmg,normalize=True)[0]
+			self.Diags.append(dmg)
+			self.Pers.append(ent)
+			self.Norm_Pers.append(pent)
 		which_one = self.sl_which_window.GetValue()
 		self.axes.plot(np.arange(windowSize-1),self.NormPers)
 		self.canvas.draw()
