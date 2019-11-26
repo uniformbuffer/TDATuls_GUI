@@ -372,7 +372,6 @@ class AppPanelLowerStar(PanelLowerStar):
 class AppPanelRipser(PanelRipser):
 	def __init__(self, parent):
 		PanelRipser.__init__(self, parent=parent)
-		self.scrolled_window = self.GetSizer().GetChildren()[0].GetWindow()
 		self.parent = parent # parent is notebook whose parent is frame
 		self.dataDict = None
 		self.metric = self.ch_metric.GetString(self.ch_metric.GetCurrentSelection())
@@ -401,16 +400,15 @@ class AppPanelRipser(PanelRipser):
 		self.toolbar = NavigationToolbar(self.canvas)
 		self.toolbar.Realize()
 
-		mainSizer = self.GetSizer()
+		#mainSizer = self.GetSizer()
 		scrolled_sizer = self.scrolled_window.GetSizer()
-		#print(scrolled_sizer)
 		# First child is canvasSizer, the second is settingsSizer
 		canvasSizer = scrolled_sizer.GetChildren()[0].GetSizer()
 		mainCanvasSizer = canvasSizer.GetChildren()[0].GetSizer()
 		mainCanvasSizer.Add(self.canvas, 1, wx.ALL)
 		mainCanvasSizer.Add(self.toolbar, 0, wx.LEFT | wx.EXPAND)
-		self.SetSizer(mainSizer)
-		self.Layout()
+		self.scrolled_window.Layout()
+		#self.SetSizer(mainSizer)
 
 	def onExecuteButtonClick(self, event):
 		X = self.dataDict["data"]

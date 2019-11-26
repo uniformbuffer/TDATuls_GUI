@@ -239,11 +239,9 @@ class PanelRipser ( wx.Panel ):
 	def __init__( self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( 500,340 ), style = wx.TAB_TRAVERSAL|wx.VSCROLL, name = wx.EmptyString ):
 		wx.Panel.__init__ ( self, parent, id = id, pos = pos, size = size, style = style, name = name )
 
-		mainSizer = wx.FlexGridSizer( 3, 1, 0, 0 )
-		mainSizer.SetFlexibleDirection( wx.BOTH )
-		mainSizer.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		mainSizer = wx.BoxSizer( wx.VERTICAL )
 
-		self.scrolled_window = wx.ScrolledWindow( self, wx.ID_ANY, wx.DefaultPosition, wx.Size( 1000,500 ), wx.VSCROLL )
+		self.scrolled_window = wx.ScrolledWindow( self, wx.ID_ANY, wx.DefaultPosition, wx.Size( -1,-1 ), wx.VSCROLL )
 		self.scrolled_window.SetScrollRate( 5, 5 )
 		scrolled_sizer = wx.FlexGridSizer( 2, 1, 0, 0 )
 		scrolled_sizer.SetFlexibleDirection( wx.BOTH )
@@ -349,6 +347,7 @@ class PanelRipser ( wx.Panel ):
 
 		self.scrolled_window.SetSizer( scrolled_sizer )
 		self.scrolled_window.Layout()
+		scrolled_sizer.Fit( self.scrolled_window )
 		mainSizer.Add( self.scrolled_window, 1, wx.EXPAND |wx.ALL, 5 )
 
 
