@@ -283,6 +283,27 @@ class PanelRipser ( wx.Panel ):
 
 		settingsSizer.Add( self.m_staticText12, 0, wx.ALL, 5 )
 
+		self.m_staticText34 = wx.StaticText( self.scrolled_window, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText34.Wrap( -1 )
+
+		settingsSizer.Add( self.m_staticText34, 0, wx.ALL, 5 )
+
+		self.m_staticText33 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Window Size:", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText33.Wrap( -1 )
+
+		settingsSizer.Add( self.m_staticText33, 0, wx.ALL, 5 )
+
+		self.window_size_slider = wx.Slider( self.scrolled_window, wx.ID_ANY, 50, 0, 100, wx.DefaultPosition, wx.Size( 200,-1 ), wx.SL_HORIZONTAL|wx.SL_VALUE_LABEL )
+		settingsSizer.Add( self.window_size_slider, 0, wx.ALL, 5 )
+
+		self.m_staticText35 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Overlap:", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText35.Wrap( -1 )
+
+		settingsSizer.Add( self.m_staticText35, 0, wx.ALL, 5 )
+
+		self.overlap_slider = wx.Slider( self.scrolled_window, wx.ID_ANY, 0, 0, 100, wx.DefaultPosition, wx.Size( 200,-1 ), wx.SL_HORIZONTAL|wx.SL_VALUE_LABEL )
+		settingsSizer.Add( self.overlap_slider, 0, wx.ALL, 5 )
+
 		self.label_shape = wx.StaticText( self.scrolled_window, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.label_shape.Wrap( -1 )
 

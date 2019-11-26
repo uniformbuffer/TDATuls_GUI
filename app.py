@@ -376,6 +376,9 @@ class AppPanelRipser(PanelRipser):
 		self.metric = self.ch_metric.GetString(self.ch_metric.GetCurrentSelection())
 		self.distance_matrix = self.chx_distance_matrix.IsChecked()
 		self.max_hom_dim = self.spn_max_hom_dim.GetValue()
+		self.window_size_slider.SetMaxValue()
+		self.window_size = self.window_size_slider.GetValue()
+		self.overlap = self.overlap_slider.GetValue()
 
 		# Execute button
 		self.btn_execute.Bind(wx.EVT_BUTTON,self.onExecuteButtonClick)
@@ -384,9 +387,9 @@ class AppPanelRipser(PanelRipser):
 		# Entropy box
 		self.chx_entropy.Bind(wx.EVT_CHECKBOX,self.onEntropyCheck)
 		# Overlap slider
-		self.sl_overlap.Bind(wx.EVT_SCROLL,self.onPctSliderChange)
+		self.overlap_slider.Bind(wx.EVT_SCROLL,self.onOverlapSliderChange)
 		# SpinCtrl window size
-		self.spn_window_size.Bind(wx.EVT_SPINCTRL,self.onWindowSizeChange)
+		self.window_size_slider.Bind(wx.EVT_SCROLL,self.onWindowSizeSliderChange)
 		# Choice for selecting the signal
 		self.ch_metric.Bind(wx.EVT_CHOICE,self.onMetricSelectionChange)
 		self.chx_distance_matrix.Bind(wx.EVT_CHECKBOX,self.onDistanceMatrixCheck)
@@ -456,10 +459,13 @@ class AppPanelRipser(PanelRipser):
 		self.distance_matrix = self.chx_distance_matrix.IsChecked()
 	def onMaxHomDimChange(self,event):
 		self.max_hom_dim = self.spn_max_hom_dim.GetValue()
-	def onPctSliderChange(self,event):
-		pass
-	def onWindowSizeChange(self, event):
-		pass
+	def onOverlapSliderChange(self,event):
+		self.overlap = self.overlap_slider.GetValue()
+
+	def onWindowSizeSliderChange(self, event):
+		self.window_size = self.window_size_slider.GetValue()
+		self.overlap_slider.SetMaxValue(self.window_size)
+
 	def onMetricSelectionChange(self, event):
 		self.metric = self.ch_metric.GetString(self.ch_metric.GetCurrentSelection())
 		pass
