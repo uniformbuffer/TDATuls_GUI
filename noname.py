@@ -136,7 +136,7 @@ class PanelLowerStar ( wx.Panel ):
 
 		mainSizer = wx.BoxSizer( wx.VERTICAL )
 
-		self.scrolled_window = wx.ScrolledWindow( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.HSCROLL|wx.VSCROLL )
+		self.scrolled_window = wx.ScrolledWindow( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.VSCROLL )
 		self.scrolled_window.SetScrollRate( 5, 5 )
 		scrolled_sizer = wx.FlexGridSizer( 2, 1, 30, 30 )
 		scrolled_sizer.SetFlexibleDirection( wx.BOTH )
@@ -293,7 +293,7 @@ class PanelRipser ( wx.Panel ):
 
 		settingsSizer.Add( self.m_staticText3, 0, wx.ALL, 5 )
 
-		self.spn_window_size = wx.SpinCtrl( self.scrolled_window, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 0, 10, 0 )
+		self.spn_window_size = wx.SpinCtrl( self.scrolled_window, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 0, 0, 0 )
 		settingsSizer.Add( self.spn_window_size, 0, wx.ALL, 5 )
 
 		self.m_staticText4 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Overalp Pct", wx.DefaultPosition, wx.DefaultSize, 0 )

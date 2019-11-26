@@ -13,7 +13,7 @@ from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigureCanvas
 from matplotlib.backends.backend_wx import NavigationToolbar2Wx as NavigationToolbar
 from matplotlib.figure import Figure
 
-from TDATuls import signal_window,matrix_window, doRipsFiltration, doLowerStarFiltration, persentropy
+from TDATuls import signal_window,matrix_window, doRipsFiltration,doWindowedRipsFiltration, doLowerStarFiltration, persentropy
 from persim import plot_diagrams
 from noname import MainFrame, PanelLowerStar, PanelRipser
 
@@ -315,7 +315,7 @@ class AppPanelLowerStar(PanelLowerStar):
 		overlap = int(floor(windowSize * overlap_pct))
 		# Devo scegliere su quale segnale fare la finestra tramite un controllo
 		signal = self.ch_signal.GetSelection()
-		print(signal)
+		#print(signal)(self.dataDict["data"]
 		print(self.dataDict["data"][signal])
 		print(overlap)
 		if signal != wx.NOT_FOUND:
@@ -397,6 +397,8 @@ class AppPanelRipser(PanelRipser):
 		self.axes = self.figure.add_subplot(111)
 		self.canvas = FigureCanvas(self.scrolled_window, -1, self.figure)
 		self.toolbar = NavigationToolbar(self.canvas)
+		self.figure_list = wx.Choice(self.toolbar, -1, (85, 18))
+		self.toolbar.AddControl(self.figure_list,"figure_list")
 		self.toolbar.Realize()
 
 		#mainSizer = self.GetSizer()
@@ -410,33 +412,21 @@ class AppPanelRipser(PanelRipser):
 		#self.SetSizer(mainSizer)
 
 	def onExecuteButtonClick(self, event):
-		self.Pers = []
-		self.NormPers = []
-		self.Diags = []
+
+		#self.Pers = []
+		#self.NormPers = []
+		#self.Diags = []
 		windowSize = self.spn_window_size.GetValue()
 		overlap_pct = self.sl_overlap.GetValue()/100 # between 0 and 1
 		overlap = int(floor(windowSize * overlap_pct))
-		# Devo scegliere su quale segnale fare la finestra tramite un controllo
-		#signal = self.ch_signal.GetSelection()
-		#print(signal)
-		print(self.dataDict["data"])
-		print(overlap)
-		W = matrix_window(self.dataDict["data"],windowSize,overlap)
-		print(len(W))
-		for w in W:
-			lsf_dgm0 = doRipsFiltration(w,self.max_hom_dim, self.distance_matrix, self.metric)
-			# Prepare the diagram for computing PE
-			L = []
-			L.append(lsf_dgm0)
-			dmg = np.array(L)
-			# Diagram ready
-			ent = persentropy(lsf_dgm0)[0]
-			pent = persentropy(dmg,normalize=True)[0]
-			self.Diags.append(dmg)
-			self.Pers.append(ent)
-			self.Norm_Pers.append(pent)
-		which_one = self.sl_which_window.GetValue()
-		self.axes.plot(np.arange(windowSize-1),self.NormPers)
+
+		plots = doWindowedRipsFiltration(self.dataDict["data"],windowSize,overlap,self.max_hom_dim,self.distance_matrix,self.metric)
+		print(plots)
+		for key in plots:
+			self.axes.plot(plots[key])
+
+		self.figure_list.SetItems(list(plots))
+		self.figure_list.SetSelection(0)
 		self.canvas.draw()
 	def onCloseButtonClick(self, event):
 		index = self.parent.GetSelection()
