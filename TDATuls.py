@@ -280,3 +280,15 @@ def persentropy(dgms, normalize=False):
         else:
             result.append(-ret)
     return np.array(result)
+
+def calculate_windows(size,overlap,limit):
+	advancement = size - overlap
+	i = 0
+	res = []
+	while i <= (limit-size):
+		res += [range(i,(i+size))]
+		i += advancement
+
+	if i < limit:
+		res += [range(i,limit)]
+	return res

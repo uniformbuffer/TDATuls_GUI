@@ -13,7 +13,7 @@ from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigureCanvas
 from matplotlib.backends.backend_wx import NavigationToolbar2Wx as NavigationToolbar
 from matplotlib.figure import Figure
 
-from TDATuls import signal_window,matrix_window, doRipsFiltration,doWindowedRipsFiltration, doLowerStarFiltration, persentropy
+from TDATuls import *
 from persim import plot_diagrams
 from noname import MainFrame, PanelLowerStar, PanelRipser
 
@@ -376,7 +376,7 @@ class AppPanelRipser(PanelRipser):
 		self.metric = self.ch_metric.GetString(self.ch_metric.GetCurrentSelection())
 		self.distance_matrix = self.chx_distance_matrix.IsChecked()
 		self.max_hom_dim = self.spn_max_hom_dim.GetValue()
-		self.window_size_slider.SetMaxValue()
+		#self.window_size_slider.SetMaxValue()
 		self.window_size = self.window_size_slider.GetValue()
 		self.overlap = self.overlap_slider.GetValue()
 
@@ -415,20 +415,19 @@ class AppPanelRipser(PanelRipser):
 		#self.SetSizer(mainSizer)
 
 	def onExecuteButtonClick(self, event):
+		windows = calculate_windows(self.window_size,self.overlap,len(self.dataDict["data"]))
+		#windows = matrix_window(self.dataDict["data"],self.window_size,self.window_size-self.overlap)
+		diagrams = {}
+		i = 0
+		for window in windows:
+			dgms = doRipsFiltration(self.dataDict["data"][window],self.max_hom_dim,self.distance_matrix,self.metric)
+			diagrams['window'+str(i)] = dgms
+			i+=1
 
-		#self.Pers = []
-		#self.NormPers = []
-		#self.Diags = []
-		windowSize = self.spn_window_size.GetValue()
-		overlap_pct = self.sl_overlap.GetValue()/100 # between 0 and 1
-		overlap = int(floor(windowSize * overlap_pct))
+		for key in diagrams:
+			print(plot_diagrams(diagrams[key]['dgms']))
 
-		plots = doWindowedRipsFiltration(self.dataDict["data"],windowSize,overlap,self.max_hom_dim,self.distance_matrix,self.metric)
-		print(plots)
-		for key in plots:
-			self.axes.plot(plots[key])
-
-		self.figure_list.SetItems(list(plots))
+		self.figure_list.SetItems(list(diagrams))
 		self.figure_list.SetSelection(0)
 		self.canvas.draw()
 	def onCloseButtonClick(self, event):
