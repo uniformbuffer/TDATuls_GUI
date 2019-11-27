@@ -140,15 +140,15 @@ class AppPageMenuItem(wx.MenuItem):
 				d = dic
 				break
 		# create the notebook page corresponding to the chosen dataset
-		page = AppPanelRipser(self.parent.Window.notebook)
-		page.dataDict = d
+		page = AppPanelRipser(self.parent.Window.notebook,d['data'])
+
 		# label display the shape of the dataset
-		page.label_shape.SetLabel(d["shape"])
+
 		# Max window size is the max value of the columns of the dataset
-		maxval = int(str(d["shape"]).split(',')[1].strip(')'))
-		page.spn_window_size.SetRange(1,maxval)
+		#maxval = int(str(d["shape"]).split(',')[1].strip(')'))
+		#page.spn_window_size.SetRange(1,maxval)
 		# Overlap can vary between no overlap (subsequent) or complete overlap (one window on top of the other)
-		page.sl_overlap.SetRange(0,100)
+		#page.sl_overlap.SetRange(0,100)
 
 		self.parent.Window.notebook.AddPage(page,'Ripser on ' + d["path"])
 		print("Ripser tab created")
@@ -274,10 +274,10 @@ class AppFrame(MainFrame):
 	# The change here requires to select on which data to perform the filtration
 # Now we override the behaviour of the Panel page for lower star filtration
 class AppPanelLowerStar(PanelLowerStar):
-	def __init__(self, parent):
+	def __init__(self, parent,data):
 		PanelLowerStar.__init__(self, parent=parent)
 		self.parent = parent # parent is notebook whose parent is frame
-		self.dataDict = None
+		self.data = data
 
 		# Execute button
 		self.btn_execute.Bind(wx.EVT_BUTTON,self.onExecuteButtonClick)
@@ -369,17 +369,20 @@ class AppPanelLowerStar(PanelLowerStar):
 
 
 class AppPanelRipser(PanelRipser):
-	def __init__(self, parent):
+	def __init__(self, parent,data):
 		PanelRipser.__init__(self, parent=parent)
 		self.parent = parent # parent is notebook whose parent is frame
-		self.dataDict = None
+		self.data = data
+		self.diagrams = {}
 		self.metric = self.ch_metric.GetString(self.ch_metric.GetCurrentSelection())
 		self.distance_matrix = self.chx_distance_matrix.IsChecked()
 		self.max_hom_dim = self.spn_max_hom_dim.GetValue()
-		#self.window_size_slider.SetMaxValue()
+		self.window_size_slider.SetMax(self.data.shape[0])
 		self.window_size = self.window_size_slider.GetValue()
 		self.overlap = self.overlap_slider.GetValue()
 
+
+		self.label_shape.SetLabel(str(self.data.shape))
 		# Execute button
 		self.btn_execute.Bind(wx.EVT_BUTTON,self.onExecuteButtonClick)
 		# Close button
@@ -394,40 +397,43 @@ class AppPanelRipser(PanelRipser):
 		self.ch_metric.Bind(wx.EVT_CHOICE,self.onMetricSelectionChange)
 		self.chx_distance_matrix.Bind(wx.EVT_CHECKBOX,self.onDistanceMatrixCheck)
 		self.spn_max_hom_dim.Bind(wx.EVT_SPINCTRL,self.onMaxHomDimChange)
-		# Create the canvas in the upper part of the sizer
 
 		self.figure = Figure()
-		self.axes = self.figure.add_subplot(111)
+		#self.axes = self.figure.add_subplot(111)
 		self.canvas = FigureCanvas(self.scrolled_window, -1, self.figure)
 		self.toolbar = NavigationToolbar(self.canvas)
 		self.figure_list = wx.Choice(self.toolbar, -1, (85, 18))
+		self.figure_list.Bind(wx.EVT_CHOICE,self.onFigureChange)
 		self.toolbar.AddControl(self.figure_list,"figure_list")
 		self.toolbar.Realize()
 
-		#mainSizer = self.GetSizer()
+
+
+		# Create the canvas in the upper part of the sizer
+
+
+
 		scrolled_sizer = self.scrolled_window.GetSizer()
 		# First child is canvasSizer, the second is settingsSizer
 		canvasSizer = scrolled_sizer.GetChildren()[0].GetSizer()
 		mainCanvasSizer = canvasSizer.GetChildren()[0].GetSizer()
 		mainCanvasSizer.Add(self.canvas, 1, wx.ALL)
 		mainCanvasSizer.Add(self.toolbar, 0, wx.LEFT | wx.EXPAND)
-		self.scrolled_window.Layout()
-		#self.SetSizer(mainSizer)
 
 	def onExecuteButtonClick(self, event):
-		windows = calculate_windows(self.window_size,self.overlap,len(self.dataDict["data"]))
-		#windows = matrix_window(self.dataDict["data"],self.window_size,self.window_size-self.overlap)
+		windows = calculate_windows(self.window_size,self.overlap,self.data.shape[0])
 		diagrams = {}
 		i = 0
 		for window in windows:
-			dgms = doRipsFiltration(self.dataDict["data"][window],self.max_hom_dim,self.distance_matrix,self.metric)
-			diagrams['window'+str(i)] = dgms
+			dgms = doRipsFiltration(self.data[window],self.max_hom_dim,self.distance_matrix,self.metric)['dgms']
+			figure = plt.figure()
+			plt.figure(figure.number)
+			plot_diagrams(dgms)
+			diagrams['window'+str(i)] = figure.number
 			i+=1
 
-		for key in diagrams:
-			print(plot_diagrams(diagrams[key]['dgms']))
-
-		self.figure_list.SetItems(list(diagrams))
+		self.diagrams = diagrams
+		self.figure_list.SetItems(list(self.diagrams))
 		self.figure_list.SetSelection(0)
 		self.canvas.draw()
 	def onCloseButtonClick(self, event):
@@ -463,8 +469,14 @@ class AppPanelRipser(PanelRipser):
 
 	def onWindowSizeSliderChange(self, event):
 		self.window_size = self.window_size_slider.GetValue()
-		self.overlap_slider.SetMaxValue(self.window_size)
+		self.overlap_slider.SetMax(self.window_size)
 
 	def onMetricSelectionChange(self, event):
 		self.metric = self.ch_metric.GetString(self.ch_metric.GetCurrentSelection())
 		pass
+
+	def onFigureChange(self, event):
+		axes = self.diagrams[self.figure_list.GetString(self.figure_list.GetCurrentSelection())]
+		print(axes)
+		self.figure.set_canvas(axes)
+		self.canvas.draw()

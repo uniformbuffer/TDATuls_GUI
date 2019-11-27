@@ -283,17 +283,17 @@ class PanelRipser ( wx.Panel ):
 
 		settingsSizer.Add( self.m_staticText12, 0, wx.ALL, 5 )
 
-		self.m_staticText34 = wx.StaticText( self.scrolled_window, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_staticText34.Wrap( -1 )
+		self.label_shape = wx.StaticText( self.scrolled_window, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.label_shape.Wrap( -1 )
 
-		settingsSizer.Add( self.m_staticText34, 0, wx.ALL, 5 )
+		settingsSizer.Add( self.label_shape, 0, wx.ALL, 5 )
 
 		self.m_staticText33 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Window Size:", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText33.Wrap( -1 )
 
 		settingsSizer.Add( self.m_staticText33, 0, wx.ALL, 5 )
 
-		self.window_size_slider = wx.Slider( self.scrolled_window, wx.ID_ANY, 50, 0, 100, wx.DefaultPosition, wx.Size( 200,-1 ), wx.SL_HORIZONTAL|wx.SL_VALUE_LABEL )
+		self.window_size_slider = wx.Slider( self.scrolled_window, wx.ID_ANY, 50, 1, 100, wx.DefaultPosition, wx.Size( 200,-1 ), wx.SL_HORIZONTAL|wx.SL_VALUE_LABEL )
 		settingsSizer.Add( self.window_size_slider, 0, wx.ALL, 5 )
 
 		self.m_staticText35 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Overlap:", wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -303,27 +303,6 @@ class PanelRipser ( wx.Panel ):
 
 		self.overlap_slider = wx.Slider( self.scrolled_window, wx.ID_ANY, 0, 0, 100, wx.DefaultPosition, wx.Size( 200,-1 ), wx.SL_HORIZONTAL|wx.SL_VALUE_LABEL )
 		settingsSizer.Add( self.overlap_slider, 0, wx.ALL, 5 )
-
-		self.label_shape = wx.StaticText( self.scrolled_window, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.label_shape.Wrap( -1 )
-
-		settingsSizer.Add( self.label_shape, 0, wx.ALL, 5 )
-
-		self.m_staticText3 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Window Size:", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_staticText3.Wrap( -1 )
-
-		settingsSizer.Add( self.m_staticText3, 0, wx.ALL, 5 )
-
-		self.spn_window_size = wx.SpinCtrl( self.scrolled_window, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 0, 0, 0 )
-		settingsSizer.Add( self.spn_window_size, 0, wx.ALL, 5 )
-
-		self.m_staticText4 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Overalp Pct", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_staticText4.Wrap( -1 )
-
-		settingsSizer.Add( self.m_staticText4, 0, wx.ALL, 5 )
-
-		self.sl_overlap = wx.Slider( self.scrolled_window, wx.ID_ANY, 50, 0, 100, wx.DefaultPosition, wx.DefaultSize, wx.SL_HORIZONTAL )
-		settingsSizer.Add( self.sl_overlap, 0, wx.ALL, 5 )
 
 		self.m_staticText31 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Metric:", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText31.Wrap( -1 )
