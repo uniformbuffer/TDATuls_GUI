@@ -8,6 +8,7 @@ import numpy as np
 from numpy import arange, sin, pi, genfromtxt, floor
 import matplotlib
 matplotlib.use('WXAgg')
+from ripser import ripser
 
 from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigureCanvas
 from matplotlib.backends.backend_wx import NavigationToolbar2Wx as NavigationToolbar
@@ -398,44 +399,49 @@ class AppPanelRipser(PanelRipser):
 		self.chx_distance_matrix.Bind(wx.EVT_CHECKBOX,self.onDistanceMatrixCheck)
 		self.spn_max_hom_dim.Bind(wx.EVT_SPINCTRL,self.onMaxHomDimChange)
 
-		self.figure = Figure()
-		#self.axes = self.figure.add_subplot(111)
-		self.canvas = FigureCanvas(self.scrolled_window, -1, self.figure)
-		self.toolbar = NavigationToolbar(self.canvas)
-		self.figure_list = wx.Choice(self.toolbar, -1, (85, 18))
-		self.figure_list.Bind(wx.EVT_CHOICE,self.onFigureChange)
-		self.toolbar.AddControl(self.figure_list,"figure_list")
-		self.toolbar.Realize()
-
-
+		#figure = Figure()
+		#axes = figure.add_subplot(111)
+		#self.updateFigure(figure)
 
 		# Create the canvas in the upper part of the sizer
 
 
 
+	def updateFigure(self,figure_index):
+		self.figure = self.diagrams[list(self.diagrams)[0]]
+		self.canvas = FigureCanvas(self.scrolled_window, -1, self.figure)
+		self.toolbar = NavigationToolbar(self.canvas)
+		self.figure_list = wx.Choice(self.toolbar, -1, (85, 18))
+		self.figure_list.Bind(wx.EVT_CHOICE,self.onFigureChange)
+		self.figure_list.SetItems(list(self.diagrams))
+		self.figure_list.SetSelection(figure_index)
+		self.toolbar.AddControl(self.figure_list,"figure_list")
+		self.toolbar.Realize()
 		scrolled_sizer = self.scrolled_window.GetSizer()
 		# First child is canvasSizer, the second is settingsSizer
 		canvasSizer = scrolled_sizer.GetChildren()[0].GetSizer()
 		mainCanvasSizer = canvasSizer.GetChildren()[0].GetSizer()
+		mainCanvasSizer.Clear()
 		mainCanvasSizer.Add(self.canvas, 1, wx.ALL)
 		mainCanvasSizer.Add(self.toolbar, 0, wx.LEFT | wx.EXPAND)
-
+		self.Layout()
 	def onExecuteButtonClick(self, event):
 		windows = calculate_windows(self.window_size,self.overlap,self.data.shape[0])
 		diagrams = {}
 		i = 0
 		for window in windows:
-			dgms = doRipsFiltration(self.data[window],self.max_hom_dim,self.distance_matrix,self.metric)['dgms']
+			dgms = ripser(self.data[window])['dgms']#,self.max_hom_dim,self.distance_matrix,self.metric
 			figure = plt.figure()
 			plt.figure(figure.number)
 			plot_diagrams(dgms)
-			diagrams['window'+str(i)] = figure.number
+			diagrams['window'+str(i)] = figure
 			i+=1
 
 		self.diagrams = diagrams
-		self.figure_list.SetItems(list(self.diagrams))
-		self.figure_list.SetSelection(0)
-		self.canvas.draw()
+		#self.figure_list.SetItems(list(self.diagrams))
+		#self.figure_list.SetSelection(0)
+		self.updateFigure(0)
+
 	def onCloseButtonClick(self, event):
 		index = self.parent.GetSelection()
 		self.parent.DeletePage(index)
@@ -476,7 +482,6 @@ class AppPanelRipser(PanelRipser):
 		pass
 
 	def onFigureChange(self, event):
-		axes = self.diagrams[self.figure_list.GetString(self.figure_list.GetCurrentSelection())]
-		print(axes)
-		self.figure.set_canvas(axes)
-		self.canvas.draw()
+		figure = self.diagrams[self.figure_list.GetString(self.figure_list.GetCurrentSelection())]
+		self.updateFigure(figure)
+		
