@@ -307,6 +307,26 @@ class AppPanelLowerStar(PanelLowerStar):
 		mainCanvasSizer.Add(self.canvas, 1, wx.ALL)
 		mainCanvasSizer.Add(self.toolbar, 0, wx.LEFT | wx.EXPAND)
 
+
+	def updateFigure(self,figure_index):
+		self.figure = self.diagrams[list(self.diagrams)[0]]
+		self.canvas = FigureCanvas(self.scrolled_window, -1, self.figure)
+		self.toolbar = NavigationToolbar(self.canvas)
+		self.figure_list = wx.Choice(self.toolbar, -1, (85, 18))
+		self.figure_list.Bind(wx.EVT_CHOICE,self.onFigureChange)
+		self.figure_list.SetItems(list(self.diagrams))
+		self.figure_list.SetSelection(figure_index)
+		self.toolbar.AddControl(self.figure_list,"figure_list")
+		self.toolbar.Realize()
+		scrolled_sizer = self.scrolled_window.GetSizer()
+		# First child is canvasSizer, the second is settingsSizer
+		canvasSizer = scrolled_sizer.GetChildren()[0].GetSizer()
+		mainCanvasSizer = canvasSizer.GetChildren()[0].GetSizer()
+		mainCanvasSizer.Clear()
+		mainCanvasSizer.Add(self.canvas, 1, wx.ALL)
+		mainCanvasSizer.Add(self.toolbar, 0, wx.LEFT | wx.EXPAND)
+		self.Layout()
+
 	def onExecuteButtonClick(self, event):
 		self.Pers = []
 		self.NormPers = []
@@ -367,7 +387,9 @@ class AppPanelLowerStar(PanelLowerStar):
 		pass
 	def onSignalSelectionChange(self, event):
 		pass
-
+	def onFigureChange(self, event):
+		figure = self.diagrams[self.figure_list.GetString(self.figure_list.GetCurrentSelection())]
+		self.updateFigure(figure)
 
 class AppPanelRipser(PanelRipser):
 	def __init__(self, parent,data):
@@ -399,13 +421,6 @@ class AppPanelRipser(PanelRipser):
 		self.chx_distance_matrix.Bind(wx.EVT_CHECKBOX,self.onDistanceMatrixCheck)
 		self.spn_max_hom_dim.Bind(wx.EVT_SPINCTRL,self.onMaxHomDimChange)
 
-		#figure = Figure()
-		#axes = figure.add_subplot(111)
-		#self.updateFigure(figure)
-
-		# Create the canvas in the upper part of the sizer
-
-
 
 	def updateFigure(self,figure_index):
 		self.figure = self.diagrams[list(self.diagrams)[0]]
@@ -425,6 +440,7 @@ class AppPanelRipser(PanelRipser):
 		mainCanvasSizer.Add(self.canvas, 1, wx.ALL)
 		mainCanvasSizer.Add(self.toolbar, 0, wx.LEFT | wx.EXPAND)
 		self.Layout()
+
 	def onExecuteButtonClick(self, event):
 		windows = calculate_windows(self.window_size,self.overlap,self.data.shape[0])
 		diagrams = {}
@@ -438,8 +454,6 @@ class AppPanelRipser(PanelRipser):
 			i+=1
 
 		self.diagrams = diagrams
-		#self.figure_list.SetItems(list(self.diagrams))
-		#self.figure_list.SetSelection(0)
 		self.updateFigure(0)
 
 	def onCloseButtonClick(self, event):
