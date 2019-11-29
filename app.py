@@ -397,6 +397,9 @@ class AppPanelRipser(PanelRipser):
 		self.parent = parent # parent is notebook whose parent is frame
 		self.data = data
 		self.diagrams = {}
+		self.canvas = None
+		self.toolbar = None
+		self.figure_list = None
 		self.metric = self.ch_metric.GetString(self.ch_metric.GetCurrentSelection())
 		self.distance_matrix = self.chx_distance_matrix.IsChecked()
 		self.max_hom_dim = self.spn_max_hom_dim.GetValue()
@@ -422,9 +425,19 @@ class AppPanelRipser(PanelRipser):
 		self.spn_max_hom_dim.Bind(wx.EVT_SPINCTRL,self.onMaxHomDimChange)
 
 
+		figure = Figure()
+		figure.add_subplot(111)
+		self.diagrams['default'] = figure
+		self.updateFigure(0)
+
+
 	def updateFigure(self,figure_index):
 		self.figure = self.diagrams[list(self.diagrams)[0]]
+		if self.canvas != None:
+			self.canvas.Destroy()
 		self.canvas = FigureCanvas(self.scrolled_window, -1, self.figure)
+		if self.toolbar != None:
+			self.toolbar.Destroy()
 		self.toolbar = NavigationToolbar(self.canvas)
 		self.figure_list = wx.Choice(self.toolbar, -1, (85, 18))
 		self.figure_list.Bind(wx.EVT_CHOICE,self.onFigureChange)
