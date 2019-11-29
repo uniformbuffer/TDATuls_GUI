@@ -397,6 +397,7 @@ class AppPanelRipser(PanelRipser):
 		self.parent = parent # parent is notebook whose parent is frame
 		self.data = data
 		self.diagrams = {}
+		self.figure = None
 		self.canvas = None
 		self.toolbar = None
 		self.figure_list = None
@@ -430,15 +431,17 @@ class AppPanelRipser(PanelRipser):
 		self.diagrams['default'] = figure
 		self.updateFigure(0)
 
-
 	def updateFigure(self,figure_index):
 		self.figure = self.diagrams[list(self.diagrams)[0]]
-		if self.canvas != None:
-			self.canvas.Destroy()
+		#if self.canvas != None:
+		#	self.canvas.Destroy()
 		self.canvas = FigureCanvas(self.scrolled_window, -1, self.figure)
-		if self.toolbar != None:
-			self.toolbar.Destroy()
+		#if self.figure_list != None:
+		#	self.figure_list.Destroy()
+		#if self.toolbar != None:
+		#	self.toolbar.Destroy()
 		self.toolbar = NavigationToolbar(self.canvas)
+
 		self.figure_list = wx.Choice(self.toolbar, -1, (85, 18))
 		self.figure_list.Bind(wx.EVT_CHOICE,self.onFigureChange)
 		self.figure_list.SetItems(list(self.diagrams))
@@ -509,6 +512,5 @@ class AppPanelRipser(PanelRipser):
 		pass
 
 	def onFigureChange(self, event):
-		figure = self.diagrams[self.figure_list.GetString(self.figure_list.GetCurrentSelection())]
-		self.updateFigure(figure)
+		self.updateFigure(self.figure_list.GetCurrentSelection())
 		
