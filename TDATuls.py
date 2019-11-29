@@ -139,15 +139,6 @@ def doRipsFiltration(X, maxHomDim, distance_matrix=False, metric='euclidean'):
         dgms = ripser(X,maxdim = maxHomDim,distance_matrix=False)["dgms"]
     return dgms
 
-def doWindowedRipsFiltration(data,windowSize,overlap, maxHomDim, distance_matrix=False, metric='euclidean'):
-	windows = matrix_window(data,windowSize,overlap)
-	diagrams = []
-	for window in windows:
-		dgms = doRipsFiltration(window,maxHomDim, distance_matrix, metric)
-		diagrams.push(diagrams)
-		print(diagrams)
-	return diagrams
-
 def doLowerStarFiltration(x):
     N = x.shape[0]
     I = np.arange(N-1)

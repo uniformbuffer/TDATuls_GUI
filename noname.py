@@ -188,16 +188,16 @@ class PanelLowerStar ( wx.Panel ):
 
 		settingsSizer.Add( self.m_staticText1, 0, wx.ALL, 5 )
 
-		self.spn_window_size = wx.SpinCtrl( self.scrolled_window, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 0, 10, 2 )
-		settingsSizer.Add( self.spn_window_size, 0, wx.ALL, 5 )
+		self.window_size_slider = wx.Slider( self.scrolled_window, wx.ID_ANY, 50, 1, 100, wx.DefaultPosition, wx.Size( 200,-1 ), wx.SL_HORIZONTAL|wx.SL_VALUE_LABEL )
+		settingsSizer.Add( self.window_size_slider, 0, wx.ALL, 5 )
 
-		self.m_staticText2 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Overlap Pct:", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText2 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Overlap:", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText2.Wrap( -1 )
 
 		settingsSizer.Add( self.m_staticText2, 0, wx.ALL, 5 )
 
-		self.sl_overlap = wx.Slider( self.scrolled_window, wx.ID_ANY, 50, 0, 100, wx.DefaultPosition, wx.DefaultSize, wx.SL_HORIZONTAL|wx.SL_VALUE_LABEL )
-		settingsSizer.Add( self.sl_overlap, 0, wx.ALL, 5 )
+		self.overlap_slider = wx.Slider( self.scrolled_window, wx.ID_ANY, 0, 0, 100, wx.DefaultPosition, wx.Size( 200,-1 ), wx.SL_HORIZONTAL|wx.SL_VALUE_LABEL )
+		settingsSizer.Add( self.overlap_slider, 0, wx.ALL, 5 )
 
 		self.label_which = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Which window:", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.label_which.Wrap( -1 )
@@ -314,36 +314,21 @@ class PanelRipser ( wx.Panel ):
 		self.ch_metric.SetSelection( 0 )
 		settingsSizer.Add( self.ch_metric, 0, wx.ALL, 5 )
 
-		self.chx_distance_matrix = wx.CheckBox( self.scrolled_window, wx.ID_ANY, u"Distance Matrix", wx.DefaultPosition, wx.DefaultSize, 0 )
-		settingsSizer.Add( self.chx_distance_matrix, 0, wx.ALL, 5 )
-
-		self.label_shape1 = wx.StaticText( self.scrolled_window, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.label_shape1.Wrap( -1 )
-
-		settingsSizer.Add( self.label_shape1, 0, wx.ALL, 5 )
-
-		self.chx_entropy = wx.CheckBox( self.scrolled_window, wx.ID_ANY, u"Pers. Entropy", wx.DefaultPosition, wx.DefaultSize, 0 )
-		settingsSizer.Add( self.chx_entropy, 0, wx.ALL, 5 )
-
-		self.label_shape11 = wx.StaticText( self.scrolled_window, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.label_shape11.Wrap( -1 )
-
-		settingsSizer.Add( self.label_shape11, 0, wx.ALL, 5 )
-
 		self.m_staticText32 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Max Homology\nDimension:", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText32.Wrap( -1 )
 
 		settingsSizer.Add( self.m_staticText32, 0, wx.ALL, 5 )
 
-		self.spn_max_hom_dim = wx.SpinCtrl( self.scrolled_window, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 0, 10, 6 )
+		self.spn_max_hom_dim = wx.SpinCtrl( self.scrolled_window, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 0, 3, 0 )
 		settingsSizer.Add( self.spn_max_hom_dim, 0, wx.ALL, 5 )
 
-		ch_pe_signalChoices = []
-		self.ch_pe_signal = wx.Choice( self.scrolled_window, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, ch_pe_signalChoices, 0 )
-		self.ch_pe_signal.SetSelection( 0 )
-		self.ch_pe_signal.Hide()
+		self.chx_distance_matrix = wx.CheckBox( self.scrolled_window, wx.ID_ANY, u"Distance Matrix", wx.DefaultPosition, wx.DefaultSize, 0 )
+		settingsSizer.Add( self.chx_distance_matrix, 0, wx.ALL, 5 )
 
-		settingsSizer.Add( self.ch_pe_signal, 0, wx.ALL, 5 )
+		self.label_shape11 = wx.StaticText( self.scrolled_window, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.label_shape11.Wrap( -1 )
+
+		settingsSizer.Add( self.label_shape11, 0, wx.ALL, 5 )
 
 		self.btn_execute = wx.Button( self.scrolled_window, wx.ID_ANY, u"Execute", wx.DefaultPosition, wx.DefaultSize, 0 )
 		settingsSizer.Add( self.btn_execute, 0, wx.ALL, 5 )

@@ -117,8 +117,8 @@ class AppPageMenuItem(wx.MenuItem):
 				d = dic
 				break
 		# create the notebook page corresponding to the chosen dataset
-		page = AppPanelLowerStar(self.parent.Window.notebook)
-		page.dataDict = d
+		page = AppPanelLowerStar(self.parent.Window.notebook,d['data'])
+		'''page.dataDict = d
 		# label display the shape of the dataset
 		page.label_shape.SetLabel(d["shape"])
 		# Max window size is the max value of the columns of the dataset
@@ -128,7 +128,7 @@ class AppPageMenuItem(wx.MenuItem):
 		page.sl_overlap.SetRange(0,100)
 		# Signal choice is equal to rows in data shape
 		maxSignal = int(str(d["shape"]).split(',')[0].strip('('))
-		page.ch_signal.SetItems([str(val) for val in range(maxSignal)])
+		page.ch_signal.SetItems([str(val) for val in range(maxSignal)])'''
 
 		self.parent.Window.notebook.AddPage(page,'Lower Star on ' + d["path"])
 		print("Lower Star tab created")
@@ -279,37 +279,37 @@ class AppPanelLowerStar(PanelLowerStar):
 		PanelLowerStar.__init__(self, parent=parent)
 		self.parent = parent # parent is notebook whose parent is frame
 		self.data = data
+		self.diagrams = {}
+		self.figure = None
+		self.canvas = None
+		self.toolbar = None
+		self.figure_list = None
+
+		# Entropy check
+		self.persistent_entropy = False
+		self.chx_entropy.Bind(wx.EVT_CHECKBOX,self.onEntropyCheck)
+
 
 		# Execute button
 		self.btn_execute.Bind(wx.EVT_BUTTON,self.onExecuteButtonClick)
 		# Close button
 		self.btn_close.Bind(wx.EVT_BUTTON,self.onCloseButtonClick)
-		# Entropy box
-		self.chx_entropy.Bind(wx.EVT_CHECKBOX,self.onEntropyCheck)
+
 		# Overlap slider
-		self.sl_overlap.Bind(wx.EVT_SCROLL,self.onPctSliderChange)
+		self.overlap_slider.Bind(wx.EVT_SCROLL,self.onOverlapSliderChange)
 		# SpinCtrl window size
-		self.spn_window_size.Bind(wx.EVT_SPINCTRL,self.onWindowSizeChange)
+		self.window_size =
+		self.window_size_slider.Bind(wx.EVT_SPINCTRL,self.onWindowSizeSliderChange)
 		# Choice for selecting the signal
 		self.ch_signal.Bind(wx.EVT_CHOICE,self.onSignalSelectionChange)
 
-		# Create the canvas in the upper part of the sizer
-		self.figure = Figure()
-		self.axes = self.figure.add_subplot(111)
-		self.canvas = FigureCanvas(self.scrolled_window, -1, self.figure)
-		self.toolbar = NavigationToolbar(self.canvas)
-		self.toolbar.Realize()
-
-		scrolled_sizer = self.scrolled_window.GetSizer()
-		# First child is canvasSizer, the second is settingsSizer
-		canvasSizer = scrolled_sizer.GetChildren()[0].GetSizer()
-		mainCanvasSizer = canvasSizer.GetChildren()[0].GetSizer()
-		mainCanvasSizer.Add(self.canvas, 1, wx.ALL)
-		mainCanvasSizer.Add(self.toolbar, 0, wx.LEFT | wx.EXPAND)
-
+		figure = Figure()
+		figure.add_subplot(111)
+		self.diagrams['empty'] = figure
+		self.updateFigure(0)
 
 	def updateFigure(self,figure_index):
-		self.figure = self.diagrams[list(self.diagrams)[0]]
+		self.figure = self.diagrams[list(self.diagrams)[figure_index]]
 		self.canvas = FigureCanvas(self.scrolled_window, -1, self.figure)
 		self.toolbar = NavigationToolbar(self.canvas)
 		self.figure_list = wx.Choice(self.toolbar, -1, (85, 18))
@@ -328,6 +328,42 @@ class AppPanelLowerStar(PanelLowerStar):
 		self.Layout()
 
 	def onExecuteButtonClick(self, event):
+		windows = calculate_windows(self.window_size,self.overlap,self.data.shape[0])
+		diagrams = {}
+		i = 0
+		for window in windows:
+
+			#Lower Star Filtration
+			figure = plt.figure()
+			plt.figure(figure.number)
+			lsf_dgm0 = doLowerStarFiltration(w)
+			diagrams['window'+str(i)+': lower star filtration'] = figure
+
+
+
+			if self.persistent_entropy:
+				# Persistent Entropy
+				figure = plt.figure()
+				plt.figure(figure.number)
+				ent = persentropy(lsf_dgm0)[0]
+				diagrams['window'+str(i)+': persistent entropy'] = figure
+
+				# Normalized Persistent Entropy
+				figure = plt.figure()
+				plt.figure(figure.number)
+				pent = persentropy(dmg,normalize=True)[0]
+				diagrams['window'+str(i)+': normalized persistent entropy'] = figure
+
+
+			dgms = ripser(self.data[window])['dgms']#,self.max_hom_dim,self.distance_matrix,self.metric
+			figure = plt.figure()
+			plt.figure(figure.number)
+			plot_diagrams(dgms)
+			diagrams['window'+str(i)] = figure
+			i+=1
+
+		'''self.diagrams = diagrams
+		self.updateFigure(0)
 		self.Pers = []
 		self.NormPers = []
 		self.Diags = []
@@ -356,13 +392,14 @@ class AppPanelLowerStar(PanelLowerStar):
 				self.Norm_Pers.append(pent)
 		which_one = self.sl_which_window.GetValue()
 		self.axes.plot(np.arange(windowSize-1),self.NormPers)
-		self.canvas.draw()
+		self.canvas.draw()'''
 	def onCloseButtonClick(self, event):
 		index = self.parent.GetSelection()
 		self.parent.DeletePage(index)
 		self.parent.SendSizeEvent()
 	def onEntropyCheck(self, event):
-		mainSizer = self.GetSizer()
+		self.persistent_entropy = self.chx_entropy.IsChecked()
+		'''mainSizer = self.GetSizer()
 		# First child is canvasSizer, the second is settingsSizer
 		canvasSizer = mainSizer.GetChildren()[0].GetSizer()
 		optionalCanvasSizer = canvasSizer.GetChildren()[1].GetSizer()
@@ -380,68 +417,71 @@ class AppPanelLowerStar(PanelLowerStar):
 		else: # Check is unchecked and I need to remove the pe plot
 			# i remove them by simply destroying children of the sizer
 			optionalCanvasSizer.Clear(True)
-			optionalCanvasSizer.Layout()
-	def onPctSliderChange(self,event):
-		pass
-	def onWindowSizeChange(self, event):
-		pass
+			optionalCanvasSizer.Layout()'''
+	def onOverlapSliderChange(self,event):
+		self.overlap = self.overlap_slider.GetValue()
+
+	def onWindowSizeSliderChange(self, event):
+		self.window_size = self.window_size_slider.GetValue()
+		self.overlap_slider.SetMax(self.window_size)
+
 	def onSignalSelectionChange(self, event):
 		pass
 	def onFigureChange(self, event):
-		figure = self.diagrams[self.figure_list.GetString(self.figure_list.GetCurrentSelection())]
-		self.updateFigure(figure)
+		self.updateFigure(self.figure_list.GetCurrentSelection())
 
 class AppPanelRipser(PanelRipser):
 	def __init__(self, parent,data):
 		PanelRipser.__init__(self, parent=parent)
-		self.parent = parent # parent is notebook whose parent is frame
+
+		# Setting default parameters
+		self.parent = parent
 		self.data = data
 		self.diagrams = {}
 		self.figure = None
 		self.canvas = None
 		self.toolbar = None
 		self.figure_list = None
-		self.metric = self.ch_metric.GetString(self.ch_metric.GetCurrentSelection())
-		self.distance_matrix = self.chx_distance_matrix.IsChecked()
-		self.max_hom_dim = self.spn_max_hom_dim.GetValue()
-		self.window_size_slider.SetMax(self.data.shape[0])
-		self.window_size = self.window_size_slider.GetValue()
-		self.overlap = self.overlap_slider.GetValue()
 
-
+		# Set Label
 		self.label_shape.SetLabel(str(self.data.shape))
+
 		# Execute button
 		self.btn_execute.Bind(wx.EVT_BUTTON,self.onExecuteButtonClick)
 		# Close button
 		self.btn_close.Bind(wx.EVT_BUTTON,self.onCloseButtonClick)
-		# Entropy box
-		self.chx_entropy.Bind(wx.EVT_CHECKBOX,self.onEntropyCheck)
+
 		# Overlap slider
+		self.overlap = self.overlap_slider.GetValue()
 		self.overlap_slider.Bind(wx.EVT_SCROLL,self.onOverlapSliderChange)
+
 		# SpinCtrl window size
 		self.window_size_slider.Bind(wx.EVT_SCROLL,self.onWindowSizeSliderChange)
-		# Choice for selecting the signal
+		self.window_size_slider.SetMax(self.data.shape[0])
+		self.window_size = self.window_size_slider.GetValue()
+
+		# Choice metric
+		self.metric = self.ch_metric.GetString(self.ch_metric.GetCurrentSelection())
 		self.ch_metric.Bind(wx.EVT_CHOICE,self.onMetricSelectionChange)
+
+		# Distance Matrix Check
+		self.distance_matrix = self.chx_distance_matrix.IsChecked()
 		self.chx_distance_matrix.Bind(wx.EVT_CHECKBOX,self.onDistanceMatrixCheck)
+
+		# Set Max Homology Dimension
+		self.max_hom_dim = self.spn_max_hom_dim.GetValue()
 		self.spn_max_hom_dim.Bind(wx.EVT_SPINCTRL,self.onMaxHomDimChange)
 
 
 		figure = Figure()
 		figure.add_subplot(111)
-		self.diagrams['default'] = figure
+		self.diagrams['empty'] = figure
 		self.updateFigure(0)
 
 	def updateFigure(self,figure_index):
-		self.figure = self.diagrams[list(self.diagrams)[0]]
-		#if self.canvas != None:
-		#	self.canvas.Destroy()
+		self.figure = self.diagrams[list(self.diagrams)[figure_index]]
 		self.canvas = FigureCanvas(self.scrolled_window, -1, self.figure)
-		#if self.figure_list != None:
-		#	self.figure_list.Destroy()
-		#if self.toolbar != None:
-		#	self.toolbar.Destroy()
 		self.toolbar = NavigationToolbar(self.canvas)
-
 		self.figure_list = wx.Choice(self.toolbar, -1, (85, 18))
 		self.figure_list.Bind(wx.EVT_CHOICE,self.onFigureChange)
 		self.figure_list.SetItems(list(self.diagrams))
