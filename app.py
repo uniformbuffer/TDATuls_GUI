@@ -298,10 +298,19 @@ class AppPanelLowerStar(PanelLowerStar):
 		# Overlap slider
 		self.overlap_slider.Bind(wx.EVT_SCROLL,self.onOverlapSliderChange)
 		# SpinCtrl window size
-		self.window_size =
 		self.window_size_slider.Bind(wx.EVT_SPINCTRL,self.onWindowSizeSliderChange)
+		self.window_size_slider.SetMax(self.data.shape[0])
+		self.window_size = self.window_size_slider.GetValue()
 		# Choice for selecting the signal
 		self.ch_signal.Bind(wx.EVT_CHOICE,self.onSignalSelectionChange)
+		if self.data.dtype.names == None:
+			list = []
+			for i in range(0,self.data.shape[0]):
+				list.append(str(i))
+			self.ch_signal.SetItems(list)
+			self.ch_signal.SetSelection(0)
+		else:
+			self.ch_signal.SetItems(self.data.dtype.names)
 
 		figure = Figure()
 		figure.add_subplot(111)
@@ -455,7 +464,7 @@ class AppPanelRipser(PanelRipser):
 		self.overlap = self.overlap_slider.GetValue()
 		self.overlap_slider.Bind(wx.EVT_SCROLL,self.onOverlapSliderChange)
 
-		# SpinCtrl window size
+		# Slider window size
 		self.window_size_slider.Bind(wx.EVT_SCROLL,self.onWindowSizeSliderChange)
 		self.window_size_slider.SetMax(self.data.shape[0])
 		self.window_size = self.window_size_slider.GetValue()
@@ -471,6 +480,14 @@ class AppPanelRipser(PanelRipser):
 		# Set Max Homology Dimension
 		self.max_hom_dim = self.spn_max_hom_dim.GetValue()
 		self.spn_max_hom_dim.Bind(wx.EVT_SPINCTRL,self.onMaxHomDimChange)
+
+		# Console
+		#import curses
+		#screen = curses.initscr()
+		#window = screen.subwin(20, 20, 5, 5)
+		#window.box()
+		#screen.getch()
+		#curses.endwin()
 
 
 		figure = Figure()
