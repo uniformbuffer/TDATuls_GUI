@@ -292,15 +292,19 @@ class AppPanelLowerStar(PanelLowerStar):
 
 		# Execute button
 		self.btn_execute.Bind(wx.EVT_BUTTON,self.onExecuteButtonClick)
+
 		# Close button
 		self.btn_close.Bind(wx.EVT_BUTTON,self.onCloseButtonClick)
 
 		# Overlap slider
+		self.overlap = self.overlap_slider.GetValue()
 		self.overlap_slider.Bind(wx.EVT_SCROLL,self.onOverlapSliderChange)
+
 		# SpinCtrl window size
 		self.window_size_slider.Bind(wx.EVT_SPINCTRL,self.onWindowSizeSliderChange)
 		self.window_size_slider.SetMax(self.data.shape[0])
 		self.window_size = self.window_size_slider.GetValue()
+
 		# Choice for selecting the signal
 		self.ch_signal.Bind(wx.EVT_CHOICE,self.onSignalSelectionChange)
 		if self.data.dtype.names == None:
@@ -308,9 +312,11 @@ class AppPanelLowerStar(PanelLowerStar):
 			for i in range(0,self.data.shape[0]):
 				list.append(str(i))
 			self.ch_signal.SetItems(list)
-			self.ch_signal.SetSelection(0)
 		else:
 			self.ch_signal.SetItems(self.data.dtype.names)
+		self.ch_signal.SetSelection(0)
+		self.signal_index = self.ch_signal.GetCurrentSelection()
+
 
 		figure = Figure()
 		figure.add_subplot(111)
@@ -341,20 +347,23 @@ class AppPanelLowerStar(PanelLowerStar):
 		diagrams = {}
 		i = 0
 		for window in windows:
-
+			window = np.array(window)
 			#Lower Star Filtration
 			figure = plt.figure()
 			plt.figure(figure.number)
-			lsf_dgm0 = doLowerStarFiltration(w)
+			print(self.data[window,self.signal_index])
+			lsf_dgm0 = doLowerStarFiltration(self.data[window,self.signal_index])
+			plt.plot(lsf_dgm0)
+			print(lsf_dgm0)
 			diagrams['window'+str(i)+': lower star filtration'] = figure
-
-
 
 			if self.persistent_entropy:
 				# Persistent Entropy
 				figure = plt.figure()
 				plt.figure(figure.number)
 				ent = persentropy(lsf_dgm0)[0]
+				print(ent)
+				plt.plot(ent)
 				diagrams['window'+str(i)+': persistent entropy'] = figure
 
 				# Normalized Persistent Entropy
@@ -363,13 +372,15 @@ class AppPanelLowerStar(PanelLowerStar):
 				pent = persentropy(dmg,normalize=True)[0]
 				diagrams['window'+str(i)+': normalized persistent entropy'] = figure
 
-
-			dgms = ripser(self.data[window])['dgms']#,self.max_hom_dim,self.distance_matrix,self.metric
-			figure = plt.figure()
-			plt.figure(figure.number)
-			plot_diagrams(dgms)
-			diagrams['window'+str(i)] = figure
 			i+=1
+		self.diagrams = diagrams
+		self.updateFigure(0)
+			#dgms = ripser(self.data[window])['dgms']#,self.max_hom_dim,self.distance_matrix,self.metric
+			#figure = plt.figure()
+			#plt.figure(figure.number)
+			#plot_diagrams(dgms)
+			#diagrams['window'+str(i)] = figure
+			#i+=1
 
 		'''self.diagrams = diagrams
 		self.updateFigure(0)
@@ -435,7 +446,7 @@ class AppPanelLowerStar(PanelLowerStar):
 		self.overlap_slider.SetMax(self.window_size)
 
 	def onSignalSelectionChange(self, event):
-		pass
+		self.signal_index = self.ch_metric.GetCurrentSelection()
 	def onFigureChange(self, event):
 		self.updateFigure(self.figure_list.GetCurrentSelection())
 
