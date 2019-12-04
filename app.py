@@ -429,6 +429,8 @@ class AppPanelLowerStar(PanelLowerStar):
 		signal_index = self.ch_signal.GetCurrentSelection()
 		windows = calculate_windows(window_size,overlap,self.data.shape[0])
 		diagrams = {}
+
+		norm_pers = []
 		i = 0
 		for window in windows:
 			#Lower Star Filtration
@@ -440,26 +442,29 @@ class AppPanelLowerStar(PanelLowerStar):
 			diagrams['window'+str(i)+': lower star filtration'] = figure
 			if self.chx_entropy.IsChecked():
 				# Persistent Entropy
-				figure = plt.figure()
-				plt.figure(figure.number)
+				#figure = plt.figure()
+				#plt.figure(figure.number)
 				L = []
 				L.append(lsf_dgm0)
 				dmg = np.array(L)
 				ent = persentropy(dmg)[0]
-				print(ent)
-				plt.plot(ent)
-				diagrams['window'+str(i)+': persistent entropy'] = figure
+				#print(ent)
+				#plt.plot(ent)
+				#diagrams['window'+str(i)+': persistent entropy'] = figure
 
 				# Normalized Persistent Entropy
-				figure = plt.figure()
-				plt.figure(figure.number)
+				#figure = plt.figure()
+				#plt.figure(figure.number)
 				pent = persentropy(dmg,normalize=True)[0]
-				print(pent)
-				plt.plot(pent)
-				diagrams['window'+str(i)+': normalized persistent entropy'] = figure
-
+				norm_pers.append(pent)
+				#print(pent)
+				#plt.plot(pent)
 			i += 1
 
+		figure = plt.figure()
+		plt.figure(figure.number)
+		plt.plot(np.arange(len(windows)),norm_pers)
+		diagrams['normalized persistent entropy'] = figure
 		self.diagrams = diagrams
 		self.updateFigure(0)
 			#dgms = ripser(self.data[window])['dgms']#,self.max_hom_dim,self.distance_matrix,self.metric
