@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ###########################################################################
-## Python code generated with wxFormBuilder (version Nov 21 2019)
+## Python code generated with wxFormBuilder (version 3.9.0 Dec  2 2019)
 ## http://www.wxformbuilder.org/
 ##
 ## PLEASE DO *NOT* EDIT THIS FILE!
@@ -198,14 +198,6 @@ class PanelLowerStar ( wx.Panel ):
 
 		self.overlap_slider = wx.Slider( self.scrolled_window, wx.ID_ANY, 0, 0, 100, wx.DefaultPosition, wx.Size( 200,-1 ), wx.SL_HORIZONTAL|wx.SL_VALUE_LABEL )
 		settingsSizer.Add( self.overlap_slider, 0, wx.ALL, 5 )
-
-		self.label_which = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Which window:", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.label_which.Wrap( -1 )
-
-		settingsSizer.Add( self.label_which, 0, wx.ALL, 5 )
-
-		self.sl_which_window = wx.Slider( self.scrolled_window, wx.ID_ANY, 50, 0, 100, wx.DefaultPosition, wx.DefaultSize, wx.SL_HORIZONTAL|wx.SL_VALUE_LABEL )
-		settingsSizer.Add( self.sl_which_window, 0, wx.ALL, 5 )
 
 		self.chx_entropy = wx.CheckBox( self.scrolled_window, wx.ID_ANY, u"Pers. Entropy", wx.DefaultPosition, wx.DefaultSize, 0 )
 		settingsSizer.Add( self.chx_entropy, 0, wx.ALL, 5 )

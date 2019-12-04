@@ -27,7 +27,90 @@ def inc_id_counter():
 	ID_COUNTER += 1
 	return ID_COUNTER
 
+def try_delimiter(line,delimiter):
+    values = line.split(delimiter)
+    if len(values) > 1:
+        return True
+    else:
+        return False
+
+def try_delimiters(line):
+	delimiter = None
+	if try_delimiter(line,';'):
+		delimiter = ';'
+	if try_delimiter(line,','):
+		delimiter = ','
+	return delimiter
+
+def are_all_strings(values):
+	if values == None:
+		return False
+	all_strings = True
+	for value in values:
+		try:
+			float(value)
+			all_strings = False
+			break
+		except ValueError:
+			None
+	return all_strings
+
+def get_delimiter(line):
+	delimiter = try_delimiters(line)
+	if delimiter == None:
+		die('Unable to detect dataset delimiter: supported delimiters are "," and ";"')
+	return delimiter
+
+def try_header(line,delimiter):
+	values = line.split(delimiter)
+	if are_all_strings(values):
+		return True
+	else:
+		return False
+
+'''
+def try_header(line):
+	values = try_all_split(line)
+	if values != None:
+		all_strings = True
+		for value in values:
+			try:
+				float(value)
+				all_strings = False
+				break
+			except ValueError:
+				None
+		if all_strings:
+			return values
+		else:
+			return None
+	return None
+'''
 def importCSVFile(file):
+	first_line = file.readline()
+	file.seek(0)
+
+	delimiter = get_delimiter(first_line)
+
+	data = None
+	if try_header(first_line,delimiter):
+		data = genfromtxt(file,delimiter=delimiter,skip_header=1)
+	else:
+		data = genfromtxt(file)
+
+	dataDict = {}
+	dataDict["path"] = os.path.realpath(file.name)
+	for dic in Data:
+		if dic["path"] == dataDict["path"]: # dataset alredy loaded, so no action takes place
+			del dataDict
+			print("dataset is already loaded in TDATuls")
+			return False
+	dataDict["id"] = inc_id_counter()
+	dataDict["page_id"] = inc_id_counter()
+	dataDict["shape"] = str(data.shape)
+	dataDict["data"] = data
+	Data.append(dataDict)
+	'''
 	global Data
 	#check for file format with sniffer
 	dialect = csv.Sniffer().sniff(file.readline())
@@ -46,7 +129,7 @@ def importCSVFile(file):
 			return False
 	dataDict["id"] = inc_id_counter()
 	dataDict["page_id"] = inc_id_counter()
-	data = genfromtxt(file,delimiter=dialect.delimiter)
+	data = genfromtxt(file,delimiter=',')#
 	if csv.Sniffer().has_header(sample): #if there is a header
 		data = data[1:,]
 		dataDict["shape"] = str(data.shape)
@@ -54,7 +137,7 @@ def importCSVFile(file):
 		dataDict["shape"] = str(data.shape)
 	dataDict["data"] = data
 	Data.append(dataDict)
-
+	'''
 def openCSVFile(file,dic):
 	global Data
 	#check for file format with sniffer
@@ -285,10 +368,12 @@ class AppPanelLowerStar(PanelLowerStar):
 		self.toolbar = None
 		self.figure_list = None
 
+		# Set Label
+		self.label_shape.SetLabel(str(self.data.shape))
+
 		# Entropy check
 		self.persistent_entropy = False
 		self.chx_entropy.Bind(wx.EVT_CHECKBOX,self.onEntropyCheck)
-
 
 		# Execute button
 		self.btn_execute.Bind(wx.EVT_BUTTON,self.onExecuteButtonClick)
@@ -352,7 +437,7 @@ class AppPanelLowerStar(PanelLowerStar):
 			figure = plt.figure()
 			plt.figure(figure.number)
 			print(self.data[window,self.signal_index])
-			lsf_dgm0 = doLowerStarFiltration(self.data[window,self.signal_index])
+			lsf_dgm0 = doLowerStarFiltration(self.data[self.signal_index,window])
 			plt.plot(lsf_dgm0)
 			print(lsf_dgm0)
 			diagrams['window'+str(i)+': lower star filtration'] = figure
@@ -530,7 +615,7 @@ class AppPanelRipser(PanelRipser):
 		diagrams = {}
 		i = 0
 		for window in windows:
-			dgms = ripser(self.data[window])['dgms']#,self.max_hom_dim,self.distance_matrix,self.metric
+			dgms = doRipsFiltration(self.data[window],self.max_hom_dim,self.distance_matrix,self.metric)#['dgms']
 			figure = plt.figure()
 			plt.figure(figure.number)
 			plot_diagrams(dgms)

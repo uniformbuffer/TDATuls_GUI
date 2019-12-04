@@ -124,11 +124,10 @@ def doRipsFiltration(X, maxHomDim, distance_matrix=False, metric='euclidean'):
     '''
     dgms = None
     if(metric == 'euclidean' and distance_matrix):
-        #D = pairwise_distances(X,metric="euclidean")
         dgms = ripser(X,maxdim = maxHomDim, distance_matrix=True, metric='euclidean')["dgms"]
     elif(metric == 'euclidean' and not distance_matrix):
         D = pairwise_distances(X,metric='euclidean')
-        dgms = ripser(X,maxdim= maxHomDim, distance_matrix=True)
+        dgms = ripser(D,maxdim=maxHomDim, distance_matrix=True)["dgms"]
     elif(metric == 'minkowski'):
         D = pairwise_distances(X,metric="minkowski")
         dgms = ripser(D,maxdim = maxHomDim, distance_matrix=True)["dgms"]
