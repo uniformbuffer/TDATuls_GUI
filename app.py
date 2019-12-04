@@ -360,6 +360,7 @@ class AppFrame(MainFrame):
 class AppPanelLowerStar(PanelLowerStar):
 	def __init__(self, parent,data):
 		PanelLowerStar.__init__(self, parent=parent)
+		print('Loading lower star panel')
 		self.parent = parent # parent is notebook whose parent is frame
 		self.data = data
 		self.diagrams = {}
@@ -382,25 +383,20 @@ class AppPanelLowerStar(PanelLowerStar):
 		self.btn_close.Bind(wx.EVT_BUTTON,self.onCloseButtonClick)
 
 		# Overlap slider
-		self.overlap = self.overlap_slider.GetValue()
-		self.overlap_slider.Bind(wx.EVT_SCROLL,self.onOverlapSliderChange)
-
 		# SpinCtrl window size
 		self.window_size_slider.Bind(wx.EVT_SPINCTRL,self.onWindowSizeSliderChange)
 		self.window_size_slider.SetMax(self.data.shape[0])
 		self.window_size = self.window_size_slider.GetValue()
 
 		# Choice for selecting the signal
-		self.ch_signal.Bind(wx.EVT_CHOICE,self.onSignalSelectionChange)
 		if self.data.dtype.names == None:
 			list = []
-			for i in range(0,self.data.shape[0]):
+			for i in range(0,self.data.shape[1]):
 				list.append(str(i))
 			self.ch_signal.SetItems(list)
 		else:
 			self.ch_signal.SetItems(self.data.dtype.names)
 		self.ch_signal.SetSelection(0)
-		self.signal_index = self.ch_signal.GetCurrentSelection()
 
 
 		figure = Figure()
@@ -428,25 +424,28 @@ class AppPanelLowerStar(PanelLowerStar):
 		self.Layout()
 
 	def onExecuteButtonClick(self, event):
-		windows = calculate_windows(self.window_size,self.overlap,self.data.shape[0])
+		window_size = self.window_size_slider.GetValue()
+		overlap = self.overlap_slider.GetValue()
+		signal_index = self.ch_signal.GetCurrentSelection()
+		windows = calculate_windows(window_size,overlap,self.data.shape[0])
 		diagrams = {}
 		i = 0
 		for window in windows:
-			window = np.array(window)
 			#Lower Star Filtration
 			figure = plt.figure()
 			plt.figure(figure.number)
-			print(self.data[window,self.signal_index])
-			lsf_dgm0 = doLowerStarFiltration(self.data[self.signal_index,window])
+			lsf_dgm0 = doLowerStarFiltration(self.data[window,signal_index])
 			plt.plot(lsf_dgm0)
-			print(lsf_dgm0)
-			diagrams['window'+str(i)+': lower star filtration'] = figure
 
-			if self.persistent_entropy:
+			diagrams['window'+str(i)+': lower star filtration'] = figure
+			if self.chx_entropy.IsChecked():
 				# Persistent Entropy
 				figure = plt.figure()
 				plt.figure(figure.number)
-				ent = persentropy(lsf_dgm0)[0]
+				L = []
+				L.append(lsf_dgm0)
+				dmg = np.array(L)
+				ent = persentropy(dmg)[0]
 				print(ent)
 				plt.plot(ent)
 				diagrams['window'+str(i)+': persistent entropy'] = figure
@@ -455,9 +454,12 @@ class AppPanelLowerStar(PanelLowerStar):
 				figure = plt.figure()
 				plt.figure(figure.number)
 				pent = persentropy(dmg,normalize=True)[0]
+				print(pent)
+				plt.plot(pent)
 				diagrams['window'+str(i)+': normalized persistent entropy'] = figure
 
-			i+=1
+			i += 1
+
 		self.diagrams = diagrams
 		self.updateFigure(0)
 			#dgms = ripser(self.data[window])['dgms']#,self.max_hom_dim,self.distance_matrix,self.metric
@@ -523,15 +525,10 @@ class AppPanelLowerStar(PanelLowerStar):
 			# i remove them by simply destroying children of the sizer
 			optionalCanvasSizer.Clear(True)
 			optionalCanvasSizer.Layout()'''
-	def onOverlapSliderChange(self,event):
-		self.overlap = self.overlap_slider.GetValue()
 
 	def onWindowSizeSliderChange(self, event):
-		self.window_size = self.window_size_slider.GetValue()
 		self.overlap_slider.SetMax(self.window_size)
 
-	def onSignalSelectionChange(self, event):
-		self.signal_index = self.ch_metric.GetCurrentSelection()
 	def onFigureChange(self, event):
 		self.updateFigure(self.figure_list.GetCurrentSelection())
 
