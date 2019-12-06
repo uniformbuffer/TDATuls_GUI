@@ -421,17 +421,11 @@ class BasePanel():
 	# Now we override the behaviour of the lowerStar menu selection
 	# The change here requires to select on which data to perform the filtration
 # Now we override the behaviour of the Panel page for lower star filtration
-class AppPanelLowerStar(PanelLowerStar):
+class AppPanelLowerStar(PanelLowerStar,BasePanel):
 	def __init__(self, parent,data):
 		PanelLowerStar.__init__(self, parent=parent)
+		BasePanel.__init__(self, parent=parent, data=data)
 		print('Loading lower star panel')
-		self.parent = parent # parent is notebook whose parent is frame
-		self.data = data
-		self.diagrams = {}
-		self.figure = None
-		self.canvas = None
-		self.toolbar = None
-		self.figure_list = None
 
 		# Set Label
 		self.label_shape.SetLabel(str(self.data.shape))
@@ -461,31 +455,6 @@ class AppPanelLowerStar(PanelLowerStar):
 		else:
 			self.ch_signal.SetItems(self.data.dtype.names)
 		self.ch_signal.SetSelection(0)
-
-
-		figure = Figure()
-		figure.add_subplot(111)
-		self.diagrams['empty'] = figure
-		self.updateFigure(0)
-
-	def updateFigure(self,figure_index):
-		self.figure = self.diagrams[list(self.diagrams)[figure_index]]
-		self.canvas = FigureCanvas(self.scrolled_window, -1, self.figure)
-		self.toolbar = NavigationToolbar(self.canvas)
-		self.figure_list = wx.Choice(self.toolbar, -1, (85, 18))
-		self.figure_list.Bind(wx.EVT_CHOICE,self.onFigureChange)
-		self.figure_list.SetItems(list(self.diagrams))
-		self.figure_list.SetSelection(figure_index)
-		self.toolbar.AddControl(self.figure_list,"figure_list")
-		self.toolbar.Realize()
-		scrolled_sizer = self.scrolled_window.GetSizer()
-		# First child is canvasSizer, the second is settingsSizer
-		canvasSizer = scrolled_sizer.GetChildren()[0].GetSizer()
-		mainCanvasSizer = canvasSizer.GetChildren()[0].GetSizer()
-		mainCanvasSizer.Clear()
-		mainCanvasSizer.Add(self.canvas, 1, wx.ALL)
-		mainCanvasSizer.Add(self.toolbar, 0, wx.LEFT | wx.EXPAND)
-		self.Layout()
 
 	def onExecuteButtonClick(self, event):
 		window_size = self.window_size_slider.GetValue()
@@ -596,18 +565,10 @@ class AppPanelLowerStar(PanelLowerStar):
 	def onFigureChange(self, event):
 		self.updateFigure(self.figure_list.GetCurrentSelection())
 
-class AppPanelRipser(PanelRipser):
+class AppPanelRipser(PanelRipser,BasePanel):
 	def __init__(self, parent,data):
 		PanelRipser.__init__(self, parent=parent)
-
-		# Setting default parameters
-		self.parent = parent
-		self.data = data
-		self.diagrams = {}
-		self.figure = None
-		self.canvas = None
-		self.toolbar = None
-		self.figure_list = None
+		BasePanel.__init__(self, parent=parent, data=data)
 
 		# Set Label
 		self.label_shape.SetLabel(str(self.data.shape))
@@ -617,57 +578,9 @@ class AppPanelRipser(PanelRipser):
 		# Close button
 		self.btn_close.Bind(wx.EVT_BUTTON,self.onCloseButtonClick)
 
-		# Overlap slider
-		#self.overlap_slider.Bind(wx.EVT_SCROLL,self.onOverlapSliderChange)
-
 		# Slider window size
 		self.window_size_slider.Bind(wx.EVT_SCROLL,self.onWindowSizeSliderChange)
 		self.window_size_slider.SetMax(self.data.shape[0])
-
-		# Choice metric
-		#self.metric = self.ch_metric.GetString(self.ch_metric.GetCurrentSelection())
-		#self.ch_metric.Bind(wx.EVT_CHOICE,self.onMetricSelectionChange)
-
-		# Distance Matrix Check
-		#self.distance_matrix = self.chx_distance_matrix.IsChecked()
-		#self.chx_distance_matrix.Bind(wx.EVT_CHECKBOX,self.onDistanceMatrixCheck)
-
-		# Set Max Homology Dimension
-		#self.max_hom_dim = self.spn_max_hom_dim.GetValue()
-		#self.spn_max_hom_dim.Bind(wx.EVT_SPINCTRL,self.onMaxHomDimChange)
-
-		# Console
-		#import curses
-		#screen = curses.initscr()
-		#window = screen.subwin(20, 20, 5, 5)
-		#window.box()
-		#screen.getch()
-		#curses.endwin()
-
-
-		figure = Figure()
-		figure.add_subplot(111)
-		self.diagrams['empty'] = figure
-		self.updateFigure(0)
-
-	def updateFigure(self,figure_index):
-		self.figure = self.diagrams[list(self.diagrams)[figure_index]]
-		self.canvas = FigureCanvas(self.scrolled_window, -1, self.figure)
-		self.toolbar = NavigationToolbar(self.canvas)
-		self.figure_list = wx.Choice(self.toolbar, -1, (85, 18))
-		self.figure_list.Bind(wx.EVT_CHOICE,self.onFigureChange)
-		self.figure_list.SetItems(list(self.diagrams))
-		self.figure_list.SetSelection(figure_index)
-		self.toolbar.AddControl(self.figure_list,"figure_list")
-		self.toolbar.Realize()
-		scrolled_sizer = self.scrolled_window.GetSizer()
-		# First child is canvasSizer, the second is settingsSizer
-		canvasSizer = scrolled_sizer.GetChildren()[0].GetSizer()
-		mainCanvasSizer = canvasSizer.GetChildren()[0].GetSizer()
-		mainCanvasSizer.Clear()
-		mainCanvasSizer.Add(self.canvas, 1, wx.ALL)
-		mainCanvasSizer.Add(self.toolbar, 0, wx.LEFT | wx.EXPAND)
-		self.Layout()
 
 	def onExecuteButtonClick(self, event):
 		overlap = self.overlap_slider.GetValue()
@@ -693,26 +606,6 @@ class AppPanelRipser(PanelRipser):
 		index = self.parent.GetSelection()
 		self.parent.DeletePage(index)
 		self.parent.SendSizeEvent()
-	def onEntropyCheck(self, event):
-		mainSizer = self.GetSizer()
-		# First child is canvasSizer, the second is settingsSizer
-		canvasSizer = mainSizer.GetChildren()[0].GetSizer()
-		optionalCanvasSizer = canvasSizer.GetChildren()[1].GetSizer()
-		if self.chx_entropy.IsChecked(): # Box is checked and I need to add the pe plot
-			self.pe_Figure = Figure()
-			self.pe_axes = self.pe_Figure.add_subplot(111)
-			self.pe_canvas = FigureCanvas(self, -1, self.pe_Figure)
-			self.pe_toolbar = NavigationToolbar(self.pe_canvas)
-			self.pe_toolbar.Realize()
-
-			optionalCanvasSizer.Add(self.pe_canvas, 1, wx.ALL)
-			optionalCanvasSizer.Add(self.pe_toolbar, 0, wx.LEFT | wx.EXPAND)
-			self.SetSizer(mainSizer)
-			self.Layout() # automatically reshape the page to fit the pe plot
-		else: # Check is unchecked and I need to remove the pe plot
-			# i remove them by simply destroying children of the sizer
-			optionalCanvasSizer.Clear(True)
-			optionalCanvasSizer.Layout()
 
 	def onWindowSizeSliderChange(self, event):
 		self.overlap_slider.SetMax(self.window_size_slider.GetValue())
@@ -722,18 +615,10 @@ class AppPanelRipser(PanelRipser):
 
 
 
-class AppPanelCorrMatDist(PanelCorrMatDist):
+class AppPanelCorrMatDist(PanelCorrMatDist,BasePanel):
 	def __init__(self, parent,data):
 		PanelRipser.__init__(self, parent=parent)
-
-		# Setting default parameters
-		self.parent = parent
-		self.data = data
-		self.diagrams = {}
-		self.figure = None
-		self.canvas = None
-		self.toolbar = None
-		self.figure_list = None
+		BasePanel.__init__(self, parent=parent, data=data)
 
 		# Set Label
 		self.label_shape.SetLabel(str(self.data.shape))
@@ -743,57 +628,9 @@ class AppPanelCorrMatDist(PanelCorrMatDist):
 		# Close button
 		self.btn_close.Bind(wx.EVT_BUTTON,self.onCloseButtonClick)
 
-		# Overlap slider
-		#self.overlap_slider.Bind(wx.EVT_SCROLL,self.onOverlapSliderChange)
-
 		# Slider window size
 		self.window_size_slider.Bind(wx.EVT_SCROLL,self.onWindowSizeSliderChange)
 		self.window_size_slider.SetMax(self.data.shape[0])
-
-		# Choice metric
-		#self.metric = self.ch_metric.GetString(self.ch_metric.GetCurrentSelection())
-		#self.ch_metric.Bind(wx.EVT_CHOICE,self.onMetricSelectionChange)
-
-		# Distance Matrix Check
-		#self.distance_matrix = self.chx_distance_matrix.IsChecked()
-		#self.chx_distance_matrix.Bind(wx.EVT_CHECKBOX,self.onDistanceMatrixCheck)
-
-		# Set Max Homology Dimension
-		#self.max_hom_dim = self.spn_max_hom_dim.GetValue()
-		#self.spn_max_hom_dim.Bind(wx.EVT_SPINCTRL,self.onMaxHomDimChange)
-
-		# Console
-		#import curses
-		#screen = curses.initscr()
-		#window = screen.subwin(20, 20, 5, 5)
-		#window.box()
-		#screen.getch()
-		#curses.endwin()
-
-
-		figure = Figure()
-		figure.add_subplot(111)
-		self.diagrams['empty'] = figure
-		self.updateFigure(0)
-
-	def updateFigure(self,figure_index):
-		self.figure = self.diagrams[list(self.diagrams)[figure_index]]
-		self.canvas = FigureCanvas(self.scrolled_window, -1, self.figure)
-		self.toolbar = NavigationToolbar(self.canvas)
-		self.figure_list = wx.Choice(self.toolbar, -1, (85, 18))
-		self.figure_list.Bind(wx.EVT_CHOICE,self.onFigureChange)
-		self.figure_list.SetItems(list(self.diagrams))
-		self.figure_list.SetSelection(figure_index)
-		self.toolbar.AddControl(self.figure_list,"figure_list")
-		self.toolbar.Realize()
-		scrolled_sizer = self.scrolled_window.GetSizer()
-		# First child is canvasSizer, the second is settingsSizer
-		canvasSizer = scrolled_sizer.GetChildren()[0].GetSizer()
-		mainCanvasSizer = canvasSizer.GetChildren()[0].GetSizer()
-		mainCanvasSizer.Clear()
-		mainCanvasSizer.Add(self.canvas, 1, wx.ALL)
-		mainCanvasSizer.Add(self.toolbar, 0, wx.LEFT | wx.EXPAND)
-		self.Layout()
 
 	def onExecuteButtonClick(self, event):
 		import time
@@ -877,18 +714,10 @@ class AppPanelCorrMatDist(PanelCorrMatDist):
 		self.updateFigure(self.figure_list.GetCurrentSelection())
 		
 
-class AppPanelCorrMatHoles(PanelCorrMatHoles):
+class AppPanelCorrMatHoles(PanelCorrMatHoles,BasePanel):
 	def __init__(self, parent,data):
 		PanelRipser.__init__(self, parent=parent)
-
-		# Setting default parameters
-		self.parent = parent
-		self.data = data
-		self.diagrams = {}
-		self.figure = None
-		self.canvas = None
-		self.toolbar = None
-		self.figure_list = None
+		BasePanel.__init__(self, parent=parent, data=data)
 
 		# Set Label
 		self.label_shape.SetLabel(str(self.data.shape))
@@ -906,28 +735,6 @@ class AppPanelCorrMatHoles(PanelCorrMatHoles):
 		figure.add_subplot(111)
 		self.diagrams['empty'] = figure
 		self.updateFigure(0)
-
-	def updateFigure(self,figure_index):
-		if figure_index < 0 and figure_index > len(self.diagrams):
-			print('Error during figure update: index '+figure_index+' out of range')
-			return
-		self.figure = self.diagrams[list(self.diagrams)[figure_index]]
-		self.canvas = FigureCanvas(self.scrolled_window, -1, self.figure)
-		self.toolbar = NavigationToolbar(self.canvas)
-		self.figure_list = wx.Choice(self.toolbar, -1, (85, 18))
-		self.figure_list.Bind(wx.EVT_CHOICE,self.onFigureChange)
-		self.figure_list.SetItems(list(self.diagrams))
-		self.figure_list.SetSelection(figure_index)
-		self.toolbar.AddControl(self.figure_list,"figure_list")
-		self.toolbar.Realize()
-		scrolled_sizer = self.scrolled_window.GetSizer()
-		# First child is canvasSizer, the second is settingsSizer
-		canvasSizer = scrolled_sizer.GetChildren()[0].GetSizer()
-		mainCanvasSizer = canvasSizer.GetChildren()[0].GetSizer()
-		mainCanvasSizer.Clear()
-		mainCanvasSizer.Add(self.canvas, 1, wx.ALL)
-		mainCanvasSizer.Add(self.toolbar, 0, wx.LEFT | wx.EXPAND)
-		self.Layout()
 
 	def onExecuteButtonClick(self, event):
 		overlap = self.overlap_slider.GetValue()
