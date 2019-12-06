@@ -16,7 +16,7 @@ from matplotlib.figure import Figure
 
 from TDATuls import *
 from persim import plot_diagrams
-from noname import MainFrame, PanelLowerStar, PanelRipser
+from noname import MainFrame, PanelLowerStar, PanelRipser, PanelCorrMatDist, PanelCorrMatHoles
 
 ID_COUNTER = 2000
 Data = []
@@ -245,21 +245,30 @@ class AppPageMenuItem(wx.MenuItem):
 				d = dic
 				break
 		# create the notebook page corresponding to the chosen dataset
-		page = AppPanelRipser(self.parent.Window.notebook)
-		page.dataDict = d
+		page = AppPanelCorrMatDist(self.parent.Window.notebook,d['data'])
+		#page.dataDict = d
 		# label display the shape of the dataset
-		page.label_shape.SetLabel(d["shape"])
+		#page.label_shape.SetLabel(d["shape"])
 		# Max window size is the max value of the columns of the dataset
-		maxval = int(str(d["shape"]).split(',')[1].strip(')'))
-		page.spn_window_size.SetRange(1,maxval)
+		#maxval = int(str(d["shape"]).split(',')[1].strip(')'))
+		#page.spn_window_size.SetRange(1,maxval)
 		# Overlap can vary between no overlap (subsequent) or complete overlap (one window on top of the other)
-		page.sl_overlap.SetRange(0,100)
+		#page.sl_overlap.SetRange(0,100)
 
 
 		self.parent.Window.notebook.AddPage(page,'Correlation Matrix on ' + d["path"])
 		print("Correlation Matrix tab created")
 	def onMenuItemClickHoles(self,event):
-		pass
+		global Data
+		d = None
+		for dic in Data:
+			if dic["path"] == self.Text: # corresponding data found
+				d = dic
+				break
+		# create the notebook page corresponding to the chosen dataset
+		page = AppPanelCorrMatHoles(self.parent.Window.notebook,d['data'])
+		self.parent.Window.notebook.AddPage(page,'Holes on ' + d["path"])
+		print("Holes tab created")
 
 
 # Start by overriding the behaviour of the MainFrame
@@ -343,16 +352,71 @@ class AppFrame(MainFrame):
 			self.lowerStar.DestroyItem(item.Id)
 		for item in self.ripser.GetMenuItems():
 			self.ripser.DestroyItem(item.Id)
+		for item in self.distanceMatrix.GetMenuItems():
+			self.distanceMatrix.DestroyItem(item.Id)
+		for item in self.holes.GetMenuItems():
+			self.holes.DestroyItem(item.Id)
 		for dic in Data:
 			if dic["data"] is not None: # dataset is loaded
 				id_lowerStar = inc_id_counter()
 				dataEntryLowerStar = AppPageMenuItem(self.lowerStar,id=id_lowerStar,text=str(dic["path"]))
 				self.Bind(wx.EVT_MENU,dataEntryLowerStar.onMenuItemClickLowerStar,id=id_lowerStar)
 				self.lowerStar.Append(dataEntryLowerStar)
+
 				id_Ripser = inc_id_counter()
 				dataEntryRipser = AppPageMenuItem(self.ripser, id=id_Ripser,text=str(dic["path"]))
 				self.Bind(wx.EVT_MENU,dataEntryRipser.onMenuItemClickRipser,id=id_Ripser)
 				self.ripser.Append(dataEntryRipser)
+
+				id_distanceMatrix = inc_id_counter()
+				data_distanceMatrix = AppPageMenuItem(self.distanceMatrix,id=id_distanceMatrix,text=str(dic["path"]))
+				self.Bind(wx.EVT_MENU,data_distanceMatrix.onMenuItemClickCorrMat,id=id_distanceMatrix)
+				self.distanceMatrix.Append(data_distanceMatrix)
+
+				id_holes = inc_id_counter()
+				data_holes = AppPageMenuItem(self.holes, id=id_holes,text=str(dic["path"]))
+				self.Bind(wx.EVT_MENU,data_holes.onMenuItemClickHoles,id=id_holes)
+				self.holes.Append(data_holes)
+
+
+
+
+class BasePanel():
+	def __init__(self, parent,data):
+		self.parent = parent # parent is notebook whose parent is frame
+		self.data = data
+		self.diagrams = {}
+		self.figure = None
+		self.canvas = None
+		self.toolbar = None
+		self.figure_list = None
+
+		figure = Figure()
+		figure.add_subplot(111)
+		self.diagrams['empty'] = figure
+		self.updateFigure(0)
+
+	def updateFigure(self,figure_index):
+		if figure_index < 0 and figure_index > len(self.diagrams):
+			print('Error during figure update: index '+figure_index+' out of range')
+			return
+		self.figure = self.diagrams[list(self.diagrams)[figure_index]]
+		self.canvas = FigureCanvas(self.scrolled_window, -1, self.figure)
+		self.toolbar = NavigationToolbar(self.canvas)
+		self.figure_list = wx.Choice(self.toolbar, -1, (85, 18))
+		self.figure_list.Bind(wx.EVT_CHOICE,self.onFigureChange)
+		self.figure_list.SetItems(list(self.diagrams))
+		self.figure_list.SetSelection(figure_index)
+		self.toolbar.AddControl(self.figure_list,"figure_list")
+		self.toolbar.Realize()
+		scrolled_sizer = self.scrolled_window.GetSizer()
+		# First child is canvasSizer, the second is settingsSizer
+		canvasSizer = scrolled_sizer.GetChildren()[0].GetSizer()
+		mainCanvasSizer = canvasSizer.GetChildren()[0].GetSizer()
+		mainCanvasSizer.Clear()
+		mainCanvasSizer.Add(self.canvas, 1, wx.ALL)
+		mainCanvasSizer.Add(self.toolbar, 0, wx.LEFT | wx.EXPAND)
+		self.Layout()
 
 	# Now we override the behaviour of the lowerStar menu selection
 	# The change here requires to select on which data to perform the filtration
@@ -554,25 +618,23 @@ class AppPanelRipser(PanelRipser):
 		self.btn_close.Bind(wx.EVT_BUTTON,self.onCloseButtonClick)
 
 		# Overlap slider
-		self.overlap = self.overlap_slider.GetValue()
-		self.overlap_slider.Bind(wx.EVT_SCROLL,self.onOverlapSliderChange)
+		#self.overlap_slider.Bind(wx.EVT_SCROLL,self.onOverlapSliderChange)
 
 		# Slider window size
 		self.window_size_slider.Bind(wx.EVT_SCROLL,self.onWindowSizeSliderChange)
 		self.window_size_slider.SetMax(self.data.shape[0])
-		self.window_size = self.window_size_slider.GetValue()
 
 		# Choice metric
-		self.metric = self.ch_metric.GetString(self.ch_metric.GetCurrentSelection())
-		self.ch_metric.Bind(wx.EVT_CHOICE,self.onMetricSelectionChange)
+		#self.metric = self.ch_metric.GetString(self.ch_metric.GetCurrentSelection())
+		#self.ch_metric.Bind(wx.EVT_CHOICE,self.onMetricSelectionChange)
 
 		# Distance Matrix Check
-		self.distance_matrix = self.chx_distance_matrix.IsChecked()
-		self.chx_distance_matrix.Bind(wx.EVT_CHECKBOX,self.onDistanceMatrixCheck)
+		#self.distance_matrix = self.chx_distance_matrix.IsChecked()
+		#self.chx_distance_matrix.Bind(wx.EVT_CHECKBOX,self.onDistanceMatrixCheck)
 
 		# Set Max Homology Dimension
-		self.max_hom_dim = self.spn_max_hom_dim.GetValue()
-		self.spn_max_hom_dim.Bind(wx.EVT_SPINCTRL,self.onMaxHomDimChange)
+		#self.max_hom_dim = self.spn_max_hom_dim.GetValue()
+		#self.spn_max_hom_dim.Bind(wx.EVT_SPINCTRL,self.onMaxHomDimChange)
 
 		# Console
 		#import curses
@@ -608,11 +670,16 @@ class AppPanelRipser(PanelRipser):
 		self.Layout()
 
 	def onExecuteButtonClick(self, event):
-		windows = calculate_windows(self.window_size,self.overlap,self.data.shape[0])
+		overlap = self.overlap_slider.GetValue()
+		window_size = self.window_size_slider.GetValue()
+		distance_matrix = self.chx_distance_matrix.IsChecked()
+		max_hom_dim = self.spn_max_hom_dim.GetValue()
+		metric = self.ch_metric.GetString(self.ch_metric.GetCurrentSelection())
+		windows = calculate_windows(window_size,overlap,self.data.shape[0])
 		diagrams = {}
 		i = 0
 		for window in windows:
-			dgms = doRipsFiltration(self.data[window],self.max_hom_dim,self.distance_matrix,self.metric)#['dgms']
+			dgms = doRipsFiltration(self.data[window],max_hom_dim,distance_matrix,metric)#['dgms']
 			figure = plt.figure()
 			plt.figure(figure.number)
 			plot_diagrams(dgms)
@@ -646,21 +713,315 @@ class AppPanelRipser(PanelRipser):
 			# i remove them by simply destroying children of the sizer
 			optionalCanvasSizer.Clear(True)
 			optionalCanvasSizer.Layout()
-	def onDistanceMatrixCheck(self, event):
-		self.distance_matrix = self.chx_distance_matrix.IsChecked()
-	def onMaxHomDimChange(self,event):
-		self.max_hom_dim = self.spn_max_hom_dim.GetValue()
-	def onOverlapSliderChange(self,event):
-		self.overlap = self.overlap_slider.GetValue()
 
 	def onWindowSizeSliderChange(self, event):
-		self.window_size = self.window_size_slider.GetValue()
-		self.overlap_slider.SetMax(self.window_size)
+		self.overlap_slider.SetMax(self.window_size_slider.GetValue())
 
-	def onMetricSelectionChange(self, event):
-		self.metric = self.ch_metric.GetString(self.ch_metric.GetCurrentSelection())
-		pass
+	def onFigureChange(self, event):
+		self.updateFigure(self.figure_list.GetCurrentSelection())
+
+
+
+class AppPanelCorrMatDist(PanelCorrMatDist):
+	def __init__(self, parent,data):
+		PanelRipser.__init__(self, parent=parent)
+
+		# Setting default parameters
+		self.parent = parent
+		self.data = data
+		self.diagrams = {}
+		self.figure = None
+		self.canvas = None
+		self.toolbar = None
+		self.figure_list = None
+
+		# Set Label
+		self.label_shape.SetLabel(str(self.data.shape))
+
+		# Execute button
+		self.btn_execute.Bind(wx.EVT_BUTTON,self.onExecuteButtonClick)
+		# Close button
+		self.btn_close.Bind(wx.EVT_BUTTON,self.onCloseButtonClick)
+
+		# Overlap slider
+		#self.overlap_slider.Bind(wx.EVT_SCROLL,self.onOverlapSliderChange)
+
+		# Slider window size
+		self.window_size_slider.Bind(wx.EVT_SCROLL,self.onWindowSizeSliderChange)
+		self.window_size_slider.SetMax(self.data.shape[0])
+
+		# Choice metric
+		#self.metric = self.ch_metric.GetString(self.ch_metric.GetCurrentSelection())
+		#self.ch_metric.Bind(wx.EVT_CHOICE,self.onMetricSelectionChange)
+
+		# Distance Matrix Check
+		#self.distance_matrix = self.chx_distance_matrix.IsChecked()
+		#self.chx_distance_matrix.Bind(wx.EVT_CHECKBOX,self.onDistanceMatrixCheck)
+
+		# Set Max Homology Dimension
+		#self.max_hom_dim = self.spn_max_hom_dim.GetValue()
+		#self.spn_max_hom_dim.Bind(wx.EVT_SPINCTRL,self.onMaxHomDimChange)
+
+		# Console
+		#import curses
+		#screen = curses.initscr()
+		#window = screen.subwin(20, 20, 5, 5)
+		#window.box()
+		#screen.getch()
+		#curses.endwin()
+
+
+		figure = Figure()
+		figure.add_subplot(111)
+		self.diagrams['empty'] = figure
+		self.updateFigure(0)
+
+	def updateFigure(self,figure_index):
+		self.figure = self.diagrams[list(self.diagrams)[figure_index]]
+		self.canvas = FigureCanvas(self.scrolled_window, -1, self.figure)
+		self.toolbar = NavigationToolbar(self.canvas)
+		self.figure_list = wx.Choice(self.toolbar, -1, (85, 18))
+		self.figure_list.Bind(wx.EVT_CHOICE,self.onFigureChange)
+		self.figure_list.SetItems(list(self.diagrams))
+		self.figure_list.SetSelection(figure_index)
+		self.toolbar.AddControl(self.figure_list,"figure_list")
+		self.toolbar.Realize()
+		scrolled_sizer = self.scrolled_window.GetSizer()
+		# First child is canvasSizer, the second is settingsSizer
+		canvasSizer = scrolled_sizer.GetChildren()[0].GetSizer()
+		mainCanvasSizer = canvasSizer.GetChildren()[0].GetSizer()
+		mainCanvasSizer.Clear()
+		mainCanvasSizer.Add(self.canvas, 1, wx.ALL)
+		mainCanvasSizer.Add(self.toolbar, 0, wx.LEFT | wx.EXPAND)
+		self.Layout()
+
+	def onExecuteButtonClick(self, event):
+		import time
+		import matplotlib.pyplot as plt
+		from matplotlib.widgets import Slider,Button
+		from matplotlib import gridspec
+		from mpl_toolkits.mplot3d import Axes3D
+		import scipy.stats as st
+		from ripser import ripser
+		from sklearn.decomposition import PCA
+		from persim import PersImage, plot_diagrams, persistent_entropy
+		from sys import argv
+		# from TDA.slidingWindow import slidingWindow
+		import TDATuls as tuls
+		#se la periodicità del segnale che vedo nella rappresentazione dopo le sliding windows si ripete per tutte le serie di punti piu o meno nelle stesse posizioni (correlazione verticale delle sliding window) significa che in quei punti qualcosa sta succedendo (si suppone proteine che vanno in folding)
+		from sklearn.metrics.pairwise import pairwise_distances
+		#import Holes as ho
+		import networkx as nx
+
+		overlap = self.overlap_slider.GetValue()
+		window_size = self.window_size_slider.GetValue()
+		distance_matrix = self.chx_distance_matrix.IsChecked()
+		max_hom_dim = self.spn_max_hom_dim.GetValue()
+		metric = self.ch_metric.GetString(self.ch_metric.GetCurrentSelection())
+
+
+		#transpose the data before applying sliding window 10001 x 15 -> 15 x 10001
+		#data = data.transpose()
+
+		#remove the timecorrelationMatrix column from data
+		#data = data[1:,] # for dim 0 pick from one to end, for dim 1 leave it as it is
+
+		#restore data in its original shape
+		#data = data.transpose()
+
+		#### CORRELATION MATRICES AND Persistent Entropy ####
+		#X = data.transpose()
+
+		windows = calculate_windows(window_size,overlap,self.data.shape[0])
+		diagrams = {}
+		WCorr = []
+		shapes = (self.data.shape[1],self.data.shape[1])
+		for window in windows:
+			#w is 14x100
+			print(window)
+			wcorr = np.zeros((self.data.shape[1],self.data.shape[1])) #14x14
+			print(wcorr.shape)
+			for i in range(self.data.shape[1]):
+				for j in range(self.data.shape[1]):
+					coeff,pvalue = st.pearsonr(self.data[i,:],self.data[j,:])
+					if coeff > 0 and pvalue < 0.05:
+						wcorr[i,j] = coeff
+			WCorr.append(wcorr)
+
+		corrmatdist = np.zeros(shapes) #14x14
+		for i,wc1 in enumerate(WCorr):
+			if i < 14:
+				for j,wc2 in enumerate(WCorr):
+					if j < 14:
+					    corrmatdist[i,j]=tuls.abs_distance(wc1,wc2)
+
+
+		D = pairwise_distances(corrmatdist)
+		hoDgms = doRipsFiltration(D,maxHomDim=2,distance_matrix=True)
+		Pers = persentropy(hoDgms)
+		plot_diagrams(hoDgms)
+
+		#distance1 sembra dare un risultato concreto
+		#l'entropia in H1 è 0 e c'è un solo barcode
+		self.diagrams = diagrams
+		self.updateFigure(0)
+
+	def onCloseButtonClick(self, event):
+		index = self.parent.GetSelection()
+		self.parent.DeletePage(index)
+		self.parent.SendSizeEvent()
+	def onWindowSizeSliderChange(self, event):
+		self.overlap_slider.SetMax(self.window_size_slider.GetValue())
 
 	def onFigureChange(self, event):
 		self.updateFigure(self.figure_list.GetCurrentSelection())
 		
+
+class AppPanelCorrMatHoles(PanelCorrMatHoles):
+	def __init__(self, parent,data):
+		PanelRipser.__init__(self, parent=parent)
+
+		# Setting default parameters
+		self.parent = parent
+		self.data = data
+		self.diagrams = {}
+		self.figure = None
+		self.canvas = None
+		self.toolbar = None
+		self.figure_list = None
+
+		# Set Label
+		self.label_shape.SetLabel(str(self.data.shape))
+
+		# Execute button
+		self.btn_execute.Bind(wx.EVT_BUTTON,self.onExecuteButtonClick)
+		# Close button
+		self.btn_close.Bind(wx.EVT_BUTTON,self.onCloseButtonClick)
+
+		# Slider window size
+		self.window_size_slider.Bind(wx.EVT_SCROLL,self.onWindowSizeSliderChange)
+		self.window_size_slider.SetMax(self.data.shape[0])
+
+		figure = Figure()
+		figure.add_subplot(111)
+		self.diagrams['empty'] = figure
+		self.updateFigure(0)
+
+	def updateFigure(self,figure_index):
+		if figure_index < 0 and figure_index > len(self.diagrams):
+			print('Error during figure update: index '+figure_index+' out of range')
+			return
+		self.figure = self.diagrams[list(self.diagrams)[figure_index]]
+		self.canvas = FigureCanvas(self.scrolled_window, -1, self.figure)
+		self.toolbar = NavigationToolbar(self.canvas)
+		self.figure_list = wx.Choice(self.toolbar, -1, (85, 18))
+		self.figure_list.Bind(wx.EVT_CHOICE,self.onFigureChange)
+		self.figure_list.SetItems(list(self.diagrams))
+		self.figure_list.SetSelection(figure_index)
+		self.toolbar.AddControl(self.figure_list,"figure_list")
+		self.toolbar.Realize()
+		scrolled_sizer = self.scrolled_window.GetSizer()
+		# First child is canvasSizer, the second is settingsSizer
+		canvasSizer = scrolled_sizer.GetChildren()[0].GetSizer()
+		mainCanvasSizer = canvasSizer.GetChildren()[0].GetSizer()
+		mainCanvasSizer.Clear()
+		mainCanvasSizer.Add(self.canvas, 1, wx.ALL)
+		mainCanvasSizer.Add(self.toolbar, 0, wx.LEFT | wx.EXPAND)
+		self.Layout()
+
+	def onExecuteButtonClick(self, event):
+		overlap = self.overlap_slider.GetValue()
+		window_size = self.window_size_slider.GetValue()
+		distance_matrix = self.chx_distance_matrix.IsChecked()
+		max_hom_dim = self.spn_max_hom_dim.GetValue()
+		metric = self.ch_metric.GetString(self.ch_metric.GetCurrentSelection())
+		windows = calculate_windows(window_size,overlap,self.data.shape[0])
+		diagrams = {}
+
+		import numpy as np
+		import pickle
+		import time
+		import matplotlib.pyplot as plt
+		from matplotlib.widgets import Slider,Button
+		from matplotlib import gridspec
+		from mpl_toolkits.mplot3d import Axes3D
+		import scipy.stats as st
+		from ripser import ripser
+		from persim import PersImage, plot_diagrams, persistent_entropy
+		from sys import argv
+		# from TDA.slidingWindow import slidingWindow
+		import TDATuls as tuls
+		#se la periodicità del segnale che vedo nella rappresentazione dopo le sliding windows si ripete per tutte le serie di punti piu o meno nelle stesse posizioni (correlazione verticale delle sliding window) significa che in quei punti qualcosa sta succedendo (si suppone proteine che vanno in folding)
+		from sklearn.metrics.pairwise import pairwise_distances
+		import Holes as ho
+		import networkx as nx
+
+		#### CORRELATION MATRICES AND HOLES #####
+		X = self.data.transpose()
+		n_signal = X.shape[0]
+		W = tuls.matrix_window(X,100,100)
+		WCORR = []
+		Fil = []
+		for w in W:
+			Wcorr = np.full((n_signal,n_signal),24.0)
+			for i in range(n_signal): # 14x14 correlation of signals
+				for j in range(n_signal):
+					coeff,pvalue = st.pearsonr(X[i,:],X[j,:])
+					if coeff > 0 and pvalue < 0.05:
+						Wcorr[i,j] = coeff
+					else:
+						Wcorr[i,j] = 0
+			WCORR.append(Wcorr)
+		for i,wc in enumerate(WCORR):
+			if i < len(WCORR):
+				figure = plt.figure()
+				plt.figure(figure.number)
+
+				G = nx.Graph(wc)
+
+				#TODO creare a mano il grafo a partire dalla matrice
+				# for i in range(len(wc)):
+				# 	for j in range(len(wc[i])):
+				# 		G.add_edge(i,j,weight=wc[i][j])
+				cliqueDict = ho.standard_weight_clique_rank_filtration(G)
+				with open('clique-%d.pkl'%(i), 'wb') as f:
+					pickle.dump(cliqueDict, f, protocol=2)
+				ho.persistent_homology_calculation("clique-%d.pkl"%(i), 1, "matrices", ".")
+				Fil.append(cliqueDict)
+				diagrams['window'+str(i)] = figure
+
+
+		self.diagrams = diagrams
+		self.updateFigure(0)
+
+	def onCloseButtonClick(self, event):
+		index = self.parent.GetSelection()
+		self.parent.DeletePage(index)
+		self.parent.SendSizeEvent()
+	def onEntropyCheck(self, event):
+		mainSizer = self.GetSizer()
+		# First child is canvasSizer, the second is settingsSizer
+		canvasSizer = mainSizer.GetChildren()[0].GetSizer()
+		optionalCanvasSizer = canvasSizer.GetChildren()[1].GetSizer()
+		if self.chx_entropy.IsChecked(): # Box is checked and I need to add the pe plot
+			self.pe_Figure = Figure()
+			self.pe_axes = self.pe_Figure.add_subplot(111)
+			self.pe_canvas = FigureCanvas(self, -1, self.pe_Figure)
+			self.pe_toolbar = NavigationToolbar(self.pe_canvas)
+			self.pe_toolbar.Realize()
+
+			optionalCanvasSizer.Add(self.pe_canvas, 1, wx.ALL)
+			optionalCanvasSizer.Add(self.pe_toolbar, 0, wx.LEFT | wx.EXPAND)
+			self.SetSizer(mainSizer)
+			self.Layout() # automatically reshape the page to fit the pe plot
+		else: # Check is unchecked and I need to remove the pe plot
+			# i remove them by simply destroying children of the sizer
+			optionalCanvasSizer.Clear(True)
+			optionalCanvasSizer.Layout()
+
+	def onWindowSizeSliderChange(self, event):
+		self.overlap_slider.SetMax(self.window_size_slider.GetValue())
+
+	def onFigureChange(self, event):
+		self.updateFigure(self.figure_list.GetCurrentSelection())
+

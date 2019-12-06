@@ -281,3 +281,48 @@ def calculate_windows(size,overlap,limit):
 	if i < limit:
 		res += [range(i,limit)]
 	return res
+
+
+
+
+def DoCorrMatDist(data):
+	#transpose the data before applying sliding window 10001 x 15 -> 15 x 10001
+	data = data.transpose()
+
+	#remove the timecorrelationMatrix column from data
+	data = data[1:,] # for dim 0 pick from one to end, for dim 1 leave it as it is
+
+	#restore data in its original shape
+	data = data.transpose()
+
+	#### CORRELATION MATRICES AND Persistent Entropy ####
+	X = data.transpose()
+	#W = tuls.matrix_window(X,window,overlap)
+	W = calculate_windows()
+	WCorr = []
+	shapes = (W[0].shape[0],W[0].shape[0])
+	for w in W:
+		#w is 14x100
+		wcorr = np.zeros(shapes) #14x14
+		for i in range(w.shape[0]):
+			for j in range(w.shape[0]):
+				coeff,pvalue = st.pearsonr(w[i,:],w[j,:])
+				if coeff > 0 and pvalue < 0.05:
+					wcorr[i,j] = coeff
+		WCorr.append(wcorr)
+
+	corrmatdist = np.zeros(shapes) #14x14
+	for i,wc1 in enumerate(WCorr):
+		if i < 14:
+		    for j,wc2 in enumerate(WCorr):
+		        if j < 14:
+		            corrmatdist[i,j]=tuls.abs_distance(wc1,wc2)
+
+
+	D = pairwise_distances(corrmatdist)
+	hoDgms = doRipsFiltration(D,maxHomDim=2,distance_matrix=True)
+	Pers = persentropy(hoDgms)
+	plot_diagrams(hoDgms)
+
+	#distance1 sembra dare un risultato concreto
+	#l'entropia in H1 è 0 e c'è un solo barcode
