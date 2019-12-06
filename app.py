@@ -4,19 +4,49 @@ import wx
 import csv
 import os
 import logging
+import pickle
+import time
+
+# Numpy
 import numpy as np
 from numpy import arange, sin, pi, genfromtxt, floor
+
+# Matplot
 import matplotlib
 matplotlib.use('WXAgg')
-from ripser import ripser
-
 from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigureCanvas
 from matplotlib.backends.backend_wx import NavigationToolbar2Wx as NavigationToolbar
 from matplotlib.figure import Figure
+from matplotlib.widgets import Slider,Button
+from matplotlib import pyplot as plt
+from matplotlib import gridspec
+from mpl_toolkits.mplot3d import Axes3D
 
+# Ripser
+from ripser import ripser
+
+# Persim
+from persim import PersImage, plot_diagrams, persistent_entropy
+
+# Holes
+import Holes as ho
+
+# NetworkX
+import networkx as nx
+
+# Scipy
+import scipy.stats as st
+
+# Sklearn
+from sklearn.metrics.pairwise import pairwise_distances
+from sklearn.decomposition import PCA
+
+# Internals
 from TDATuls import *
-from persim import plot_diagrams
 from noname import MainFrame, PanelLowerStar, PanelRipser, PanelCorrMatDist, PanelCorrMatHoles
+
+#se la periodicità del segnale che vedo nella rappresentazione dopo le sliding windows si ripete per tutte le serie di punti piu o meno nelle stesse posizioni (correlazione verticale delle sliding window) significa che in quei punti qualcosa sta succedendo (si suppone proteine che vanno in folding)
+
 
 ID_COUNTER = 2000
 Data = []
@@ -397,8 +427,8 @@ class BasePanel():
 		self.updateFigure(0)
 
 	def updateFigure(self,figure_index):
-		if figure_index < 0 and figure_index > len(self.diagrams):
-			print('Error during figure update: index '+figure_index+' out of range')
+		if figure_index < 0 or figure_index >= len(self.diagrams):
+			print('Error during figure update: index '+str(figure_index)+' out of range')
 			return
 		self.figure = self.diagrams[list(self.diagrams)[figure_index]]
 		self.canvas = FigureCanvas(self.scrolled_window, -1, self.figure)
@@ -633,23 +663,6 @@ class AppPanelCorrMatDist(PanelCorrMatDist,BasePanel):
 		self.window_size_slider.SetMax(self.data.shape[0])
 
 	def onExecuteButtonClick(self, event):
-		import time
-		import matplotlib.pyplot as plt
-		from matplotlib.widgets import Slider,Button
-		from matplotlib import gridspec
-		from mpl_toolkits.mplot3d import Axes3D
-		import scipy.stats as st
-		from ripser import ripser
-		from sklearn.decomposition import PCA
-		from persim import PersImage, plot_diagrams, persistent_entropy
-		from sys import argv
-		# from TDA.slidingWindow import slidingWindow
-		import TDATuls as tuls
-		#se la periodicità del segnale che vedo nella rappresentazione dopo le sliding windows si ripete per tutte le serie di punti piu o meno nelle stesse posizioni (correlazione verticale delle sliding window) significa che in quei punti qualcosa sta succedendo (si suppone proteine che vanno in folding)
-		from sklearn.metrics.pairwise import pairwise_distances
-		#import Holes as ho
-		import networkx as nx
-
 		overlap = self.overlap_slider.GetValue()
 		window_size = self.window_size_slider.GetValue()
 		distance_matrix = self.chx_distance_matrix.IsChecked()
@@ -690,7 +703,7 @@ class AppPanelCorrMatDist(PanelCorrMatDist,BasePanel):
 			if i < 14:
 				for j,wc2 in enumerate(WCorr):
 					if j < 14:
-					    corrmatdist[i,j]=tuls.abs_distance(wc1,wc2)
+					    corrmatdist[i,j] = abs_distance(wc1,wc2)
 
 
 		D = pairwise_distances(corrmatdist)
@@ -745,28 +758,10 @@ class AppPanelCorrMatHoles(PanelCorrMatHoles,BasePanel):
 		windows = calculate_windows(window_size,overlap,self.data.shape[0])
 		diagrams = {}
 
-		import numpy as np
-		import pickle
-		import time
-		import matplotlib.pyplot as plt
-		from matplotlib.widgets import Slider,Button
-		from matplotlib import gridspec
-		from mpl_toolkits.mplot3d import Axes3D
-		import scipy.stats as st
-		from ripser import ripser
-		from persim import PersImage, plot_diagrams, persistent_entropy
-		from sys import argv
-		# from TDA.slidingWindow import slidingWindow
-		import TDATuls as tuls
-		#se la periodicità del segnale che vedo nella rappresentazione dopo le sliding windows si ripete per tutte le serie di punti piu o meno nelle stesse posizioni (correlazione verticale delle sliding window) significa che in quei punti qualcosa sta succedendo (si suppone proteine che vanno in folding)
-		from sklearn.metrics.pairwise import pairwise_distances
-		import Holes as ho
-		import networkx as nx
-
 		#### CORRELATION MATRICES AND HOLES #####
 		X = self.data.transpose()
 		n_signal = X.shape[0]
-		W = tuls.matrix_window(X,100,100)
+		W = matrix_window(X,100,100)
 		WCORR = []
 		Fil = []
 		for w in W:
