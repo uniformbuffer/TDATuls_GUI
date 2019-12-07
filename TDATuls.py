@@ -228,47 +228,50 @@ def slidingWindow(x, dim, Tau, dT):
     return X
 
 def persentropy(dgms, normalize=False):
-    """
-    Calculates the persistent entropies of a set of persistent diagrams.
-    """
-    result = []
+	"""
+	Calculates the persistent entropies of a set of persistence diagrams.
+	"""
+	result = []
+	if not (isinstance(dgms, list) or isinstance(dgms, np.ndarray)):
+		dgms = [dgms]
+	#calculate PE for all diagrams
+	for dgm in dgms:
+		#array copy of the array to not modify the original diagram
+		dgm_np = np.asarray(dgm)
+		#substitute the point at infinity with max + 1
+		values =[]
+		ltot = 0
+		_max = None
+		infs = []
+		for row in dgm_np:
+			if row[1] == math.inf:
+				infs.append(row)
+			else:
+				li = row[1] - row[0] #lunghezza del barcode
+				values.append(li)
+				ltot = ltot + li #lunghezza totale dei barcode
+				if _max == None or _max < row[1]: #mi salvo il massimo valore della filtrazione + 1 per poterlo sostituire al punto inf
+					_max = row[1]
 
-    #calculate PE for all diagrams
-    for dgm in dgms:
-        #array copy of the array to not modify the original diagram
-        dgm_np = np.asarray(dgm)
-        #substitute the point at infinity with max + 1
-        values =[]
-        ltot = 0
-        _max = None
-        infs = []
-        for row in dgm_np:
-            if row[1] == math.inf:
-                infs.append(row)
-                continue
-            li = row[1] - row[0] #lunghezza del barcode
-            values.append(li)
-            ltot = ltot + li #lunghezza totale dei barcode
-            if _max == None or _max < row[1]: #mi salvo il massimo valore della filtrazione + 1 per poterlo sostituire al punto inf
-                _max = row[1] 
+		if _max != None:
+			_max = _max + 1
 
-        _max = _max + 1
-        for row in infs:
-            li = _max - row[0] #persistent entropy: i punti all'infinito danno contributi ad li e ltot?
-            values.append(li)
-            ltot = ltot + li
+			for row in infs:
+				li = _max - row[0] #persistent entropy: i punti all'infinito danno contributi ad li e ltot
+				values.append(li)
+				ltot = ltot + li
         
-        size = len(values)
-        ret = 0
-        for e in values: #ogni valore e e' un li e faccio la sommatoria come richiede la formula
-            ret = ret + e/ltot * math.log(e/ltot)
-        if size == 1 and normalize:
-            result.append(-ret)
-        elif normalize: # normalize [0,1]
-            result.append((-1/np.log(size))*ret)
-        else:
-            result.append(-ret)
-    return np.array(result)
+		size = len(values)
+		ret = 0
+		for e in values: #ogni valore e è un li e faccio la sommatoria come richiede la formula
+			ret = ret + e/ltot * math.log(e/ltot)
+		if size == 1 and normalize:
+			result.append(-ret)
+		elif normalize: # normalize [0,1]
+			result.append((-1/np.log(size))*ret)
+		else:
+			result.append(-ret)
+	return np.array(result)
 
 def calculate_windows(size,overlap,limit):
 	advancement = size - overlap
@@ -282,47 +285,3 @@ def calculate_windows(size,overlap,limit):
 		res += [range(i,limit)]
 	return res
 
-
-
-
-def DoCorrMatDist(data):
-	#transpose the data before applying sliding window 10001 x 15 -> 15 x 10001
-	data = data.transpose()
-
-	#remove the timecorrelationMatrix column from data
-	data = data[1:,] # for dim 0 pick from one to end, for dim 1 leave it as it is
-
-	#restore data in its original shape
-	data = data.transpose()
-
-	#### CORRELATION MATRICES AND Persistent Entropy ####
-	X = data.transpose()
-	#W = tuls.matrix_window(X,window,overlap)
-	W = calculate_windows()
-	WCorr = []
-	shapes = (W[0].shape[0],W[0].shape[0])
-	for w in W:
-		#w is 14x100
-		wcorr = np.zeros(shapes) #14x14
-		for i in range(w.shape[0]):
-			for j in range(w.shape[0]):
-				coeff,pvalue = st.pearsonr(w[i,:],w[j,:])
-				if coeff > 0 and pvalue < 0.05:
-					wcorr[i,j] = coeff
-		WCorr.append(wcorr)
-
-	corrmatdist = np.zeros(shapes) #14x14
-	for i,wc1 in enumerate(WCorr):
-		if i < 14:
-		    for j,wc2 in enumerate(WCorr):
-		        if j < 14:
-		            corrmatdist[i,j]=tuls.abs_distance(wc1,wc2)
-
-
-	D = pairwise_distances(corrmatdist)
-	hoDgms = doRipsFiltration(D,maxHomDim=2,distance_matrix=True)
-	Pers = persentropy(hoDgms)
-	plot_diagrams(hoDgms)
-
-	#distance1 sembra dare un risultato concreto
-	#l'entropia in H1 è 0 e c'è un solo barcode

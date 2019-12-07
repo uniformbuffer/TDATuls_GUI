@@ -1,6 +1,0 @@
-Holes
-Holes/classes
-Holes/drawing
-Holes/measures
-Holes/operations
-Holes/perseus_utils

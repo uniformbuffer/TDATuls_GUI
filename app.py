@@ -420,13 +420,14 @@ class BasePanel():
 		self.canvas = None
 		self.toolbar = None
 		self.figure_list = None
-
-		figure = Figure()
-		figure.add_subplot(111)
-		self.diagrams['empty'] = figure
 		self.updateFigure(0)
 
 	def updateFigure(self,figure_index):
+		if len(self.diagrams) == 0:
+			figure = Figure()
+			figure.add_subplot(111)
+			self.diagrams['empty'] = figure
+
 		if figure_index < 0 or figure_index >= len(self.diagrams):
 			print('Error during figure update: index '+str(figure_index)+' out of range')
 			return
@@ -501,27 +502,18 @@ class AppPanelLowerStar(PanelLowerStar,BasePanel):
 			plt.figure(figure.number)
 			lsf_dgm0 = doLowerStarFiltration(self.data[window,signal_index])
 			plt.plot(lsf_dgm0)
-
 			diagrams['window'+str(i)+': lower star filtration'] = figure
+
 			if self.chx_entropy.IsChecked():
 				# Persistent Entropy
-				#figure = plt.figure()
-				#plt.figure(figure.number)
 				L = []
 				L.append(lsf_dgm0)
 				dmg = np.array(L)
 				ent = persentropy(dmg)[0]
-				#print(ent)
-				#plt.plot(ent)
-				#diagrams['window'+str(i)+': persistent entropy'] = figure
 
 				# Normalized Persistent Entropy
-				#figure = plt.figure()
-				#plt.figure(figure.number)
 				pent = persentropy(dmg,normalize=True)[0]
 				norm_pers.append(pent)
-				#print(pent)
-				#plt.plot(pent)
 			i += 1
 
 		if self.chx_entropy.IsChecked():
@@ -529,65 +521,15 @@ class AppPanelLowerStar(PanelLowerStar,BasePanel):
 			plt.figure(figure.number)
 			plt.plot(np.arange(len(windows)),norm_pers)
 			diagrams['normalized persistent entropy'] = figure
+
 		self.diagrams = diagrams
 		self.updateFigure(0)
-
-		'''self.diagrams = diagrams
-		self.updateFigure(0)
-		self.Pers = []
-		self.NormPers = []
-		self.Diags = []
-		windowSize = self.spn_window_size.GetValue()
-		overlap_pct = self.sl_overlap.GetValue()/100 # between 0 and 1
-		overlap = int(floor(windowSize * overlap_pct))
-		# Devo scegliere su quale segnale fare la finestra tramite un controllo
-		signal = self.ch_signal.GetSelection()
-		#print(signal)(self.dataDict["data"]
-		print(self.dataDict["data"][signal])
-		print(overlap)
-		if signal != wx.NOT_FOUND:
-			W = signal_window(self.dataDict["data"][signal],windowSize,overlap)
-			print(len(W))
-			for w in W:
-				lsf_dgm0 = doLowerStarFiltration(w)
-				# Prepare the diagram for computing PE
-				L = []
-				L.append(lsf_dgm0)
-				dmg = np.array(L)
-				# Diagram ready
-				ent = persentropy(lsf_dgm0)[0]
-				pent = persentropy(dmg,normalize=True)[0]
-				self.Diags.append(dmg)
-				self.Pers.append(ent)
-				self.Norm_Pers.append(pent)
-		which_one = self.sl_which_window.GetValue()
-		self.axes.plot(np.arange(windowSize-1),self.NormPers)
-		self.canvas.draw()'''
 	def onCloseButtonClick(self, event):
 		index = self.parent.GetSelection()
 		self.parent.DeletePage(index)
 		self.parent.SendSizeEvent()
 	def onEntropyCheck(self, event):
 		self.persistent_entropy = self.chx_entropy.IsChecked()
-		'''mainSizer = self.GetSizer()
-		# First child is canvasSizer, the second is settingsSizer
-		canvasSizer = mainSizer.GetChildren()[0].GetSizer()
-		optionalCanvasSizer = canvasSizer.GetChildren()[1].GetSizer()
-		if self.chx_entropy.IsChecked(): # Box is checked and I need to add the pe plot
-			self.pe_Figure = Figure()
-			self.pe_axes = self.pe_Figure.add_subplot(111)
-			self.pe_canvas = FigureCanvas(self, -1, self.pe_Figure)
-			self.pe_toolbar = NavigationToolbar(self.pe_canvas)
-			self.pe_toolbar.Realize()
-			
-			optionalCanvasSizer.Add(self.pe_canvas, 1, wx.ALL)
-			optionalCanvasSizer.Add(self.pe_toolbar, 0, wx.LEFT | wx.EXPAND)
-			self.SetSizer(mainSizer)
-			self.Layout() # automatically reshape the page to fit the pe plot
-		else: # Check is unchecked and I need to remove the pe plot
-			# i remove them by simply destroying children of the sizer
-			optionalCanvasSizer.Clear(True)
-			optionalCanvasSizer.Layout()'''
 
 	def onWindowSizeSliderChange(self, event):
 		self.overlap_slider.SetMax(self.window_size_slider.GetValue())
@@ -705,11 +647,13 @@ class AppPanelCorrMatDist(PanelCorrMatDist,BasePanel):
 					if j < 14:
 					    corrmatdist[i,j] = abs_distance(wc1,wc2)
 
-
+		figure = plt.figure()
+		plt.figure(figure.number)
 		D = pairwise_distances(corrmatdist)
 		hoDgms = doRipsFiltration(D,maxHomDim=2,distance_matrix=True)
 		Pers = persentropy(hoDgms)
 		plot_diagrams(hoDgms)
+		diagrams['correlation__matrix'] = figure
 
 		#distance1 sembra dare un risultato concreto
 		#l'entropia in H1 è 0 e c'è un solo barcode
@@ -744,9 +688,6 @@ class AppPanelCorrMatHoles(PanelCorrMatHoles,BasePanel):
 		self.window_size_slider.Bind(wx.EVT_SCROLL,self.onWindowSizeSliderChange)
 		self.window_size_slider.SetMax(self.data.shape[0])
 
-		figure = Figure()
-		figure.add_subplot(111)
-		self.diagrams['empty'] = figure
 		self.updateFigure(0)
 
 	def onExecuteButtonClick(self, event):
@@ -761,7 +702,7 @@ class AppPanelCorrMatHoles(PanelCorrMatHoles,BasePanel):
 		#### CORRELATION MATRICES AND HOLES #####
 		X = self.data.transpose()
 		n_signal = X.shape[0]
-		W = matrix_window(X,100,100)
+		W = matrix_window(X,window_size,window_size-overlap)
 		WCORR = []
 		Fil = []
 		for w in W:
@@ -776,8 +717,8 @@ class AppPanelCorrMatHoles(PanelCorrMatHoles,BasePanel):
 			WCORR.append(Wcorr)
 		for i,wc in enumerate(WCORR):
 			if i < len(WCORR):
-				figure = plt.figure()
-				plt.figure(figure.number)
+				#figure = plt.figure()
+				#plt.figure(figure.number)
 
 				G = nx.Graph(wc)
 
@@ -790,7 +731,7 @@ class AppPanelCorrMatHoles(PanelCorrMatHoles,BasePanel):
 					pickle.dump(cliqueDict, f, protocol=2)
 				ho.persistent_homology_calculation("clique-%d.pkl"%(i), 1, "matrices", ".")
 				Fil.append(cliqueDict)
-				diagrams['window'+str(i)] = figure
+				#diagrams['window'+str(i)] = figure
 
 
 		self.diagrams = diagrams
