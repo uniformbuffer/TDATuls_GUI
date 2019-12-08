@@ -710,10 +710,11 @@ class AppPanelCorrMatDist(PanelCorrMatDist,BasePanel):
 		Pers = persentropy(hoDgms)
 		#print('Persentropy',Pers)
 		plot_diagrams(hoDgms)
-		diagrams['correlation__matrix'] = figure
+		diagrams['correlation_matrix'] = figure
 
 		#distance1 sembra dare un risultato concreto
 		#l'entropia in H1 è 0 e c'è un solo barcode
+		wx.adv.NotificationMessage('Done', message="Done")
 		self.diagrams = diagrams
 		self.updateFigure(0)
 
