@@ -409,31 +409,11 @@ class PanelCorrMatHoles ( wx.Panel ):
 		self.overlap_slider = wx.Slider( self.scrolled_window, wx.ID_ANY, 0, 0, 100, wx.DefaultPosition, wx.Size( 200,-1 ), wx.SL_HORIZONTAL|wx.SL_VALUE_LABEL )
 		settingsSizer.Add( self.overlap_slider, 0, wx.ALL, 5 )
 
-		self.m_staticText31 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Metric:", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_staticText31.Wrap( -1 )
+		self.btn_open_folder = wx.Button( self.scrolled_window, wx.ID_ANY, u"Output Folder", wx.DefaultPosition, wx.DefaultSize, 0 )
+		settingsSizer.Add( self.btn_open_folder, 0, wx.ALL, 5 )
 
-		settingsSizer.Add( self.m_staticText31, 0, wx.ALL, 5 )
-
-		ch_metricChoices = [ u"euclidean", u"minkowski", u"chebyshev" ]
-		self.ch_metric = wx.Choice( self.scrolled_window, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, ch_metricChoices, 0 )
-		self.ch_metric.SetSelection( 0 )
-		settingsSizer.Add( self.ch_metric, 0, wx.ALL, 5 )
-
-		self.m_staticText32 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Max Homology\nDimension:", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_staticText32.Wrap( -1 )
-
-		settingsSizer.Add( self.m_staticText32, 0, wx.ALL, 5 )
-
-		self.spn_max_hom_dim = wx.SpinCtrl( self.scrolled_window, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 0, 3, 0 )
-		settingsSizer.Add( self.spn_max_hom_dim, 0, wx.ALL, 5 )
-
-		self.chx_distance_matrix = wx.CheckBox( self.scrolled_window, wx.ID_ANY, u"Distance Matrix", wx.DefaultPosition, wx.DefaultSize, 0 )
-		settingsSizer.Add( self.chx_distance_matrix, 0, wx.ALL, 5 )
-
-		self.label_shape11 = wx.StaticText( self.scrolled_window, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.label_shape11.Wrap( -1 )
-
-		settingsSizer.Add( self.label_shape11, 0, wx.ALL, 5 )
+		self.txt_open_folder = wx.TextCtrl( self.scrolled_window, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		settingsSizer.Add( self.txt_open_folder, 0, wx.ALL, 5 )
 
 		self.btn_execute = wx.Button( self.scrolled_window, wx.ID_ANY, u"Execute", wx.DefaultPosition, wx.DefaultSize, 0 )
 		settingsSizer.Add( self.btn_execute, 0, wx.ALL, 5 )
@@ -606,32 +586,6 @@ class PanelCorrMatDist ( wx.Panel ):
 
 		self.overlap_slider = wx.Slider( self.scrolled_window, wx.ID_ANY, 0, 0, 100, wx.DefaultPosition, wx.Size( 200,-1 ), wx.SL_HORIZONTAL|wx.SL_VALUE_LABEL )
 		settingsSizer.Add( self.overlap_slider, 0, wx.ALL, 5 )
-
-		self.m_staticText31 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Metric:", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_staticText31.Wrap( -1 )
-
-		settingsSizer.Add( self.m_staticText31, 0, wx.ALL, 5 )
-
-		ch_metricChoices = [ u"euclidean", u"minkowski", u"chebyshev" ]
-		self.ch_metric = wx.Choice( self.scrolled_window, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, ch_metricChoices, 0 )
-		self.ch_metric.SetSelection( 0 )
-		settingsSizer.Add( self.ch_metric, 0, wx.ALL, 5 )
-
-		self.m_staticText32 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Max Homology\nDimension:", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_staticText32.Wrap( -1 )
-
-		settingsSizer.Add( self.m_staticText32, 0, wx.ALL, 5 )
-
-		self.spn_max_hom_dim = wx.SpinCtrl( self.scrolled_window, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 0, 3, 0 )
-		settingsSizer.Add( self.spn_max_hom_dim, 0, wx.ALL, 5 )
-
-		self.chx_distance_matrix = wx.CheckBox( self.scrolled_window, wx.ID_ANY, u"Distance Matrix", wx.DefaultPosition, wx.DefaultSize, 0 )
-		settingsSizer.Add( self.chx_distance_matrix, 0, wx.ALL, 5 )
-
-		self.label_shape11 = wx.StaticText( self.scrolled_window, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.label_shape11.Wrap( -1 )
-
-		settingsSizer.Add( self.label_shape11, 0, wx.ALL, 5 )
 
 		self.btn_execute = wx.Button( self.scrolled_window, wx.ID_ANY, u"Execute", wx.DefaultPosition, wx.DefaultSize, 0 )
 		settingsSizer.Add( self.btn_execute, 0, wx.ALL, 5 )

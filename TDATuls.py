@@ -15,6 +15,8 @@ def abs_distance(A,B):
     suum = 0
     for i in range(A.shape[0]):
         for j in range(B.shape[0]):
+            #print('A',A[i][j])
+            #print('B',B[i][j])
             suum = suum + np.abs(A[i][j]-B[i][j])
     return suum
 
