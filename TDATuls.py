@@ -287,3 +287,83 @@ def calculate_windows(size,overlap,limit):
 		res += [range(i,limit)]
 	return res
 
+
+from multiprocessing.pool import ThreadPool as Pool
+pool = Pool(4)
+
+'''
+Spikes
+'''
+def prepare_spike_detection_parameters(data,windows,threshold):
+    parameters = []
+    t = (data.max() - data.min())/100*threshold
+    offset = 0
+    for w in windows:
+        parameters += [(data[w],offset,t)]
+        offset += w.stop - w.start
+    return parameters
+
+
+def spike_detection(data,offset,threshold):
+    min = data.min()
+    argmin = data.argmin()
+    max = data.max()
+    argmax = data.argmax()
+    if max - min >= threshold:
+        if argmax >= argmin:
+            return (1,offset+argmax)
+        else:
+            return (-1,offset+argmin)
+    else:
+        return (0,0)
+
+def filter_spikes(spikes,data_len):
+    res = np.full((data_len),0)
+    for s in spikes:
+        res[s[1]] = s[0]
+    return res
+
+print('spikes(data,window=None,show=False,threshold=30)')
+def spikes(data,window=None,show=False,threshold=30):
+    cols = data.shape[0]
+    if data.shape == (cols,):
+        data = np.array([data]).transpose()
+
+
+    print('Calculating spikes...')
+    spikes = np.empty((cols,0))
+    for i in range(0,data.shape[1]):
+        row = np.array([data[:,i]]).transpose()
+
+        if(window != None):
+            size,overlap = window
+            windows = calculate_windows(size,overlap,len(row))
+        else:
+            windows = calculate_windows(len(row),0,len(row))
+
+        parameters = prepare_spike_detection_parameters(row,windows,threshold)
+        raw_spikes = pool.starmap(spike_detection,parameters)
+        filtred_spikes = np.array([filter_spikes(raw_spikes,len(row))]).transpose()
+        spikes = np.hstack((spikes,filtred_spikes))
+
+    spikes = np.array(spikes)
+    print('Spikes calculated')
+
+    if(show):
+        print('Plotting results...')
+        cols = np.ceil(np.sqrt(spikes.shape[1]))
+        rows = np.ceil(spikes.shape[1]/cols)
+        for i in range(0,spikes.shape[1]):
+            fig = plt.subplot(rows,cols, i+1)
+            plt.ylim(-1,1)
+            plt.xlabel('Time')
+            plt.ylabel('Direction')
+            plt.suptitle('Spikes on '+str(data.shape[1])+' signals with a threshold of '+str(threshold)+'%')
+            plt.plot(spikes[:,i])
+        print('Results plotted')
+
+        plt.tight_layout()
+        plt.show()#block=False
+    return spikes
+
+
