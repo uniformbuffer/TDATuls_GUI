@@ -44,7 +44,7 @@ from sklearn.decomposition import PCA
 
 # Internals
 from TDATuls import *
-from noname import MainFrame, PanelLowerStar, PanelRipser, PanelCorrMatDist, PanelCorrMatHoles, PanelSpikes
+from noname import MainFrame, PanelLowerStar, PanelRipser, PanelCorrMatDist, PanelCorrMatHoles, PanelSpikes, PanelMultiCluster
 
 #se la periodicità del segnale che vedo nella rappresentazione dopo le sliding windows si ripete per tutte le serie di punti piu o meno nelle stesse posizioni (correlazione verticale delle sliding window) significa che in quei punti qualcosa sta succedendo (si suppone proteine che vanno in folding)
 
@@ -313,6 +313,18 @@ class AppPageMenuItem(wx.MenuItem):
 		self.parent.Window.notebook.AddPage(page,'Spikes on ' + d["path"])
 		print("Spikes tab created")
 
+	def onMenuItemClickMultiCluster(self,event):
+		global Data
+		d = None
+		for dic in Data:
+			if dic["path"] == self.Text: # corresponding data found
+				d = dic
+				break
+		# create the notebook page corresponding to the chosen dataset
+		page = AppPanelMultiCluster(self.parent.Window.notebook,d['data'])
+		self.parent.Window.notebook.AddPage(page,'MultiCluster on ' + d["path"])
+		print("MultiCluster tab created")
+
 # Start by overriding the behaviour of the MainFrame
 class AppFrame(MainFrame):
 	def __init__( self, parent ):
@@ -400,6 +412,8 @@ class AppFrame(MainFrame):
 			self.distanceMatrix.DestroyItem(item.Id)
 		for item in self.holes.GetMenuItems():
 			self.holes.DestroyItem(item.Id)
+		for item in self.multicluster.GetMenuItems():
+			self.multicluster.DestroyItem(item.Id)
 		for dic in Data:
 			if dic["data"] is not None: # dataset is loaded
 				id_lowerStar = inc_id_counter()
@@ -427,6 +441,10 @@ class AppFrame(MainFrame):
 				self.Bind(wx.EVT_MENU,data_holes.onMenuItemClickHoles,id=id_holes)
 				self.holes.Append(data_holes)
 
+				id_multicluster = inc_id_counter()
+				data_multicluster = AppPageMenuItem(self.multicluster, id=id_multicluster,text=str(dic["path"]))
+				self.Bind(wx.EVT_MENU,data_multicluster.onMenuItemClickMultiCluster,id=id_multicluster)
+				self.multicluster.Append(data_multicluster)
 
 
 
@@ -894,6 +912,53 @@ class AppPanelSpikes(PanelSpikes,BasePanel):
 			plt.ylabel('Direction')
 			plt.plot(spikes_list[:,i])
 			diagrams['Spikes on signal '+str(i)] = figure
+		print('Results plotted')
+
+		wx.adv.NotificationMessage('Done', message="Done")
+		self.diagrams = diagrams
+		self.updateFigure(0)
+
+	def onCloseButtonClick(self, event):
+		index = self.parent.GetSelection()
+		self.parent.DeletePage(index)
+		self.parent.SendSizeEvent()
+	def onWindowSizeSliderChange(self, event):
+		self.overlap_slider.SetMax(self.window_size_slider.GetValue())
+
+	def onFigureChange(self, event):
+		self.updateFigure(self.figure_list.GetCurrentSelection())
+
+class AppPanelMultiCluster(PanelMultiCluster,BasePanel):
+	def __init__(self, parent,data):
+		PanelMultiCluster.__init__(self, parent=parent)
+		BasePanel.__init__(self, parent=parent, data=data)
+
+		# Set Label
+		self.label_shape.SetLabel(str(self.data.shape))
+
+		# Execute button
+		self.btn_execute.Bind(wx.EVT_BUTTON,self.onExecuteButtonClick)
+		# Close button
+		self.btn_close.Bind(wx.EVT_BUTTON,self.onCloseButtonClick)
+
+		# Slider window size
+		self.window_size_slider.Bind(wx.EVT_SCROLL,self.onWindowSizeSliderChange)
+		self.window_size_slider.SetMax(self.data.shape[0])
+
+	def onExecuteButtonClick(self, event):
+		overlap = self.overlap_slider.GetValue()
+		window_size = self.window_size_slider.GetValue()
+		windows = calculate_windows(window_size,overlap,self.data.shape[0])
+		diagrams = {}
+
+		clusters = all_clusters(self.data)
+
+		print('Plotting results...')
+		for (name,data) in clusters:
+			figure = plt.figure()
+			plt.figure(figure.number)
+			plt.plot(data)
+			diagrams[name+' on signal '+str(i)] = figure
 		print('Results plotted')
 
 		wx.adv.NotificationMessage('Done', message="Done")

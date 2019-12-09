@@ -5,6 +5,10 @@ import matplotlib.pyplot as plt
 from ripser import ripser
 import scipy.spatial.distance as dist
 from scipy import sparse
+from sklearn import cluster, datasets, mixture
+from sklearn.neighbors import kneighbors_graph
+from sklearn.preprocessing import StandardScaler,MinMaxScaler,Normalizer
+from sklearn.decomposition import PCA
 from sklearn.metrics.pairwise import pairwise_distances
 
 def abs_distance(A,B):
@@ -323,7 +327,6 @@ def filter_spikes(spikes,data_len):
         res[s[1]] = s[0]
     return res
 
-print('spikes(data,window=None,show=False,threshold=30)')
 def spikes(data,window=None,show=False,threshold=30):
     cols = data.shape[0]
     if data.shape == (cols,):
@@ -366,4 +369,109 @@ def spikes(data,window=None,show=False,threshold=30):
         plt.show()#block=False
     return spikes
 
+
+
+'''
+Clusters
+'''
+def all_clusters(data,parameters={}):
+	# ============
+	# Set up cluster parameters
+	# ============
+	print('Calculating all clusters...')
+	#plt.figure(figsize=(9 * 2 + 3, 12.5))
+	#plt.subplots_adjust(left=.02, right=.98, bottom=.001, top=.96, wspace=.05,
+	#                    hspace=.01)
+
+	#plot_num = 1
+
+	params = {'quantile': .3,
+					'eps': .3,
+					'damping': .9,
+					'preference': -200,
+					'n_neighbors': 10,
+					'n_clusters': 2,
+					'min_samples': 20,
+					'xi': 0.05,
+					'min_cluster_size': 0.1}
+
+	X = data
+	params.update(parameters)
+
+	# normalize dataset for easier parameter selection
+	X = StandardScaler().fit_transform(X)
+
+	# estimate bandwidth for mean shift
+	bandwidth = cluster.estimate_bandwidth(X, quantile=params['quantile'])
+
+	# connectivity matrix for structured Ward
+	connectivity = kneighbors_graph(X, n_neighbors=params['n_neighbors'], include_self=False)
+	# make connectivity symmetric
+	connectivity = 0.5 * (connectivity + connectivity.T)
+
+	# ============
+	# Create cluster objects
+	# ============
+	ms = cluster.MeanShift(bandwidth=bandwidth, bin_seeding=True)
+	two_means = cluster.MiniBatchKMeans(n_clusters=params['n_clusters'])
+	ward = cluster.AgglomerativeClustering(
+		n_clusters=params['n_clusters'], linkage='ward',
+		connectivity=connectivity)
+	spectral = cluster.SpectralClustering(
+		n_clusters=params['n_clusters'], eigen_solver='arpack',
+		affinity="nearest_neighbors")
+	dbscan = cluster.DBSCAN(eps=params['eps'])
+	optics = cluster.OPTICS(min_samples=params['min_samples'],
+							xi=params['xi'],
+							min_cluster_size=params['min_cluster_size'])
+	affinity_propagation = cluster.AffinityPropagation(
+		damping=params['damping'], preference=params['preference'])
+	average_linkage = cluster.AgglomerativeClustering(
+		linkage="average", affinity="cityblock",
+		n_clusters=params['n_clusters'], connectivity=connectivity)
+	birch = cluster.Birch(n_clusters=params['n_clusters'])
+	gmm = mixture.GaussianMixture(
+		n_components=params['n_clusters'], covariance_type='full')
+
+	clustering_algorithms = (
+		('MiniBatchKMeans', two_means),
+		('AffinityPropagation', affinity_propagation),
+		('MeanShift', ms),
+		('SpectralClustering', spectral),
+		('Ward', ward),
+		('AgglomerativeClustering', average_linkage),
+		('DBSCAN', dbscan),
+		('OPTICS', optics),
+		('Birch', birch),
+		('GaussianMixture', gmm)
+	)
+
+	results = {}
+
+	for name, algorithm in clustering_algorithms:
+		t0 = time.time()
+
+		# catch warnings related to kneighbors_graph
+		with warnings.catch_warnings():
+			warnings.filterwarnings(
+				"ignore",
+				message="the number of connected components of the " +
+				"connectivity matrix is [0-9]{1,2}" +
+				" > 1. Completing it to avoid stopping the tree early.",
+				category=UserWarning)
+			warnings.filterwarnings(
+				"ignore",
+				message="Graph is not fully connected, spectral embedding" +
+				" may not work as expected.",
+				category=UserWarning)
+			algorithm.fit(X)
+
+		results[name] = X[:, 0:1]
+
+	print('Calculation compleded')
+
+	print('Plotting results...')
+	#plt.show()#block=False
+	print('Results plotted')
+	return result
 
