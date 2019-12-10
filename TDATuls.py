@@ -301,7 +301,6 @@ Spikes
 def prepare_spike_detection_parameters(data,windows,threshold):
     parameters = []
     t = (data.max() - data.min())/100*threshold
-    offset = 0
     for w in windows:
         parameters += [(data[w],w.start,t)]
     return parameters
