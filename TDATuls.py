@@ -284,11 +284,11 @@ def calculate_windows(size,overlap,limit):
 	i = 0
 	res = []
 	while i <= (limit-size):
-		res += [range(i,(i+size))]
+		res.append(range(i,(i+size)))
 		i += advancement
 
 	if i < limit:
-		res += [range(i,limit)]
+		res.append(range(i,limit))
 	return res
 
 
@@ -303,8 +303,7 @@ def prepare_spike_detection_parameters(data,windows,threshold):
     t = (data.max() - data.min())/100*threshold
     offset = 0
     for w in windows:
-        parameters += [(data[w],offset,t)]
-        offset += w.stop - w.start
+        parameters += [(data[w],w.start,t)]
     return parameters
 
 
