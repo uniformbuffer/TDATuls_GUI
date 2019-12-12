@@ -44,14 +44,15 @@ from sklearn.decomposition import PCA
 
 # Internals
 from TDATuls import *
-from noname import MainFrame, PanelLowerStar, PanelRipser, PanelCorrMatDist, PanelCorrMatHoles, PanelSpikes, PanelMultiCluster
+from noname import *
 
 #se la periodicità del segnale che vedo nella rappresentazione dopo le sliding windows si ripete per tutte le serie di punti piu o meno nelle stesse posizioni (correlazione verticale delle sliding window) significa che in quei punti qualcosa sta succedendo (si suppone proteine che vanno in folding)
-
+from functools import partial
 
 ID_COUNTER = 2000
 Data = []
 Settings = {}
+
 
 def inc_id_counter():
 	global ID_COUNTER
@@ -232,18 +233,6 @@ class AppPageMenuItem(wx.MenuItem):
 				break
 		# create the notebook page corresponding to the chosen dataset
 		page = AppPanelLowerStar(self.parent.Window.notebook,d['data'])
-		'''page.dataDict = d
-		# label display the shape of the dataset
-		page.label_shape.SetLabel(d["shape"])
-		# Max window size is the max value of the columns of the dataset
-		maxval = int(str(d["shape"]).split(',')[1].strip(')'))
-		page.spn_window_size.SetRange(1,maxval)
-		# Overlap can vary between no overlap (subsequent) or complete overlap (one window on top of the other)
-		page.sl_overlap.SetRange(0,100)
-		# Signal choice is equal to rows in data shape
-		maxSignal = int(str(d["shape"]).split(',')[0].strip('('))
-		page.ch_signal.SetItems([str(val) for val in range(maxSignal)])'''
-
 		self.parent.Window.notebook.AddPage(page,'Lower Star on ' + d["path"])
 		print("Lower Star tab created")
 
@@ -257,13 +246,6 @@ class AppPageMenuItem(wx.MenuItem):
 		# create the notebook page corresponding to the chosen dataset
 		page = AppPanelRipser(self.parent.Window.notebook,d['data'])
 
-		# label display the shape of the dataset
-
-		# Max window size is the max value of the columns of the dataset
-		#maxval = int(str(d["shape"]).split(',')[1].strip(')'))
-		#page.spn_window_size.SetRange(1,maxval)
-		# Overlap can vary between no overlap (subsequent) or complete overlap (one window on top of the other)
-		#page.sl_overlap.SetRange(0,100)
 
 		self.parent.Window.notebook.AddPage(page,'Ripser on ' + d["path"])
 		print("Ripser tab created")
@@ -277,16 +259,6 @@ class AppPageMenuItem(wx.MenuItem):
 				break
 		# create the notebook page corresponding to the chosen dataset
 		page = AppPanelCorrMatDist(self.parent.Window.notebook,d['data'])
-		#page.dataDict = d
-		# label display the shape of the dataset
-		#page.label_shape.SetLabel(d["shape"])
-		# Max window size is the max value of the columns of the dataset
-		#maxval = int(str(d["shape"]).split(',')[1].strip(')'))
-		#page.spn_window_size.SetRange(1,maxval)
-		# Overlap can vary between no overlap (subsequent) or complete overlap (one window on top of the other)
-		#page.sl_overlap.SetRange(0,100)
-
-
 		self.parent.Window.notebook.AddPage(page,'Correlation Matrix on ' + d["path"])
 		print("Correlation Matrix tab created")
 	def onMenuItemClickHoles(self,event):
@@ -313,7 +285,7 @@ class AppPageMenuItem(wx.MenuItem):
 		self.parent.Window.notebook.AddPage(page,'Spikes on ' + d["path"])
 		print("Spikes tab created")
 
-	def onMenuItemClickMultiCluster(self,event):
+	def onMenuItemClickMiniBatchKMeans(self,event):
 		global Data
 		d = None
 		for dic in Data:
@@ -321,15 +293,122 @@ class AppPageMenuItem(wx.MenuItem):
 				d = dic
 				break
 		# create the notebook page corresponding to the chosen dataset
-		page = AppPanelMultiCluster(self.parent.Window.notebook,d['data'])
-		self.parent.Window.notebook.AddPage(page,'MultiCluster on ' + d["path"])
-		print("MultiCluster tab created")
+		page = AppPanelMiniBatchKMeans(self.parent.Window.notebook,d['data'])
+		self.parent.Window.notebook.AddPage(page,'MiniBatchKMeans on ' + d["path"])
+		print("MiniBatchKMeans tab created")
+
+	def onMenuItemClickAffinityPropagation(self,event):
+		global Data
+		d = None
+		for dic in Data:
+			if dic["path"] == self.Text: # corresponding data found
+				d = dic
+				break
+		# create the notebook page corresponding to the chosen dataset
+		page = AppPanelAffinityPropagation(self.parent.Window.notebook,d['data'])
+		self.parent.Window.notebook.AddPage(page,'AffinityPropagation on ' + d["path"])
+		print("AffinityPropagation tab created")
+
+	def onMenuItemClickMeanShift(self,event):
+		global Data
+		d = None
+		for dic in Data:
+			if dic["path"] == self.Text: # corresponding data found
+				d = dic
+				break
+		# create the notebook page corresponding to the chosen dataset
+		page = AppPanelMeanShift(self.parent.Window.notebook,d['data'])
+		self.parent.Window.notebook.AddPage(page,'MeanShift on ' + d["path"])
+		print("MeanShift tab created")
+
+	def onMenuItemClickSpectralClustering(self,event):
+		global Data
+		d = None
+		for dic in Data:
+			if dic["path"] == self.Text: # corresponding data found
+				d = dic
+				break
+		# create the notebook page corresponding to the chosen dataset
+		page = AppPanelSpectralClustering(self.parent.Window.notebook,d['data'])
+		self.parent.Window.notebook.AddPage(page,'SpectralClustering on ' + d["path"])
+		print("SpectralClustering tab created")
+
+	def onMenuItemClickWard(self,event):
+		global Data
+		d = None
+		for dic in Data:
+			if dic["path"] == self.Text: # corresponding data found
+				d = dic
+				break
+		# create the notebook page corresponding to the chosen dataset
+		page = AppPanelWard(self.parent.Window.notebook,d['data'])
+		self.parent.Window.notebook.AddPage(page,'Ward on ' + d["path"])
+		print("Ward tab created")
+
+	def onMenuItemClickAgglomerativeClustering(self,event):
+		global Data
+		d = None
+		for dic in Data:
+			if dic["path"] == self.Text: # corresponding data found
+				d = dic
+				break
+		# create the notebook page corresponding to the chosen dataset
+		page = AppPanelAgglomerativeClustering(self.parent.Window.notebook,d['data'])
+		self.parent.Window.notebook.AddPage(page,'AgglomerativeClustering on ' + d["path"])
+		print("AgglomerativeClustering tab created")
+
+	def onMenuItemClickDBSCAN(self,event):
+		global Data
+		d = None
+		for dic in Data:
+			if dic["path"] == self.Text: # corresponding data found
+				d = dic
+				break
+		# create the notebook page corresponding to the chosen dataset
+		page = AppPanelDBSCAN(self.parent.Window.notebook,d['data'])
+		self.parent.Window.notebook.AddPage(page,'DBSCAN on ' + d["path"])
+		print("DBSCAN tab created")
+
+	def onMenuItemClickOPTICS(self,event):
+		global Data
+		d = None
+		for dic in Data:
+			if dic["path"] == self.Text: # corresponding data found
+				d = dic
+				break
+		# create the notebook page corresponding to the chosen dataset
+		page = AppPanelOPTICS(self.parent.Window.notebook,d['data'])
+		self.parent.Window.notebook.AddPage(page,'OPTICS on ' + d["path"])
+		print("OPTICS tab created")
+
+	def onMenuItemClickBirch(self,event):
+		global Data
+		d = None
+		for dic in Data:
+			if dic["path"] == self.Text: # corresponding data found
+				d = dic
+				break
+		# create the notebook page corresponding to the chosen dataset
+		page = AppPanelBirch(self.parent.Window.notebook,d['data'])
+		self.parent.Window.notebook.AddPage(page,'Birch on ' + d["path"])
+		print("Birch tab created")
+
+	def onMenuItemClickGaussianMixture(self,event):
+		global Data
+		d = None
+		for dic in Data:
+			if dic["path"] == self.Text: # corresponding data found
+				d = dic
+				break
+		# create the notebook page corresponding to the chosen dataset
+		page = AppPanelGaussianMixture(self.parent.Window.notebook,d['data'])
+		self.parent.Window.notebook.AddPage(page,'GaussianMixture on ' + d["path"])
+		print("GaussianMixture tab created")
 
 # Start by overriding the behaviour of the MainFrame
 class AppFrame(MainFrame):
 	def __init__( self, parent ):
 		MainFrame.__init__( self,parent=parent )
-
 		# Here we change the display of elements and their behaviour
 		# The most important change is to make the panel a child of the frame
 		# outside any sizer and then create a notebook and a sizer which the notebook is a child of
@@ -412,8 +491,27 @@ class AppFrame(MainFrame):
 			self.distanceMatrix.DestroyItem(item.Id)
 		for item in self.holes.GetMenuItems():
 			self.holes.DestroyItem(item.Id)
-		for item in self.multicluster.GetMenuItems():
-			self.multicluster.DestroyItem(item.Id)
+		for item in self.MiniBatchKMeans.GetMenuItems():
+			self.MiniBatchKMeans.DestroyItem(item.Id)
+		for item in self.AffinityPropagation.GetMenuItems():
+			self.AffinityPropagation.DestroyItem(item.Id)
+		for item in self.MeanShift.GetMenuItems():
+			self.MeanShift.DestroyItem(item.Id)
+		for item in self.SpectralClustering.GetMenuItems():
+			self.SpectralClustering.DestroyItem(item.Id)
+		for item in self.Ward.GetMenuItems():
+			self.Ward.DestroyItem(item.Id)
+		for item in self.AgglomerativeClustering.GetMenuItems():
+			self.AgglomerativeClustering.DestroyItem(item.Id)
+		for item in self.DBSCAN.GetMenuItems():
+			self.DBSCAN.DestroyItem(item.Id)
+		for item in self.OPTICS.GetMenuItems():
+			self.OPTICS.DestroyItem(item.Id)
+		for item in self.Birch.GetMenuItems():
+			self.Birch.DestroyItem(item.Id)
+		for item in self.GaussianMixture.GetMenuItems():
+			self.GaussianMixture.DestroyItem(item.Id)
+
 		for dic in Data:
 			if dic["data"] is not None: # dataset is loaded
 				id_lowerStar = inc_id_counter()
@@ -431,6 +529,7 @@ class AppFrame(MainFrame):
 				self.Bind(wx.EVT_MENU,dataEntrySpikes.onMenuItemClickSpikes,id=id_Spikes)
 				self.spikes.Append(dataEntrySpikes)
 
+
 				id_distanceMatrix = inc_id_counter()
 				data_distanceMatrix = AppPageMenuItem(self.distanceMatrix,id=id_distanceMatrix,text=str(dic["path"]))
 				self.Bind(wx.EVT_MENU,data_distanceMatrix.onMenuItemClickCorrMat,id=id_distanceMatrix)
@@ -441,12 +540,55 @@ class AppFrame(MainFrame):
 				self.Bind(wx.EVT_MENU,data_holes.onMenuItemClickHoles,id=id_holes)
 				self.holes.Append(data_holes)
 
-				id_multicluster = inc_id_counter()
-				data_multicluster = AppPageMenuItem(self.multicluster, id=id_multicluster,text=str(dic["path"]))
-				self.Bind(wx.EVT_MENU,data_multicluster.onMenuItemClickMultiCluster,id=id_multicluster)
-				self.multicluster.Append(data_multicluster)
+				id_MiniBatchKMeans = inc_id_counter()
+				data_MiniBatchKMeans = AppPageMenuItem(self.MiniBatchKMeans, id=id_MiniBatchKMeans,text=str(dic["path"]))
+				self.Bind(wx.EVT_MENU,data_MiniBatchKMeans.onMenuItemClickMiniBatchKMeans,id=id_MiniBatchKMeans)
+				self.MiniBatchKMeans.Append(data_MiniBatchKMeans)
 
+				id_AffinityPropagation = inc_id_counter()
+				data_AffinityPropagation = AppPageMenuItem(self.AffinityPropagation, id=id_AffinityPropagation,text=str(dic["path"]))
+				self.Bind(wx.EVT_MENU,data_AffinityPropagation.onMenuItemClickAffinityPropagation,id=id_AffinityPropagation)
+				self.AffinityPropagation.Append(data_AffinityPropagation)
 
+				id_MeanShift = inc_id_counter()
+				data_MeanShift = AppPageMenuItem(self.MeanShift, id=id_MeanShift,text=str(dic["path"]))
+				self.Bind(wx.EVT_MENU,data_MeanShift.onMenuItemClickMeanShift,id=id_MeanShift)
+				self.MeanShift.Append(data_MeanShift)
+
+				id_SpectralClustering = inc_id_counter()
+				data_SpectralClustering = AppPageMenuItem(self.SpectralClustering, id=id_SpectralClustering,text=str(dic["path"]))
+				self.Bind(wx.EVT_MENU,data_SpectralClustering.onMenuItemClickSpectralClustering,id=id_SpectralClustering)
+				self.SpectralClustering.Append(data_SpectralClustering)
+
+				id_Ward = inc_id_counter()
+				data_Ward = AppPageMenuItem(self.Ward, id=id_Ward,text=str(dic["path"]))
+				self.Bind(wx.EVT_MENU,data_Ward.onMenuItemClickWard,id=id_Ward)
+				self.Ward.Append(data_Ward)
+
+				id_AgglomerativeClustering = inc_id_counter()
+				data_AgglomerativeClustering = AppPageMenuItem(self.AgglomerativeClustering, id=id_AgglomerativeClustering,text=str(dic["path"]))
+				self.Bind(wx.EVT_MENU,data_AgglomerativeClustering.onMenuItemClickAgglomerativeClustering,id=id_AgglomerativeClustering)
+				self.AgglomerativeClustering.Append(data_AgglomerativeClustering)
+
+				id_DBSCAN = inc_id_counter()
+				data_DBSCAN = AppPageMenuItem(self.DBSCAN, id=id_DBSCAN,text=str(dic["path"]))
+				self.Bind(wx.EVT_MENU,data_DBSCAN.onMenuItemClickDBSCAN,id=id_DBSCAN)
+				self.DBSCAN.Append(data_DBSCAN)
+
+				id_OPTICS = inc_id_counter()
+				data_OPTICS = AppPageMenuItem(self.OPTICS, id=id_OPTICS,text=str(dic["path"]))
+				self.Bind(wx.EVT_MENU,data_OPTICS.onMenuItemClickOPTICS,id=id_OPTICS)
+				self.OPTICS.Append(data_OPTICS)
+
+				id_Birch = inc_id_counter()
+				data_Birch = AppPageMenuItem(self.Birch, id=id_Birch,text=str(dic["path"]))
+				self.Bind(wx.EVT_MENU,data_Birch.onMenuItemClickBirch,id=id_Birch)
+				self.Birch.Append(data_Birch)
+
+				id_GaussianMixture = inc_id_counter()
+				data_GaussianMixture = AppPageMenuItem(self.GaussianMixture, id=id_GaussianMixture,text=str(dic["path"]))
+				self.Bind(wx.EVT_MENU,data_GaussianMixture.onMenuItemClickGaussianMixture,id=id_GaussianMixture)
+				self.GaussianMixture.Append(data_GaussianMixture)
 
 class BasePanel():
 	def __init__(self, parent,data):
@@ -588,6 +730,10 @@ class AppPanelRipser(PanelRipser,BasePanel):
 		PanelRipser.__init__(self, parent=parent)
 		BasePanel.__init__(self, parent=parent, data=data)
 
+		export_Ripser_dgms = AppPageMenuItem(self.parent.parent.Window.export, id=0,text="Export ripser dgms")
+		self.Bind(wx.EVT_MENU,export_Ripser_dgms.saveDgms,id=0)
+		self.parent.export.Append(export_Ripser_dgms)
+
 		# Set Label
 		self.label_shape.SetLabel(str(self.data.shape))
 
@@ -608,6 +754,7 @@ class AppPanelRipser(PanelRipser,BasePanel):
 		metric = self.ch_metric.GetString(self.ch_metric.GetCurrentSelection())
 		windows = calculate_windows(window_size,overlap,self.data.shape[0])
 		diagrams = {}
+		data = {'dgms': {}}
 		i = 0
 		for window in windows:
 			dgms = doRipsFiltration(self.data[window],max_hom_dim,distance_matrix,metric)#['dgms']
@@ -615,11 +762,23 @@ class AppPanelRipser(PanelRipser,BasePanel):
 			plt.figure(figure.number)
 			plot_diagrams(dgms)
 			diagrams['window'+str(i)] = figure
+			data['dgms']['window'+str(i)] = dgms
 			i+=1
 
 		wx.adv.NotificationMessage('Done', message="Done")
 		self.diagrams = diagrams
+		self.data = data
 		self.updateFigure(0)
+
+	def saveDgms(self,event):
+		dialog = wx.DirDialog (None, "Choose output directory", "", wx.DD_DEFAULT_STYLE | wx.DD_DIR_MUST_EXIST)
+		if dialog.ShowModal() == wx.ID_CANCEL:
+			return
+
+		path = dialog.GetPath()
+		for name in self.data['dgms']:
+			np.savetxt(os.path.join(path,name),self.data['dgms'][name])
+
 
 	def onCloseButtonClick(self, event):
 		index = self.parent.GetSelection()
@@ -769,7 +928,7 @@ class AppPanelCorrMatHoles(PanelCorrMatHoles,BasePanel):
 	def __init__(self, parent,data):
 		PanelCorrMatHoles.__init__(self, parent=parent)
 		BasePanel.__init__(self, parent=parent, data=data)
-
+		print(vars(self.frame))
 		# Set Label
 		self.label_shape.SetLabel(str(self.data.shape))
 
@@ -786,6 +945,12 @@ class AppPanelCorrMatHoles(PanelCorrMatHoles,BasePanel):
 		self.window_size_slider.SetMax(self.data.shape[0])
 
 		self.updateFigure(0)
+
+	def onExportPikle(self,event):
+		dialog = wx.DirDialog (None, "Choose output directory", "", wx.DD_DEFAULT_STYLE | wx.DD_DIR_MUST_EXIST)
+		if dialog.ShowModal() == wx.ID_CANCEL:
+			return
+		self.txt_open_folder.SetValue(dialog.GetPath())
 
 	def onSelectFolder(self,event):
 		dialog = wx.DirDialog (None, "Choose output directory", "", wx.DD_DEFAULT_STYLE | wx.DD_DIR_MUST_EXIST)
@@ -928,9 +1093,9 @@ class AppPanelSpikes(PanelSpikes,BasePanel):
 	def onFigureChange(self, event):
 		self.updateFigure(self.figure_list.GetCurrentSelection())
 
-class AppPanelMultiCluster(PanelMultiCluster,BasePanel):
+class AppPanelMiniBatchKMeans(PanelMiniBatchKMeans,BasePanel):
 	def __init__(self, parent,data):
-		PanelMultiCluster.__init__(self, parent=parent)
+		PanelMiniBatchKMeans.__init__(self, parent=parent)
 		BasePanel.__init__(self, parent=parent, data=data)
 
 		# Set Label
@@ -941,15 +1106,414 @@ class AppPanelMultiCluster(PanelMultiCluster,BasePanel):
 		# Close button
 		self.btn_close.Bind(wx.EVT_BUTTON,self.onCloseButtonClick)
 
-		# Slider window size
-		self.window_size_slider.Bind(wx.EVT_SCROLL,self.onWindowSizeSliderChange)
-		self.window_size_slider.SetMax(self.data.shape[0])
 
 	def onExecuteButtonClick(self, event):
-		overlap = self.overlap_slider.GetValue()
-		window_size = self.window_size_slider.GetValue()
-		windows = calculate_windows(window_size,overlap,self.data.shape[0])
 		diagrams = {}
+
+		two_means = cluster.MiniBatchKMeans(n_clusters=params['n_clusters'])
+
+		clusters = all_clusters(self.data)
+
+		print('Plotting results...')
+		for (name,data) in clusters:
+			figure = plt.figure()
+			plt.figure(figure.number)
+			plt.plot(data)
+			diagrams[name+' on signal '+str(i)] = figure
+		print('Results plotted')
+
+		wx.adv.NotificationMessage('Done', message="Done")
+		self.diagrams = diagrams
+		self.updateFigure(0)
+
+	def onCloseButtonClick(self, event):
+		index = self.parent.GetSelection()
+		self.parent.DeletePage(index)
+		self.parent.SendSizeEvent()
+	def onWindowSizeSliderChange(self, event):
+		self.overlap_slider.SetMax(self.window_size_slider.GetValue())
+
+	def onFigureChange(self, event):
+		self.updateFigure(self.figure_list.GetCurrentSelection())
+
+class AppPanelAffinityPropagation(PanelAffinityPropagation,BasePanel):
+	def __init__(self, parent,data):
+		PanelAffinityPropagation.__init__(self, parent=parent)
+		BasePanel.__init__(self, parent=parent, data=data)
+
+		# Set Label
+		self.label_shape.SetLabel(str(self.data.shape))
+
+		# Execute button
+		self.btn_execute.Bind(wx.EVT_BUTTON,self.onExecuteButtonClick)
+		# Close button
+		self.btn_close.Bind(wx.EVT_BUTTON,self.onCloseButtonClick)
+
+
+	def onExecuteButtonClick(self, event):
+		diagrams = {}
+
+		two_means = cluster.AffinityPropagation(n_clusters=params['n_clusters'])
+
+		clusters = all_clusters(self.data)
+
+		print('Plotting results...')
+		for (name,data) in clusters:
+			figure = plt.figure()
+			plt.figure(figure.number)
+			plt.plot(data)
+			diagrams[name+' on signal '+str(i)] = figure
+		print('Results plotted')
+
+		wx.adv.NotificationMessage('Done', message="Done")
+		self.diagrams = diagrams
+		self.updateFigure(0)
+
+	def onCloseButtonClick(self, event):
+		index = self.parent.GetSelection()
+		self.parent.DeletePage(index)
+		self.parent.SendSizeEvent()
+	def onWindowSizeSliderChange(self, event):
+		self.overlap_slider.SetMax(self.window_size_slider.GetValue())
+
+	def onFigureChange(self, event):
+		self.updateFigure(self.figure_list.GetCurrentSelection())
+
+
+
+class AppPanelMeanShift(PanelMeanShift,BasePanel):
+	def __init__(self, parent,data):
+		PanelMeanShift.__init__(self, parent=parent)
+		BasePanel.__init__(self, parent=parent, data=data)
+
+		# Set Label
+		self.label_shape.SetLabel(str(self.data.shape))
+
+		# Execute button
+		self.btn_execute.Bind(wx.EVT_BUTTON,self.onExecuteButtonClick)
+		# Close button
+		self.btn_close.Bind(wx.EVT_BUTTON,self.onCloseButtonClick)
+
+
+	def onExecuteButtonClick(self, event):
+		diagrams = {}
+
+		two_means = cluster.MeanShift(n_clusters=params['n_clusters'])
+
+		clusters = all_clusters(self.data)
+
+		print('Plotting results...')
+		for (name,data) in clusters:
+			figure = plt.figure()
+			plt.figure(figure.number)
+			plt.plot(data)
+			diagrams[name+' on signal '+str(i)] = figure
+		print('Results plotted')
+
+		wx.adv.NotificationMessage('Done', message="Done")
+		self.diagrams = diagrams
+		self.updateFigure(0)
+
+	def onCloseButtonClick(self, event):
+		index = self.parent.GetSelection()
+		self.parent.DeletePage(index)
+		self.parent.SendSizeEvent()
+	def onWindowSizeSliderChange(self, event):
+		self.overlap_slider.SetMax(self.window_size_slider.GetValue())
+
+	def onFigureChange(self, event):
+		self.updateFigure(self.figure_list.GetCurrentSelection())
+
+
+
+class AppPanelSpectralClustering(PanelSpectralClustering,BasePanel):
+	def __init__(self, parent,data):
+		PanelSpectralClustering.__init__(self, parent=parent)
+		BasePanel.__init__(self, parent=parent, data=data)
+
+		# Set Label
+		self.label_shape.SetLabel(str(self.data.shape))
+
+		# Execute button
+		self.btn_execute.Bind(wx.EVT_BUTTON,self.onExecuteButtonClick)
+		# Close button
+		self.btn_close.Bind(wx.EVT_BUTTON,self.onCloseButtonClick)
+
+
+	def onExecuteButtonClick(self, event):
+		diagrams = {}
+
+		two_means = cluster.SpectralClustering(n_clusters=params['n_clusters'])
+
+		clusters = all_clusters(self.data)
+
+		print('Plotting results...')
+		for (name,data) in clusters:
+			figure = plt.figure()
+			plt.figure(figure.number)
+			plt.plot(data)
+			diagrams[name+' on signal '+str(i)] = figure
+		print('Results plotted')
+
+		wx.adv.NotificationMessage('Done', message="Done")
+		self.diagrams = diagrams
+		self.updateFigure(0)
+
+	def onCloseButtonClick(self, event):
+		index = self.parent.GetSelection()
+		self.parent.DeletePage(index)
+		self.parent.SendSizeEvent()
+	def onWindowSizeSliderChange(self, event):
+		self.overlap_slider.SetMax(self.window_size_slider.GetValue())
+
+	def onFigureChange(self, event):
+		self.updateFigure(self.figure_list.GetCurrentSelection())
+
+
+
+class AppPanelWard(PanelWard,BasePanel):
+	def __init__(self, parent,data):
+		PanelWard.__init__(self, parent=parent)
+		BasePanel.__init__(self, parent=parent, data=data)
+
+		# Set Label
+		self.label_shape.SetLabel(str(self.data.shape))
+
+		# Execute button
+		self.btn_execute.Bind(wx.EVT_BUTTON,self.onExecuteButtonClick)
+		# Close button
+		self.btn_close.Bind(wx.EVT_BUTTON,self.onCloseButtonClick)
+
+
+	def onExecuteButtonClick(self, event):
+		diagrams = {}
+
+		two_means = cluster.Ward(n_clusters=params['n_clusters'])
+
+		clusters = all_clusters(self.data)
+
+		print('Plotting results...')
+		for (name,data) in clusters:
+			figure = plt.figure()
+			plt.figure(figure.number)
+			plt.plot(data)
+			diagrams[name+' on signal '+str(i)] = figure
+		print('Results plotted')
+
+		wx.adv.NotificationMessage('Done', message="Done")
+		self.diagrams = diagrams
+		self.updateFigure(0)
+
+	def onCloseButtonClick(self, event):
+		index = self.parent.GetSelection()
+		self.parent.DeletePage(index)
+		self.parent.SendSizeEvent()
+	def onWindowSizeSliderChange(self, event):
+		self.overlap_slider.SetMax(self.window_size_slider.GetValue())
+
+	def onFigureChange(self, event):
+		self.updateFigure(self.figure_list.GetCurrentSelection())
+
+
+
+class AppPanelAgglomerativeClustering(PanelAgglomerativeClustering,BasePanel):
+	def __init__(self, parent,data):
+		PanelAgglomerativeClustering.__init__(self, parent=parent)
+		BasePanel.__init__(self, parent=parent, data=data)
+
+		# Set Label
+		self.label_shape.SetLabel(str(self.data.shape))
+
+		# Execute button
+		self.btn_execute.Bind(wx.EVT_BUTTON,self.onExecuteButtonClick)
+		# Close button
+		self.btn_close.Bind(wx.EVT_BUTTON,self.onCloseButtonClick)
+
+
+	def onExecuteButtonClick(self, event):
+		diagrams = {}
+
+		two_means = cluster.AgglomerativeClustering(n_clusters=params['n_clusters'])
+
+		clusters = all_clusters(self.data)
+
+		print('Plotting results...')
+		for (name,data) in clusters:
+			figure = plt.figure()
+			plt.figure(figure.number)
+			plt.plot(data)
+			diagrams[name+' on signal '+str(i)] = figure
+		print('Results plotted')
+
+		wx.adv.NotificationMessage('Done', message="Done")
+		self.diagrams = diagrams
+		self.updateFigure(0)
+
+	def onCloseButtonClick(self, event):
+		index = self.parent.GetSelection()
+		self.parent.DeletePage(index)
+		self.parent.SendSizeEvent()
+	def onWindowSizeSliderChange(self, event):
+		self.overlap_slider.SetMax(self.window_size_slider.GetValue())
+
+	def onFigureChange(self, event):
+		self.updateFigure(self.figure_list.GetCurrentSelection())
+
+
+
+class AppPanelDBSCAN(PanelDBSCAN,BasePanel):
+	def __init__(self, parent,data):
+		PanelDBSCAN.__init__(self, parent=parent)
+		BasePanel.__init__(self, parent=parent, data=data)
+
+		# Set Label
+		self.label_shape.SetLabel(str(self.data.shape))
+
+		# Execute button
+		self.btn_execute.Bind(wx.EVT_BUTTON,self.onExecuteButtonClick)
+		# Close button
+		self.btn_close.Bind(wx.EVT_BUTTON,self.onCloseButtonClick)
+
+
+	def onExecuteButtonClick(self, event):
+		diagrams = {}
+
+		two_means = cluster.DBSCAN(n_clusters=params['n_clusters'])
+
+		clusters = all_clusters(self.data)
+
+		print('Plotting results...')
+		for (name,data) in clusters:
+			figure = plt.figure()
+			plt.figure(figure.number)
+			plt.plot(data)
+			diagrams[name+' on signal '+str(i)] = figure
+		print('Results plotted')
+
+		wx.adv.NotificationMessage('Done', message="Done")
+		self.diagrams = diagrams
+		self.updateFigure(0)
+
+	def onCloseButtonClick(self, event):
+		index = self.parent.GetSelection()
+		self.parent.DeletePage(index)
+		self.parent.SendSizeEvent()
+	def onWindowSizeSliderChange(self, event):
+		self.overlap_slider.SetMax(self.window_size_slider.GetValue())
+
+	def onFigureChange(self, event):
+		self.updateFigure(self.figure_list.GetCurrentSelection())
+
+
+
+class AppPanelOPTICS(PanelOPTICS,BasePanel):
+	def __init__(self, parent,data):
+		PanelOPTICS.__init__(self, parent=parent)
+		BasePanel.__init__(self, parent=parent, data=data)
+
+		# Set Label
+		self.label_shape.SetLabel(str(self.data.shape))
+
+		# Execute button
+		self.btn_execute.Bind(wx.EVT_BUTTON,self.onExecuteButtonClick)
+		# Close button
+		self.btn_close.Bind(wx.EVT_BUTTON,self.onCloseButtonClick)
+
+
+	def onExecuteButtonClick(self, event):
+		diagrams = {}
+
+		two_means = cluster.OPTICS(n_clusters=params['n_clusters'])
+
+		clusters = all_clusters(self.data)
+
+		print('Plotting results...')
+		for (name,data) in clusters:
+			figure = plt.figure()
+			plt.figure(figure.number)
+			plt.plot(data)
+			diagrams[name+' on signal '+str(i)] = figure
+		print('Results plotted')
+
+		wx.adv.NotificationMessage('Done', message="Done")
+		self.diagrams = diagrams
+		self.updateFigure(0)
+
+	def onCloseButtonClick(self, event):
+		index = self.parent.GetSelection()
+		self.parent.DeletePage(index)
+		self.parent.SendSizeEvent()
+	def onWindowSizeSliderChange(self, event):
+		self.overlap_slider.SetMax(self.window_size_slider.GetValue())
+
+	def onFigureChange(self, event):
+		self.updateFigure(self.figure_list.GetCurrentSelection())
+
+
+
+class AppPanelBirch(PanelBirch,BasePanel):
+	def __init__(self, parent,data):
+		PanelBirch.__init__(self, parent=parent)
+		BasePanel.__init__(self, parent=parent, data=data)
+
+		# Set Label
+		self.label_shape.SetLabel(str(self.data.shape))
+
+		# Execute button
+		self.btn_execute.Bind(wx.EVT_BUTTON,self.onExecuteButtonClick)
+		# Close button
+		self.btn_close.Bind(wx.EVT_BUTTON,self.onCloseButtonClick)
+
+
+	def onExecuteButtonClick(self, event):
+		diagrams = {}
+
+		two_means = cluster.Birch(n_clusters=params['n_clusters'])
+
+		clusters = all_clusters(self.data)
+
+		print('Plotting results...')
+		for (name,data) in clusters:
+			figure = plt.figure()
+			plt.figure(figure.number)
+			plt.plot(data)
+			diagrams[name+' on signal '+str(i)] = figure
+		print('Results plotted')
+
+		wx.adv.NotificationMessage('Done', message="Done")
+		self.diagrams = diagrams
+		self.updateFigure(0)
+
+	def onCloseButtonClick(self, event):
+		index = self.parent.GetSelection()
+		self.parent.DeletePage(index)
+		self.parent.SendSizeEvent()
+	def onWindowSizeSliderChange(self, event):
+		self.overlap_slider.SetMax(self.window_size_slider.GetValue())
+
+	def onFigureChange(self, event):
+		self.updateFigure(self.figure_list.GetCurrentSelection())
+
+
+
+class AppPanelGaussianMixture(PanelGaussianMixture,BasePanel):
+	def __init__(self, parent,data):
+		PanelGaussianMixture.__init__(self, parent=parent)
+		BasePanel.__init__(self, parent=parent, data=data)
+
+		# Set Label
+		self.label_shape.SetLabel(str(self.data.shape))
+
+		# Execute button
+		self.btn_execute.Bind(wx.EVT_BUTTON,self.onExecuteButtonClick)
+		# Close button
+		self.btn_close.Bind(wx.EVT_BUTTON,self.onCloseButtonClick)
+
+
+	def onExecuteButtonClick(self, event):
+		diagrams = {}
+
+		two_means = cluster.GaussianMixture(n_clusters=params['n_clusters'])
 
 		clusters = all_clusters(self.data)
 
