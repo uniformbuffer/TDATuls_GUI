@@ -740,12 +740,22 @@ class PanelMiniBatchKMeans ( wx.Panel ):
 
 		settingsSizer.Add( self.label_shape, 0, wx.ALL, 5 )
 
+		self.m_staticText19 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Select signal:", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText19.Wrap( -1 )
+
+		settingsSizer.Add( self.m_staticText19, 0, wx.ALL, 5 )
+
+		ch_signalChoices = []
+		self.ch_signal = wx.Choice( self.scrolled_window, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, ch_signalChoices, 0 )
+		self.ch_signal.SetSelection( 0 )
+		settingsSizer.Add( self.ch_signal, 0, wx.ALL, 5 )
+
 		self.m_staticText33 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Cluster Number:", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText33.Wrap( -1 )
 
 		settingsSizer.Add( self.m_staticText33, 0, wx.ALL, 5 )
 
-		self.ncluster_textctrl = wx.TextCtrl( self.scrolled_window, wx.ID_ANY, u"1", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.ncluster_textctrl = wx.TextCtrl( self.scrolled_window, wx.ID_ANY, u"2", wx.DefaultPosition, wx.DefaultSize, 0 )
 		settingsSizer.Add( self.ncluster_textctrl, 0, wx.ALL, 5 )
 
 		self.btn_execute = wx.Button( self.scrolled_window, wx.ID_ANY, u"Execute", wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -819,21 +829,31 @@ class PanelAffinityPropagation ( wx.Panel ):
 
 		settingsSizer.Add( self.label_shape, 0, wx.ALL, 5 )
 
-		self.m_staticText33 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Window Size:", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText19 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Select signal:", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText19.Wrap( -1 )
+
+		settingsSizer.Add( self.m_staticText19, 0, wx.ALL, 5 )
+
+		ch_signalChoices = []
+		self.ch_signal = wx.Choice( self.scrolled_window, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, ch_signalChoices, 0 )
+		self.ch_signal.SetSelection( 0 )
+		settingsSizer.Add( self.ch_signal, 0, wx.ALL, 5 )
+
+		self.m_staticText33 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Damping:", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText33.Wrap( -1 )
 
 		settingsSizer.Add( self.m_staticText33, 0, wx.ALL, 5 )
 
-		self.window_size_slider = wx.Slider( self.scrolled_window, wx.ID_ANY, 50, 1, 100, wx.DefaultPosition, wx.Size( 200,-1 ), wx.SL_HORIZONTAL|wx.SL_VALUE_LABEL )
-		settingsSizer.Add( self.window_size_slider, 0, wx.ALL, 5 )
+		self.damping_textctrl = wx.TextCtrl( self.scrolled_window, wx.ID_ANY, u"0.9", wx.DefaultPosition, wx.DefaultSize, 0 )
+		settingsSizer.Add( self.damping_textctrl, 0, wx.ALL, 5 )
 
-		self.m_staticText35 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Overlap:", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText35 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Preference:", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText35.Wrap( -1 )
 
 		settingsSizer.Add( self.m_staticText35, 0, wx.ALL, 5 )
 
-		self.overlap_slider = wx.Slider( self.scrolled_window, wx.ID_ANY, 0, 0, 100, wx.DefaultPosition, wx.Size( 200,-1 ), wx.SL_HORIZONTAL|wx.SL_VALUE_LABEL )
-		settingsSizer.Add( self.overlap_slider, 0, wx.ALL, 5 )
+		self.preference_textctrl = wx.TextCtrl( self.scrolled_window, wx.ID_ANY, u"-200", wx.DefaultPosition, wx.DefaultSize, 0 )
+		settingsSizer.Add( self.preference_textctrl, 0, wx.ALL, 5 )
 
 		self.btn_execute = wx.Button( self.scrolled_window, wx.ID_ANY, u"Execute", wx.DefaultPosition, wx.DefaultSize, 0 )
 		settingsSizer.Add( self.btn_execute, 0, wx.ALL, 5 )
@@ -906,21 +926,23 @@ class PanelMeanShift ( wx.Panel ):
 
 		settingsSizer.Add( self.label_shape, 0, wx.ALL, 5 )
 
-		self.m_staticText33 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Window Size:", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText19 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Select signal:", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText19.Wrap( -1 )
+
+		settingsSizer.Add( self.m_staticText19, 0, wx.ALL, 5 )
+
+		ch_signalChoices = []
+		self.ch_signal = wx.Choice( self.scrolled_window, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, ch_signalChoices, 0 )
+		self.ch_signal.SetSelection( 0 )
+		settingsSizer.Add( self.ch_signal, 0, wx.ALL, 5 )
+
+		self.m_staticText33 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Quantile:", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText33.Wrap( -1 )
 
 		settingsSizer.Add( self.m_staticText33, 0, wx.ALL, 5 )
 
-		self.window_size_slider = wx.Slider( self.scrolled_window, wx.ID_ANY, 50, 1, 100, wx.DefaultPosition, wx.Size( 200,-1 ), wx.SL_HORIZONTAL|wx.SL_VALUE_LABEL )
-		settingsSizer.Add( self.window_size_slider, 0, wx.ALL, 5 )
-
-		self.m_staticText35 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Overlap:", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_staticText35.Wrap( -1 )
-
-		settingsSizer.Add( self.m_staticText35, 0, wx.ALL, 5 )
-
-		self.overlap_slider = wx.Slider( self.scrolled_window, wx.ID_ANY, 0, 0, 100, wx.DefaultPosition, wx.Size( 200,-1 ), wx.SL_HORIZONTAL|wx.SL_VALUE_LABEL )
-		settingsSizer.Add( self.overlap_slider, 0, wx.ALL, 5 )
+		self.quantile_textctrl = wx.TextCtrl( self.scrolled_window, wx.ID_ANY, u"0.3", wx.DefaultPosition, wx.DefaultSize, 0 )
+		settingsSizer.Add( self.quantile_textctrl, 0, wx.ALL, 5 )
 
 		self.btn_execute = wx.Button( self.scrolled_window, wx.ID_ANY, u"Execute", wx.DefaultPosition, wx.DefaultSize, 0 )
 		settingsSizer.Add( self.btn_execute, 0, wx.ALL, 5 )
@@ -993,21 +1015,23 @@ class PanelSpectralClustering ( wx.Panel ):
 
 		settingsSizer.Add( self.label_shape, 0, wx.ALL, 5 )
 
-		self.m_staticText33 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Window Size:", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText19 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Select signal:", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText19.Wrap( -1 )
+
+		settingsSizer.Add( self.m_staticText19, 0, wx.ALL, 5 )
+
+		ch_signalChoices = []
+		self.ch_signal = wx.Choice( self.scrolled_window, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, ch_signalChoices, 0 )
+		self.ch_signal.SetSelection( 0 )
+		settingsSizer.Add( self.ch_signal, 0, wx.ALL, 5 )
+
+		self.m_staticText33 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Cluster Number:", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText33.Wrap( -1 )
 
 		settingsSizer.Add( self.m_staticText33, 0, wx.ALL, 5 )
 
-		self.window_size_slider = wx.Slider( self.scrolled_window, wx.ID_ANY, 50, 1, 100, wx.DefaultPosition, wx.Size( 200,-1 ), wx.SL_HORIZONTAL|wx.SL_VALUE_LABEL )
-		settingsSizer.Add( self.window_size_slider, 0, wx.ALL, 5 )
-
-		self.m_staticText35 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Overlap:", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_staticText35.Wrap( -1 )
-
-		settingsSizer.Add( self.m_staticText35, 0, wx.ALL, 5 )
-
-		self.overlap_slider = wx.Slider( self.scrolled_window, wx.ID_ANY, 0, 0, 100, wx.DefaultPosition, wx.Size( 200,-1 ), wx.SL_HORIZONTAL|wx.SL_VALUE_LABEL )
-		settingsSizer.Add( self.overlap_slider, 0, wx.ALL, 5 )
+		self.ncluster_textctrl = wx.TextCtrl( self.scrolled_window, wx.ID_ANY, u"2", wx.DefaultPosition, wx.DefaultSize, 0 )
+		settingsSizer.Add( self.ncluster_textctrl, 0, wx.ALL, 5 )
 
 		self.btn_execute = wx.Button( self.scrolled_window, wx.ID_ANY, u"Execute", wx.DefaultPosition, wx.DefaultSize, 0 )
 		settingsSizer.Add( self.btn_execute, 0, wx.ALL, 5 )
@@ -1080,21 +1104,31 @@ class PanelWard ( wx.Panel ):
 
 		settingsSizer.Add( self.label_shape, 0, wx.ALL, 5 )
 
-		self.m_staticText33 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Window Size:", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText19 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Select signal:", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText19.Wrap( -1 )
+
+		settingsSizer.Add( self.m_staticText19, 0, wx.ALL, 5 )
+
+		ch_signalChoices = []
+		self.ch_signal = wx.Choice( self.scrolled_window, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, ch_signalChoices, 0 )
+		self.ch_signal.SetSelection( 0 )
+		settingsSizer.Add( self.ch_signal, 0, wx.ALL, 5 )
+
+		self.m_staticText33 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Cluster Number:", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText33.Wrap( -1 )
 
 		settingsSizer.Add( self.m_staticText33, 0, wx.ALL, 5 )
 
-		self.window_size_slider = wx.Slider( self.scrolled_window, wx.ID_ANY, 50, 1, 100, wx.DefaultPosition, wx.Size( 200,-1 ), wx.SL_HORIZONTAL|wx.SL_VALUE_LABEL )
-		settingsSizer.Add( self.window_size_slider, 0, wx.ALL, 5 )
+		self.ncluster_textctrl = wx.TextCtrl( self.scrolled_window, wx.ID_ANY, u"2", wx.DefaultPosition, wx.DefaultSize, 0 )
+		settingsSizer.Add( self.ncluster_textctrl, 0, wx.ALL, 5 )
 
-		self.m_staticText35 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Overlap:", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_staticText35.Wrap( -1 )
+		self.m_staticText331 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Neighbors:", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText331.Wrap( -1 )
 
-		settingsSizer.Add( self.m_staticText35, 0, wx.ALL, 5 )
+		settingsSizer.Add( self.m_staticText331, 0, wx.ALL, 5 )
 
-		self.overlap_slider = wx.Slider( self.scrolled_window, wx.ID_ANY, 0, 0, 100, wx.DefaultPosition, wx.Size( 200,-1 ), wx.SL_HORIZONTAL|wx.SL_VALUE_LABEL )
-		settingsSizer.Add( self.overlap_slider, 0, wx.ALL, 5 )
+		self.neighbors_textctrl = wx.TextCtrl( self.scrolled_window, wx.ID_ANY, u"10", wx.DefaultPosition, wx.DefaultSize, 0 )
+		settingsSizer.Add( self.neighbors_textctrl, 0, wx.ALL, 5 )
 
 		self.btn_execute = wx.Button( self.scrolled_window, wx.ID_ANY, u"Execute", wx.DefaultPosition, wx.DefaultSize, 0 )
 		settingsSizer.Add( self.btn_execute, 0, wx.ALL, 5 )
@@ -1167,21 +1201,31 @@ class PanelAgglomerativeClustering ( wx.Panel ):
 
 		settingsSizer.Add( self.label_shape, 0, wx.ALL, 5 )
 
-		self.m_staticText33 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Window Size:", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText19 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Select signal:", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText19.Wrap( -1 )
+
+		settingsSizer.Add( self.m_staticText19, 0, wx.ALL, 5 )
+
+		ch_signalChoices = []
+		self.ch_signal = wx.Choice( self.scrolled_window, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, ch_signalChoices, 0 )
+		self.ch_signal.SetSelection( 0 )
+		settingsSizer.Add( self.ch_signal, 0, wx.ALL, 5 )
+
+		self.m_staticText33 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Cluster Number:", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText33.Wrap( -1 )
 
 		settingsSizer.Add( self.m_staticText33, 0, wx.ALL, 5 )
 
-		self.window_size_slider = wx.Slider( self.scrolled_window, wx.ID_ANY, 50, 1, 100, wx.DefaultPosition, wx.Size( 200,-1 ), wx.SL_HORIZONTAL|wx.SL_VALUE_LABEL )
-		settingsSizer.Add( self.window_size_slider, 0, wx.ALL, 5 )
+		self.ncluster_textctrl = wx.TextCtrl( self.scrolled_window, wx.ID_ANY, u"2", wx.DefaultPosition, wx.DefaultSize, 0 )
+		settingsSizer.Add( self.ncluster_textctrl, 0, wx.ALL, 5 )
 
-		self.m_staticText35 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Overlap:", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_staticText35.Wrap( -1 )
+		self.m_staticText331 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Neighbors:", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText331.Wrap( -1 )
 
-		settingsSizer.Add( self.m_staticText35, 0, wx.ALL, 5 )
+		settingsSizer.Add( self.m_staticText331, 0, wx.ALL, 5 )
 
-		self.overlap_slider = wx.Slider( self.scrolled_window, wx.ID_ANY, 0, 0, 100, wx.DefaultPosition, wx.Size( 200,-1 ), wx.SL_HORIZONTAL|wx.SL_VALUE_LABEL )
-		settingsSizer.Add( self.overlap_slider, 0, wx.ALL, 5 )
+		self.neighbors_textctrl = wx.TextCtrl( self.scrolled_window, wx.ID_ANY, u"10", wx.DefaultPosition, wx.DefaultSize, 0 )
+		settingsSizer.Add( self.neighbors_textctrl, 0, wx.ALL, 5 )
 
 		self.btn_execute = wx.Button( self.scrolled_window, wx.ID_ANY, u"Execute", wx.DefaultPosition, wx.DefaultSize, 0 )
 		settingsSizer.Add( self.btn_execute, 0, wx.ALL, 5 )
@@ -1254,21 +1298,23 @@ class PanelDBSCAN ( wx.Panel ):
 
 		settingsSizer.Add( self.label_shape, 0, wx.ALL, 5 )
 
-		self.m_staticText33 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Window Size:", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText19 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Select signal:", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText19.Wrap( -1 )
+
+		settingsSizer.Add( self.m_staticText19, 0, wx.ALL, 5 )
+
+		ch_signalChoices = []
+		self.ch_signal = wx.Choice( self.scrolled_window, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, ch_signalChoices, 0 )
+		self.ch_signal.SetSelection( 0 )
+		settingsSizer.Add( self.ch_signal, 0, wx.ALL, 5 )
+
+		self.m_staticText33 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Eps:", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText33.Wrap( -1 )
 
 		settingsSizer.Add( self.m_staticText33, 0, wx.ALL, 5 )
 
-		self.window_size_slider = wx.Slider( self.scrolled_window, wx.ID_ANY, 50, 1, 100, wx.DefaultPosition, wx.Size( 200,-1 ), wx.SL_HORIZONTAL|wx.SL_VALUE_LABEL )
-		settingsSizer.Add( self.window_size_slider, 0, wx.ALL, 5 )
-
-		self.m_staticText35 = wx.StaticText( self.scrolled_window, wx.ID_ANY, u"Overlap:", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_staticText35.Wrap( -1 )
-
-		settingsSizer.Add( self.m_staticText35, 0, wx.ALL, 5 )
-
-		self.overlap_slider = wx.Slider( self.scrolled_window, wx.ID_ANY, 0, 0, 100, wx.DefaultPosition, wx.Size( 200,-1 ), wx.SL_HORIZONTAL|wx.SL_VALUE_LABEL )
-		settingsSizer.Add( self.overlap_slider, 0, wx.ALL, 5 )
+		self.eps_textctrl = wx.TextCtrl( self.scrolled_window, wx.ID_ANY, u"0.3", wx.DefaultPosition, wx.DefaultSize, 0 )
+		settingsSizer.Add( self.eps_textctrl, 0, wx.ALL, 5 )
 
 		self.btn_execute = wx.Button( self.scrolled_window, wx.ID_ANY, u"Execute", wx.DefaultPosition, wx.DefaultSize, 0 )
 		settingsSizer.Add( self.btn_execute, 0, wx.ALL, 5 )

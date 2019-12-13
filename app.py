@@ -49,6 +49,7 @@ from noname import *
 #se la periodicità del segnale che vedo nella rappresentazione dopo le sliding windows si ripete per tutte le serie di punti piu o meno nelle stesse posizioni (correlazione verticale delle sliding window) significa che in quei punti qualcosa sta succedendo (si suppone proteine che vanno in folding)
 from functools import partial
 
+
 ID_COUNTER = 2000
 Data = []
 Settings = {}
@@ -1106,21 +1107,37 @@ class AppPanelMiniBatchKMeans(PanelMiniBatchKMeans,BasePanel):
 		# Close button
 		self.btn_close.Bind(wx.EVT_BUTTON,self.onCloseButtonClick)
 
+		# Choice for selecting the signal
+		if self.data.dtype.names == None:
+			list = []
+			for i in range(0,self.data.shape[1]):
+				list.append(str(i))
+			self.ch_signal.SetItems(list)
+		else:
+			self.ch_signal.SetItems(self.data.dtype.names)
+		self.ch_signal.SetSelection(0)
+
 
 	def onExecuteButtonClick(self, event):
+		nclusters = int(self.ncluster_textctrl.GetValue())
+		if nclusters < 2:
+			print("Error: Number of clusters must be greater then 2")
+			return
+		signal_index = self.ch_signal.GetCurrentSelection()
+
 		diagrams = {}
+		name = 'MiniBatchKMeans'
+		data = self.data[:,signal_index]
+		time_line = np.arange(len(data))
+		timed_data = np.vstack((time_line,data)).transpose()
 
-		two_means = cluster.MiniBatchKMeans(n_clusters=params['n_clusters'])
+		algorithm = cluster.MiniBatchKMeans(n_clusters=nclusters)
+		figure = plt.figure()
+		plt.figure(figure.number)
 
-		clusters = all_clusters(self.data)
+		plot_cluster(name,algorithm,timed_data)
 
-		print('Plotting results...')
-		for (name,data) in clusters:
-			figure = plt.figure()
-			plt.figure(figure.number)
-			plt.plot(data)
-			diagrams[name+' on signal '+str(i)] = figure
-		print('Results plotted')
+		diagrams[name] = figure
 
 		wx.adv.NotificationMessage('Done', message="Done")
 		self.diagrams = diagrams
@@ -1149,21 +1166,34 @@ class AppPanelAffinityPropagation(PanelAffinityPropagation,BasePanel):
 		# Close button
 		self.btn_close.Bind(wx.EVT_BUTTON,self.onCloseButtonClick)
 
+		# Choice for selecting the signal
+		if self.data.dtype.names == None:
+			list = []
+			for i in range(0,self.data.shape[1]):
+				list.append(str(i))
+			self.ch_signal.SetItems(list)
+		else:
+			self.ch_signal.SetItems(self.data.dtype.names)
+		self.ch_signal.SetSelection(0)
 
 	def onExecuteButtonClick(self, event):
+		damping = float(self.damping_textctrl.GetValue())
+		preference = int(self.preference_textctrl.GetValue())
+		signal_index = self.ch_signal.GetCurrentSelection()
+
 		diagrams = {}
+		name = 'AffinityPropagation'
+		data = self.data[:,signal_index]
+		time_line = np.arange(len(data))
+		timed_data = np.vstack((time_line,data)).transpose()
 
-		two_means = cluster.AffinityPropagation(n_clusters=params['n_clusters'])
+		algorithm = cluster.AffinityPropagation(damping=damping, preference=preference)
+		figure = plt.figure()
+		plt.figure(figure.number)
 
-		clusters = all_clusters(self.data)
+		plot_cluster(name,algorithm,timed_data)
 
-		print('Plotting results...')
-		for (name,data) in clusters:
-			figure = plt.figure()
-			plt.figure(figure.number)
-			plt.plot(data)
-			diagrams[name+' on signal '+str(i)] = figure
-		print('Results plotted')
+		diagrams[name] = figure
 
 		wx.adv.NotificationMessage('Done', message="Done")
 		self.diagrams = diagrams
@@ -1194,21 +1224,34 @@ class AppPanelMeanShift(PanelMeanShift,BasePanel):
 		# Close button
 		self.btn_close.Bind(wx.EVT_BUTTON,self.onCloseButtonClick)
 
+		# Choice for selecting the signal
+		if self.data.dtype.names == None:
+			list = []
+			for i in range(0,self.data.shape[1]):
+				list.append(str(i))
+			self.ch_signal.SetItems(list)
+		else:
+			self.ch_signal.SetItems(self.data.dtype.names)
+		self.ch_signal.SetSelection(0)
 
 	def onExecuteButtonClick(self, event):
+		quantile = float(self.quantile_textctrl.GetValue())
+		signal_index = self.ch_signal.GetCurrentSelection()
+
 		diagrams = {}
+		name = 'MeanShift'
+		data = self.data[:,signal_index]
+		time_line = np.arange(len(data))
+		timed_data = np.vstack((time_line,data)).transpose()
 
-		two_means = cluster.MeanShift(n_clusters=params['n_clusters'])
+		bandwidth = cluster.estimate_bandwidth(timed_data, quantile=quantile)
+		algorithm = cluster.MeanShift(bandwidth=bandwidth, bin_seeding=True)
+		figure = plt.figure()
+		plt.figure(figure.number)
 
-		clusters = all_clusters(self.data)
+		plot_cluster(name,algorithm,timed_data)
 
-		print('Plotting results...')
-		for (name,data) in clusters:
-			figure = plt.figure()
-			plt.figure(figure.number)
-			plt.plot(data)
-			diagrams[name+' on signal '+str(i)] = figure
-		print('Results plotted')
+		diagrams[name] = figure
 
 		wx.adv.NotificationMessage('Done', message="Done")
 		self.diagrams = diagrams
@@ -1239,21 +1282,35 @@ class AppPanelSpectralClustering(PanelSpectralClustering,BasePanel):
 		# Close button
 		self.btn_close.Bind(wx.EVT_BUTTON,self.onCloseButtonClick)
 
+		# Choice for selecting the signal
+		if self.data.dtype.names == None:
+			list = []
+			for i in range(0,self.data.shape[1]):
+				list.append(str(i))
+			self.ch_signal.SetItems(list)
+		else:
+			self.ch_signal.SetItems(self.data.dtype.names)
+		self.ch_signal.SetSelection(0)
 
 	def onExecuteButtonClick(self, event):
+		nclusters = int(self.ncluster_textctrl.GetValue())
+		if nclusters < 2:
+			print("Error: Number of clusters must be greater then 2")
+			return
+		signal_index = self.ch_signal.GetCurrentSelection()
 		diagrams = {}
+		name = 'SpectralClustering'
+		data = self.data[:,signal_index]
+		time_line = np.arange(len(data))
+		timed_data = np.vstack((time_line,data)).transpose()
 
-		two_means = cluster.SpectralClustering(n_clusters=params['n_clusters'])
+		algorithm = cluster.SpectralClustering(n_clusters=nclusters, eigen_solver='arpack',affinity="nearest_neighbors")
+		figure = plt.figure()
+		plt.figure(figure.number)
 
-		clusters = all_clusters(self.data)
+		plot_cluster(name,algorithm,timed_data)
 
-		print('Plotting results...')
-		for (name,data) in clusters:
-			figure = plt.figure()
-			plt.figure(figure.number)
-			plt.plot(data)
-			diagrams[name+' on signal '+str(i)] = figure
-		print('Results plotted')
+		diagrams[name] = figure
 
 		wx.adv.NotificationMessage('Done', message="Done")
 		self.diagrams = diagrams
@@ -1284,21 +1341,37 @@ class AppPanelWard(PanelWard,BasePanel):
 		# Close button
 		self.btn_close.Bind(wx.EVT_BUTTON,self.onCloseButtonClick)
 
+		# Choice for selecting the signal
+		if self.data.dtype.names == None:
+			list = []
+			for i in range(0,self.data.shape[1]):
+				list.append(str(i))
+			self.ch_signal.SetItems(list)
+		else:
+			self.ch_signal.SetItems(self.data.dtype.names)
+		self.ch_signal.SetSelection(0)
 
 	def onExecuteButtonClick(self, event):
+		nclusters = int(self.ncluster_textctrl.GetValue())
+		if nclusters < 2:
+			print("Error: Number of clusters must be greater then 2")
+			return
+		neighbors = int(self.neighbors_textctrl.GetValue())
+		signal_index = self.ch_signal.GetCurrentSelection()
 		diagrams = {}
+		name = 'Ward'
+		data = self.data[:,signal_index]
+		time_line = np.arange(len(data))
+		timed_data = np.vstack((time_line,data)).transpose()
 
-		two_means = cluster.Ward(n_clusters=params['n_clusters'])
+		connectivity = kneighbors_graph(timed_data, n_neighbors=neighbors, include_self=False)
+		algorithm = cluster.AgglomerativeClustering(n_clusters=nclusters, linkage='ward',connectivity=connectivity)
+		figure = plt.figure()
+		plt.figure(figure.number)
 
-		clusters = all_clusters(self.data)
+		plot_cluster(name,algorithm,timed_data)
 
-		print('Plotting results...')
-		for (name,data) in clusters:
-			figure = plt.figure()
-			plt.figure(figure.number)
-			plt.plot(data)
-			diagrams[name+' on signal '+str(i)] = figure
-		print('Results plotted')
+		diagrams[name] = figure
 
 		wx.adv.NotificationMessage('Done', message="Done")
 		self.diagrams = diagrams
@@ -1329,21 +1402,37 @@ class AppPanelAgglomerativeClustering(PanelAgglomerativeClustering,BasePanel):
 		# Close button
 		self.btn_close.Bind(wx.EVT_BUTTON,self.onCloseButtonClick)
 
+		# Choice for selecting the signal
+		if self.data.dtype.names == None:
+			list = []
+			for i in range(0,self.data.shape[1]):
+				list.append(str(i))
+			self.ch_signal.SetItems(list)
+		else:
+			self.ch_signal.SetItems(self.data.dtype.names)
+		self.ch_signal.SetSelection(0)
 
 	def onExecuteButtonClick(self, event):
+		nclusters = int(self.ncluster_textctrl.GetValue())
+		if nclusters < 2:
+			print("Error: Number of clusters must be greater then 2")
+			return
+		neighbors = int(self.neighbors_textctrl.GetValue())
+		signal_index = self.ch_signal.GetCurrentSelection()
 		diagrams = {}
+		name = 'AgglomerativeClustering'
+		data = self.data[:,signal_index]
+		time_line = np.arange(len(data))
+		timed_data = np.vstack((time_line,data)).transpose()
 
-		two_means = cluster.AgglomerativeClustering(n_clusters=params['n_clusters'])
+		connectivity = kneighbors_graph(timed_data, n_neighbors=neighbors, include_self=False)
+		algorithm = cluster.AgglomerativeClustering(linkage="average", affinity="cityblock",n_clusters=nclusters, connectivity=connectivity)
+		figure = plt.figure()
+		plt.figure(figure.number)
 
-		clusters = all_clusters(self.data)
+		plot_cluster(name,algorithm,timed_data)
 
-		print('Plotting results...')
-		for (name,data) in clusters:
-			figure = plt.figure()
-			plt.figure(figure.number)
-			plt.plot(data)
-			diagrams[name+' on signal '+str(i)] = figure
-		print('Results plotted')
+		diagrams[name] = figure
 
 		wx.adv.NotificationMessage('Done', message="Done")
 		self.diagrams = diagrams
@@ -1374,21 +1463,32 @@ class AppPanelDBSCAN(PanelDBSCAN,BasePanel):
 		# Close button
 		self.btn_close.Bind(wx.EVT_BUTTON,self.onCloseButtonClick)
 
+		# Choice for selecting the signal
+		if self.data.dtype.names == None:
+			list = []
+			for i in range(0,self.data.shape[1]):
+				list.append(str(i))
+			self.ch_signal.SetItems(list)
+		else:
+			self.ch_signal.SetItems(self.data.dtype.names)
+		self.ch_signal.SetSelection(0)
 
 	def onExecuteButtonClick(self, event):
+		eps = float(self.eps_textctrl.GetValue())
+		signal_index = self.ch_signal.GetCurrentSelection()
 		diagrams = {}
+		name = 'DBSCAN'
+		data = self.data[:,signal_index]
+		time_line = np.arange(len(data))
+		timed_data = np.vstack((time_line,data)).transpose()
 
-		two_means = cluster.DBSCAN(n_clusters=params['n_clusters'])
+		algorithm = cluster.DBSCAN(eps=eps)
+		figure = plt.figure()
+		plt.figure(figure.number)
 
-		clusters = all_clusters(self.data)
+		plot_cluster(name,algorithm,timed_data)
 
-		print('Plotting results...')
-		for (name,data) in clusters:
-			figure = plt.figure()
-			plt.figure(figure.number)
-			plt.plot(data)
-			diagrams[name+' on signal '+str(i)] = figure
-		print('Results plotted')
+		diagrams[name] = figure
 
 		wx.adv.NotificationMessage('Done', message="Done")
 		self.diagrams = diagrams
@@ -1419,6 +1519,15 @@ class AppPanelOPTICS(PanelOPTICS,BasePanel):
 		# Close button
 		self.btn_close.Bind(wx.EVT_BUTTON,self.onCloseButtonClick)
 
+		# Choice for selecting the signal
+		if self.data.dtype.names == None:
+			list = []
+			for i in range(0,self.data.shape[1]):
+				list.append(str(i))
+			self.ch_signal.SetItems(list)
+		else:
+			self.ch_signal.SetItems(self.data.dtype.names)
+		self.ch_signal.SetSelection(0)
 
 	def onExecuteButtonClick(self, event):
 		diagrams = {}
@@ -1464,6 +1573,15 @@ class AppPanelBirch(PanelBirch,BasePanel):
 		# Close button
 		self.btn_close.Bind(wx.EVT_BUTTON,self.onCloseButtonClick)
 
+		# Choice for selecting the signal
+		if self.data.dtype.names == None:
+			list = []
+			for i in range(0,self.data.shape[1]):
+				list.append(str(i))
+			self.ch_signal.SetItems(list)
+		else:
+			self.ch_signal.SetItems(self.data.dtype.names)
+		self.ch_signal.SetSelection(0)
 
 	def onExecuteButtonClick(self, event):
 		diagrams = {}
@@ -1509,6 +1627,15 @@ class AppPanelGaussianMixture(PanelGaussianMixture,BasePanel):
 		# Close button
 		self.btn_close.Bind(wx.EVT_BUTTON,self.onCloseButtonClick)
 
+		# Choice for selecting the signal
+		if self.data.dtype.names == None:
+			list = []
+			for i in range(0,self.data.shape[1]):
+				list.append(str(i))
+			self.ch_signal.SetItems(list)
+		else:
+			self.ch_signal.SetItems(self.data.dtype.names)
+		self.ch_signal.SetSelection(0)
 
 	def onExecuteButtonClick(self, event):
 		diagrams = {}

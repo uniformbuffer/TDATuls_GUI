@@ -10,6 +10,7 @@ from sklearn.neighbors import kneighbors_graph
 from sklearn.preprocessing import StandardScaler,MinMaxScaler,Normalizer
 from sklearn.decomposition import PCA
 from sklearn.metrics.pairwise import pairwise_distances
+from itertools import cycle, islice
 
 def abs_distance(A,B):
     assert A.shape[0] == A.shape[1] , "Matrix is not square"
@@ -473,3 +474,24 @@ def all_clusters(data,parameters={}):
 	print('Results plotted')
 	return result
 
+
+def plot_cluster(name,algorithm,timed_data):
+	t0 = time.time()
+	algorithm.fit(timed_data)
+	t1 = time.time()
+
+	if hasattr(algorithm, 'labels_'):
+		y_pred = algorithm.labels_.astype(np.int)
+	else:
+		y_pred = algorithm.predict(data)
+	plt.title(name, size=18)
+	colors = np.array(list(islice(cycle(['#377eb8', '#ff7f00', '#4daf4a',
+											'#f781bf', '#a65628', '#984ea3',
+											'#999999', '#e41a1c', '#dede00']),
+											int(max(y_pred) + 1))))
+	# add black color for outliers (if any)
+	colors = np.append(colors, ["#000000"])
+	plt.scatter(timed_data[:,0],timed_data[:,1], s=10, color=colors[y_pred])
+	plt.text(.99, .01, ('%.2fs' % (t1 - t0)).lstrip('0'),
+			transform=plt.gca().transAxes, size=15,
+			horizontalalignment='right')
