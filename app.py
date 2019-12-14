@@ -1530,19 +1530,23 @@ class AppPanelOPTICS(PanelOPTICS,BasePanel):
 		self.ch_signal.SetSelection(0)
 
 	def onExecuteButtonClick(self, event):
+		min_samples = int(self.min_samples_textctrl.GetValue())
+		xi = float(self.xi_textctrl.GetValue())
+		min_cluster_size = float(self.min_cluster_size_textctrl.GetValue())
+		signal_index = self.ch_signal.GetCurrentSelection()
 		diagrams = {}
+		name = 'OPTICS'
+		data = self.data[:,signal_index]
+		time_line = np.arange(len(data))
+		timed_data = np.vstack((time_line,data)).transpose()
 
-		two_means = cluster.OPTICS(n_clusters=params['n_clusters'])
+		algorithm = cluster.OPTICS(min_samples=min_samples,xi=xi,min_cluster_size=min_cluster_size)
+		figure = plt.figure()
+		plt.figure(figure.number)
 
-		clusters = all_clusters(self.data)
+		plot_cluster(name,algorithm,timed_data)
 
-		print('Plotting results...')
-		for (name,data) in clusters:
-			figure = plt.figure()
-			plt.figure(figure.number)
-			plt.plot(data)
-			diagrams[name+' on signal '+str(i)] = figure
-		print('Results plotted')
+		diagrams[name] = figure
 
 		wx.adv.NotificationMessage('Done', message="Done")
 		self.diagrams = diagrams
@@ -1584,19 +1588,24 @@ class AppPanelBirch(PanelBirch,BasePanel):
 		self.ch_signal.SetSelection(0)
 
 	def onExecuteButtonClick(self, event):
+		nclusters = int(self.ncluster_textctrl.GetValue())
+		if nclusters < 2:
+			print("Error: Number of clusters must be greater then 2")
+			return
+		signal_index = self.ch_signal.GetCurrentSelection()
 		diagrams = {}
+		name = 'Birch'
+		data = self.data[:,signal_index]
+		time_line = np.arange(len(data))
+		timed_data = np.vstack((time_line,data)).transpose()
 
-		two_means = cluster.Birch(n_clusters=params['n_clusters'])
+		algorithm = cluster.Birch(n_clusters=nclusters)
+		figure = plt.figure()
+		plt.figure(figure.number)
 
-		clusters = all_clusters(self.data)
+		plot_cluster(name,algorithm,timed_data)
 
-		print('Plotting results...')
-		for (name,data) in clusters:
-			figure = plt.figure()
-			plt.figure(figure.number)
-			plt.plot(data)
-			diagrams[name+' on signal '+str(i)] = figure
-		print('Results plotted')
+		diagrams[name] = figure
 
 		wx.adv.NotificationMessage('Done', message="Done")
 		self.diagrams = diagrams
@@ -1638,19 +1647,24 @@ class AppPanelGaussianMixture(PanelGaussianMixture,BasePanel):
 		self.ch_signal.SetSelection(0)
 
 	def onExecuteButtonClick(self, event):
+		nclusters = int(self.ncluster_textctrl.GetValue())
+		if nclusters < 2:
+			print("Error: Number of clusters must be greater then 2")
+			return
+		signal_index = self.ch_signal.GetCurrentSelection()
 		diagrams = {}
+		name = 'GaussianMixture'
+		data = self.data[:,signal_index]
+		time_line = np.arange(len(data))
+		timed_data = np.vstack((time_line,data)).transpose()
 
-		two_means = cluster.GaussianMixture(n_clusters=params['n_clusters'])
+		algorithm = mixture.GaussianMixture(n_components=nclusters, covariance_type='full')
+		figure = plt.figure()
+		plt.figure(figure.number)
 
-		clusters = all_clusters(self.data)
+		plot_cluster(name,algorithm,timed_data)
 
-		print('Plotting results...')
-		for (name,data) in clusters:
-			figure = plt.figure()
-			plt.figure(figure.number)
-			plt.plot(data)
-			diagrams[name+' on signal '+str(i)] = figure
-		print('Results plotted')
+		diagrams[name] = figure
 
 		wx.adv.NotificationMessage('Done', message="Done")
 		self.diagrams = diagrams

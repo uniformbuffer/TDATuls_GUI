@@ -483,7 +483,7 @@ def plot_cluster(name,algorithm,timed_data):
 	if hasattr(algorithm, 'labels_'):
 		y_pred = algorithm.labels_.astype(np.int)
 	else:
-		y_pred = algorithm.predict(data)
+		y_pred = algorithm.predict(timed_data)
 	plt.title(name, size=18)
 	colors = np.array(list(islice(cycle(['#377eb8', '#ff7f00', '#4daf4a',
 											'#f781bf', '#a65628', '#984ea3',
