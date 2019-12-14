@@ -245,7 +245,7 @@ class AppPageMenuItem(wx.MenuItem):
 				d = dic
 				break
 		# create the notebook page corresponding to the chosen dataset
-		page = AppPanelRipser(self.parent.Window.notebook,d['data'])
+		page = AppPanelRipser(self.parent.Window,d['data'])
 
 
 		self.parent.Window.notebook.AddPage(page,'Ripser on ' + d["path"])
@@ -592,15 +592,47 @@ class AppFrame(MainFrame):
 				self.GaussianMixture.Append(data_GaussianMixture)
 
 class BasePanel():
-	def __init__(self, parent,data):
+	def __init__(self, name, parent,data):
 		self.parent = parent # parent is notebook whose parent is frame
+		self.id = inc_id_counter()
 		self.data = data
 		self.diagrams = {}
+		self.exports = {}
+		#name: data
+		#
+		#
+
+		self.menu = wx.Menu()
+		self.parent.export.AppendSubMenu(self.menu,name)
+		self.menu.Append(wx.MenuItem(self.menu, id=0,text="EXECUTE BEFORE EXPORT DATA"))
+
+
 		self.figure = None
 		self.canvas = None
 		self.toolbar = None
 		self.figure_list = None
 		self.updateFigure(0)
+
+	def save_data(self,name,event):
+		print('clicked '+ name)
+		dialog = wx.DirDialog (None, "Choose output directory", "", wx.DD_DEFAULT_STYLE | wx.DD_DIR_MUST_EXIST)
+		if dialog.ShowModal() == wx.ID_CANCEL:
+			return
+
+		path = dialog.GetPath()
+		np.savetxt(os.path.join(path,name),self.exports[name])
+		wx.adv.NotificationMessage('Saved successfully', message="Saved successfully")
+
+	def add_export(self,name,data):
+		id = len(self.exports)
+		self.exports[name] = data
+		menu = wx.MenuItem(self.menu, id=id,text=name)
+		self.menu.Bind(wx.EVT_MENU,partial(self.save_data,name))
+		self.menu.Append(menu)
+
+	def clear_exports(self):
+		for item in self.menu.GetMenuItems():
+			self.menu.DestroyItem(item.Id)
 
 	def clearOldFigures(self):
 		if len(self.diagrams) > 0:
@@ -645,6 +677,8 @@ class AppPanelLowerStar(PanelLowerStar,BasePanel):
 		PanelLowerStar.__init__(self, parent=parent)
 		BasePanel.__init__(self, parent=parent, data=data)
 		print('Loading lower star panel')
+
+		print(vars(parent))
 
 		# Set Label
 		self.label_shape.SetLabel(str(self.data.shape))
@@ -728,12 +762,8 @@ class AppPanelLowerStar(PanelLowerStar,BasePanel):
 
 class AppPanelRipser(PanelRipser,BasePanel):
 	def __init__(self, parent,data):
-		PanelRipser.__init__(self, parent=parent)
-		BasePanel.__init__(self, parent=parent, data=data)
-
-		export_Ripser_dgms = AppPageMenuItem(self.parent.parent.Window.export, id=0,text="Export ripser dgms")
-		self.Bind(wx.EVT_MENU,export_Ripser_dgms.saveDgms,id=0)
-		self.parent.export.Append(export_Ripser_dgms)
+		PanelRipser.__init__(self, parent=parent.notebook)
+		BasePanel.__init__(self, name='Ripser', parent=parent, data=data)
 
 		# Set Label
 		self.label_shape.SetLabel(str(self.data.shape))
@@ -748,6 +778,7 @@ class AppPanelRipser(PanelRipser,BasePanel):
 		self.window_size_slider.SetMax(self.data.shape[0])
 
 	def onExecuteButtonClick(self, event):
+		self.clear_exports()
 		overlap = self.overlap_slider.GetValue()
 		window_size = self.window_size_slider.GetValue()
 		distance_matrix = self.chx_distance_matrix.IsChecked()
@@ -755,7 +786,6 @@ class AppPanelRipser(PanelRipser,BasePanel):
 		metric = self.ch_metric.GetString(self.ch_metric.GetCurrentSelection())
 		windows = calculate_windows(window_size,overlap,self.data.shape[0])
 		diagrams = {}
-		data = {'dgms': {}}
 		i = 0
 		for window in windows:
 			dgms = doRipsFiltration(self.data[window],max_hom_dim,distance_matrix,metric)#['dgms']
@@ -763,22 +793,12 @@ class AppPanelRipser(PanelRipser,BasePanel):
 			plt.figure(figure.number)
 			plot_diagrams(dgms)
 			diagrams['window'+str(i)] = figure
-			data['dgms']['window'+str(i)] = dgms
+			self.add_export('window'+str(i),dgms)
 			i+=1
 
 		wx.adv.NotificationMessage('Done', message="Done")
 		self.diagrams = diagrams
-		self.data = data
 		self.updateFigure(0)
-
-	def saveDgms(self,event):
-		dialog = wx.DirDialog (None, "Choose output directory", "", wx.DD_DEFAULT_STYLE | wx.DD_DIR_MUST_EXIST)
-		if dialog.ShowModal() == wx.ID_CANCEL:
-			return
-
-		path = dialog.GetPath()
-		for name in self.data['dgms']:
-			np.savetxt(os.path.join(path,name),self.data['dgms'][name])
 
 
 	def onCloseButtonClick(self, event):
