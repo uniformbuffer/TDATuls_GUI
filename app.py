@@ -233,9 +233,7 @@ class AppPageMenuItem(wx.MenuItem):
 				d = dic
 				break
 		# create the notebook page corresponding to the chosen dataset
-		page = AppPanelLowerStar(self.parent.Window.notebook,d['data'])
-		self.parent.Window.notebook.AddPage(page,'Lower Star on ' + d["path"])
-		print("Lower Star tab created")
+		page = AppPanelLowerStar(self.parent.Window,d)
 
 	def onMenuItemClickRipser(self,event):
 		global Data
@@ -245,11 +243,7 @@ class AppPageMenuItem(wx.MenuItem):
 				d = dic
 				break
 		# create the notebook page corresponding to the chosen dataset
-		page = AppPanelRipser(self.parent.Window,d['data'])
-
-
-		self.parent.Window.notebook.AddPage(page,'Ripser on ' + d["path"])
-		print("Ripser tab created")
+		page = AppPanelRipser(self.parent.Window,d)
 
 	def onMenuItemClickCorrMat(self,event):
 		global Data
@@ -259,9 +253,8 @@ class AppPageMenuItem(wx.MenuItem):
 				d = dic
 				break
 		# create the notebook page corresponding to the chosen dataset
-		page = AppPanelCorrMatDist(self.parent.Window.notebook,d['data'])
-		self.parent.Window.notebook.AddPage(page,'Correlation Matrix on ' + d["path"])
-		print("Correlation Matrix tab created")
+		page = AppPanelCorrMatDist(self.parent.Window,d)
+
 	def onMenuItemClickHoles(self,event):
 		global Data
 		d = None
@@ -270,9 +263,7 @@ class AppPageMenuItem(wx.MenuItem):
 				d = dic
 				break
 		# create the notebook page corresponding to the chosen dataset
-		page = AppPanelCorrMatHoles(self.parent.Window.notebook,d['data'])
-		self.parent.Window.notebook.AddPage(page,'Holes on ' + d["path"])
-		print("Holes tab created")
+		page = AppPanelCorrMatHoles(self.parent.Window,d)
 
 	def onMenuItemClickSpikes(self,event):
 		global Data
@@ -282,9 +273,7 @@ class AppPageMenuItem(wx.MenuItem):
 				d = dic
 				break
 		# create the notebook page corresponding to the chosen dataset
-		page = AppPanelSpikes(self.parent.Window.notebook,d['data'])
-		self.parent.Window.notebook.AddPage(page,'Spikes on ' + d["path"])
-		print("Spikes tab created")
+		page = AppPanelSpikes(self.parent.Window,d)
 
 	def onMenuItemClickMiniBatchKMeans(self,event):
 		global Data
@@ -294,9 +283,7 @@ class AppPageMenuItem(wx.MenuItem):
 				d = dic
 				break
 		# create the notebook page corresponding to the chosen dataset
-		page = AppPanelMiniBatchKMeans(self.parent.Window.notebook,d['data'])
-		self.parent.Window.notebook.AddPage(page,'MiniBatchKMeans on ' + d["path"])
-		print("MiniBatchKMeans tab created")
+		page = AppPanelMiniBatchKMeans(self.parent.Window,d)
 
 	def onMenuItemClickAffinityPropagation(self,event):
 		global Data
@@ -306,9 +293,7 @@ class AppPageMenuItem(wx.MenuItem):
 				d = dic
 				break
 		# create the notebook page corresponding to the chosen dataset
-		page = AppPanelAffinityPropagation(self.parent.Window.notebook,d['data'])
-		self.parent.Window.notebook.AddPage(page,'AffinityPropagation on ' + d["path"])
-		print("AffinityPropagation tab created")
+		page = AppPanelAffinityPropagation(self.parent.Window,d)
 
 	def onMenuItemClickMeanShift(self,event):
 		global Data
@@ -318,9 +303,7 @@ class AppPageMenuItem(wx.MenuItem):
 				d = dic
 				break
 		# create the notebook page corresponding to the chosen dataset
-		page = AppPanelMeanShift(self.parent.Window.notebook,d['data'])
-		self.parent.Window.notebook.AddPage(page,'MeanShift on ' + d["path"])
-		print("MeanShift tab created")
+		page = AppPanelMeanShift(self.parent.Window,d)
 
 	def onMenuItemClickSpectralClustering(self,event):
 		global Data
@@ -330,9 +313,7 @@ class AppPageMenuItem(wx.MenuItem):
 				d = dic
 				break
 		# create the notebook page corresponding to the chosen dataset
-		page = AppPanelSpectralClustering(self.parent.Window.notebook,d['data'])
-		self.parent.Window.notebook.AddPage(page,'SpectralClustering on ' + d["path"])
-		print("SpectralClustering tab created")
+		page = AppPanelSpectralClustering(self.parent.Window,d)
 
 	def onMenuItemClickWard(self,event):
 		global Data
@@ -342,9 +323,7 @@ class AppPageMenuItem(wx.MenuItem):
 				d = dic
 				break
 		# create the notebook page corresponding to the chosen dataset
-		page = AppPanelWard(self.parent.Window.notebook,d['data'])
-		self.parent.Window.notebook.AddPage(page,'Ward on ' + d["path"])
-		print("Ward tab created")
+		page = AppPanelWard(self.parent.Window,d)
 
 	def onMenuItemClickAgglomerativeClustering(self,event):
 		global Data
@@ -354,9 +333,7 @@ class AppPageMenuItem(wx.MenuItem):
 				d = dic
 				break
 		# create the notebook page corresponding to the chosen dataset
-		page = AppPanelAgglomerativeClustering(self.parent.Window.notebook,d['data'])
-		self.parent.Window.notebook.AddPage(page,'AgglomerativeClustering on ' + d["path"])
-		print("AgglomerativeClustering tab created")
+		page = AppPanelAgglomerativeClustering(self.parent.Window,d)
 
 	def onMenuItemClickDBSCAN(self,event):
 		global Data
@@ -366,9 +343,7 @@ class AppPageMenuItem(wx.MenuItem):
 				d = dic
 				break
 		# create the notebook page corresponding to the chosen dataset
-		page = AppPanelDBSCAN(self.parent.Window.notebook,d['data'])
-		self.parent.Window.notebook.AddPage(page,'DBSCAN on ' + d["path"])
-		print("DBSCAN tab created")
+		page = AppPanelDBSCAN(self.parent.Window,d)
 
 	def onMenuItemClickOPTICS(self,event):
 		global Data
@@ -378,9 +353,7 @@ class AppPageMenuItem(wx.MenuItem):
 				d = dic
 				break
 		# create the notebook page corresponding to the chosen dataset
-		page = AppPanelOPTICS(self.parent.Window.notebook,d['data'])
-		self.parent.Window.notebook.AddPage(page,'OPTICS on ' + d["path"])
-		print("OPTICS tab created")
+		page = AppPanelOPTICS(self.parent.Window,d)
 
 	def onMenuItemClickBirch(self,event):
 		global Data
@@ -390,9 +363,7 @@ class AppPageMenuItem(wx.MenuItem):
 				d = dic
 				break
 		# create the notebook page corresponding to the chosen dataset
-		page = AppPanelBirch(self.parent.Window.notebook,d['data'])
-		self.parent.Window.notebook.AddPage(page,'Birch on ' + d["path"])
-		print("Birch tab created")
+		page = AppPanelBirch(self.parent.Window,d)
 
 	def onMenuItemClickGaussianMixture(self,event):
 		global Data
@@ -402,9 +373,7 @@ class AppPageMenuItem(wx.MenuItem):
 				d = dic
 				break
 		# create the notebook page corresponding to the chosen dataset
-		page = AppPanelGaussianMixture(self.parent.Window.notebook,d['data'])
-		self.parent.Window.notebook.AddPage(page,'GaussianMixture on ' + d["path"])
-		print("GaussianMixture tab created")
+		page = AppPanelGaussianMixture(self.parent.Window,d)
 
 # Start by overriding the behaviour of the MainFrame
 class AppFrame(MainFrame):
@@ -593,25 +562,31 @@ class AppFrame(MainFrame):
 
 class BasePanel():
 	def __init__(self, name, parent,data):
-		self.parent = parent # parent is notebook whose parent is frame
+		self.parent = parent
 		self.id = inc_id_counter()
-		self.data = data
+		self.data = data['data']
+		self.path = data['path']
 		self.diagrams = {}
 		self.exports = {}
+		self.name = name
+		self.tab_name = str(self.id) + ": " + self.name
 		#name: data
 		#
 		#
 
-		self.menu = wx.Menu()
-		self.parent.export.AppendSubMenu(self.menu,name)
-		self.menu.Append(wx.MenuItem(self.menu, id=0,text="EXECUTE BEFORE EXPORT DATA"))
+		self.parent.notebook.AddPage(self, self.tab_name + ' on ' + self.path)
 
+		self.menu = wx.Menu()
+		self.menu_item = self.parent.export.AppendSubMenu(self.menu,self.tab_name)
+		self.menu.Append(wx.MenuItem(self.menu, id=0,text="EXECUTE BEFORE EXPORT DATA"))
 
 		self.figure = None
 		self.canvas = None
 		self.toolbar = None
 		self.figure_list = None
 		self.updateFigure(0)
+
+		print(self.name + " tab created")
 
 	def save_data(self,name,event):
 		print('clicked '+ name)
@@ -633,6 +608,12 @@ class BasePanel():
 	def clear_exports(self):
 		for item in self.menu.GetMenuItems():
 			self.menu.DestroyItem(item.Id)
+
+	def onCloseButtonClick(self, event):
+		self.parent.export.DestroyItem(self.menu_item)
+		index = self.parent.notebook.GetSelection()
+		self.parent.notebook.DeletePage(index)
+		self.parent.notebook.SendSizeEvent()
 
 	def clearOldFigures(self):
 		if len(self.diagrams) > 0:
@@ -669,21 +650,15 @@ class BasePanel():
 		mainCanvasSizer.Add(self.toolbar, 0, wx.LEFT | wx.EXPAND)
 		self.Layout()
 
-	def onCloseButtonClick(self, event):
-		index = self.parent.notebook.GetSelection()
-		self.parent.notebook.DeletePage(index)
-		self.parent.notebook.SendSizeEvent()
+
 
 	# Now we override the behaviour of the lowerStar menu selection
 	# The change here requires to select on which data to perform the filtration
 # Now we override the behaviour of the Panel page for lower star filtration
 class AppPanelLowerStar(PanelLowerStar,BasePanel):
 	def __init__(self, parent,data):
-		PanelLowerStar.__init__(self, parent=parent)
-		BasePanel.__init__(self, parent=parent, data=data)
-		print('Loading lower star panel')
-
-		print(vars(parent))
+		PanelLowerStar.__init__(self, parent=parent.notebook)
+		BasePanel.__init__(self, name='LowerStar', parent=parent, data=data)
 
 		# Set Label
 		self.label_shape.SetLabel(str(self.data.shape))
@@ -812,8 +787,8 @@ class AppPanelRipser(PanelRipser,BasePanel):
 
 class AppPanelCorrMatDist(PanelCorrMatDist,BasePanel):
 	def __init__(self, parent,data):
-		PanelCorrMatDist.__init__(self, parent=parent)
-		BasePanel.__init__(self, parent=parent, data=data)
+		PanelCorrMatDist.__init__(self, parent=parent.notebook)
+		BasePanel.__init__(self, name='CorrMatDist', parent=parent, data=data)
 
 		# Set Label
 		self.label_shape.SetLabel(str(self.data.shape))
@@ -939,9 +914,9 @@ class AppPanelCorrMatDist(PanelCorrMatDist,BasePanel):
 
 class AppPanelCorrMatHoles(PanelCorrMatHoles,BasePanel):
 	def __init__(self, parent,data):
-		PanelCorrMatHoles.__init__(self, parent=parent)
-		BasePanel.__init__(self, parent=parent, data=data)
-		print(vars(self.frame))
+		PanelCorrMatHoles.__init__(self, parent=parent.notebook)
+		BasePanel.__init__(self, name='CorrMatHoles', parent=parent, data=data)
+
 		# Set Label
 		self.label_shape.SetLabel(str(self.data.shape))
 
@@ -1051,8 +1026,8 @@ class AppPanelCorrMatHoles(PanelCorrMatHoles,BasePanel):
 
 class AppPanelSpikes(PanelSpikes,BasePanel):
 	def __init__(self, parent,data):
-		PanelSpikes.__init__(self, parent=parent)
-		BasePanel.__init__(self, parent=parent, data=data)
+		PanelSpikes.__init__(self, parent=parent.notebook)
+		BasePanel.__init__(self, name='Spikes', parent=parent, data=data)
 
 		# Set Label
 		self.label_shape.SetLabel(str(self.data.shape))
@@ -1100,8 +1075,8 @@ class AppPanelSpikes(PanelSpikes,BasePanel):
 
 class AppPanelMiniBatchKMeans(PanelMiniBatchKMeans,BasePanel):
 	def __init__(self, parent,data):
-		PanelMiniBatchKMeans.__init__(self, parent=parent)
-		BasePanel.__init__(self, parent=parent, data=data)
+		PanelMiniBatchKMeans.__init__(self, parent=parent.notebook)
+		BasePanel.__init__(self, name='MiniBatchKMeans', parent=parent, data=data)
 
 		# Set Label
 		self.label_shape.SetLabel(str(self.data.shape))
@@ -1155,8 +1130,8 @@ class AppPanelMiniBatchKMeans(PanelMiniBatchKMeans,BasePanel):
 
 class AppPanelAffinityPropagation(PanelAffinityPropagation,BasePanel):
 	def __init__(self, parent,data):
-		PanelAffinityPropagation.__init__(self, parent=parent)
-		BasePanel.__init__(self, parent=parent, data=data)
+		PanelAffinityPropagation.__init__(self, parent=parent.notebook)
+		BasePanel.__init__(self, name='AffinityPropagation', parent=parent, data=data)
 
 		# Set Label
 		self.label_shape.SetLabel(str(self.data.shape))
@@ -1209,8 +1184,8 @@ class AppPanelAffinityPropagation(PanelAffinityPropagation,BasePanel):
 
 class AppPanelMeanShift(PanelMeanShift,BasePanel):
 	def __init__(self, parent,data):
-		PanelMeanShift.__init__(self, parent=parent)
-		BasePanel.__init__(self, parent=parent, data=data)
+		PanelMeanShift.__init__(self, parent=parent.notebook)
+		BasePanel.__init__(self, name='MeanShift', parent=parent, data=data)
 
 		# Set Label
 		self.label_shape.SetLabel(str(self.data.shape))
@@ -1263,8 +1238,8 @@ class AppPanelMeanShift(PanelMeanShift,BasePanel):
 
 class AppPanelSpectralClustering(PanelSpectralClustering,BasePanel):
 	def __init__(self, parent,data):
-		PanelSpectralClustering.__init__(self, parent=parent)
-		BasePanel.__init__(self, parent=parent, data=data)
+		PanelSpectralClustering.__init__(self, parent=parent.notebook)
+		BasePanel.__init__(self, name='SpectralClustering', parent=parent, data=data)
 
 		# Set Label
 		self.label_shape.SetLabel(str(self.data.shape))
@@ -1318,8 +1293,8 @@ class AppPanelSpectralClustering(PanelSpectralClustering,BasePanel):
 
 class AppPanelWard(PanelWard,BasePanel):
 	def __init__(self, parent,data):
-		PanelWard.__init__(self, parent=parent)
-		BasePanel.__init__(self, parent=parent, data=data)
+		PanelWard.__init__(self, parent=parent.notebook)
+		BasePanel.__init__(self, name='Ward', parent=parent, data=data)
 
 		# Set Label
 		self.label_shape.SetLabel(str(self.data.shape))
@@ -1375,8 +1350,8 @@ class AppPanelWard(PanelWard,BasePanel):
 
 class AppPanelAgglomerativeClustering(PanelAgglomerativeClustering,BasePanel):
 	def __init__(self, parent,data):
-		PanelAgglomerativeClustering.__init__(self, parent=parent)
-		BasePanel.__init__(self, parent=parent, data=data)
+		PanelAgglomerativeClustering.__init__(self, parent=parent.notebook)
+		BasePanel.__init__(self, name='AgglomerativeClustering', parent=parent, data=data)
 
 		# Set Label
 		self.label_shape.SetLabel(str(self.data.shape))
@@ -1432,8 +1407,8 @@ class AppPanelAgglomerativeClustering(PanelAgglomerativeClustering,BasePanel):
 
 class AppPanelDBSCAN(PanelDBSCAN,BasePanel):
 	def __init__(self, parent,data):
-		PanelDBSCAN.__init__(self, parent=parent)
-		BasePanel.__init__(self, parent=parent, data=data)
+		PanelDBSCAN.__init__(self, parent=parent.notebook)
+		BasePanel.__init__(self, name='DBSCAN', parent=parent, data=data)
 
 		# Set Label
 		self.label_shape.SetLabel(str(self.data.shape))
@@ -1484,8 +1459,8 @@ class AppPanelDBSCAN(PanelDBSCAN,BasePanel):
 
 class AppPanelOPTICS(PanelOPTICS,BasePanel):
 	def __init__(self, parent,data):
-		PanelOPTICS.__init__(self, parent=parent)
-		BasePanel.__init__(self, parent=parent, data=data)
+		PanelOPTICS.__init__(self, parent=parent.notebook)
+		BasePanel.__init__(self, name='OPTICS', parent=parent, data=data)
 
 		# Set Label
 		self.label_shape.SetLabel(str(self.data.shape))
@@ -1538,8 +1513,8 @@ class AppPanelOPTICS(PanelOPTICS,BasePanel):
 
 class AppPanelBirch(PanelBirch,BasePanel):
 	def __init__(self, parent,data):
-		PanelBirch.__init__(self, parent=parent)
-		BasePanel.__init__(self, parent=parent, data=data)
+		PanelBirch.__init__(self, parent=parent.notebook)
+		BasePanel.__init__(self, name='Birch', parent=parent, data=data)
 
 		# Set Label
 		self.label_shape.SetLabel(str(self.data.shape))
@@ -1593,8 +1568,8 @@ class AppPanelBirch(PanelBirch,BasePanel):
 
 class AppPanelGaussianMixture(PanelGaussianMixture,BasePanel):
 	def __init__(self, parent,data):
-		PanelGaussianMixture.__init__(self, parent=parent)
-		BasePanel.__init__(self, parent=parent, data=data)
+		PanelGaussianMixture.__init__(self, parent=parent.notebook)
+		BasePanel.__init__(self, name='GaussianMixture', parent=parent, data=data)
 
 		# Set Label
 		self.label_shape.SetLabel(str(self.data.shape))
