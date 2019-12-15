@@ -669,6 +669,11 @@ class BasePanel():
 		mainCanvasSizer.Add(self.toolbar, 0, wx.LEFT | wx.EXPAND)
 		self.Layout()
 
+	def onCloseButtonClick(self, event):
+		index = self.parent.notebook.GetSelection()
+		self.parent.notebook.DeletePage(index)
+		self.parent.notebook.SendSizeEvent()
+
 	# Now we override the behaviour of the lowerStar menu selection
 	# The change here requires to select on which data to perform the filtration
 # Now we override the behaviour of the Panel page for lower star filtration
@@ -747,10 +752,7 @@ class AppPanelLowerStar(PanelLowerStar,BasePanel):
 		wx.adv.NotificationMessage('Done', message="Done")
 		self.diagrams = diagrams
 		self.updateFigure(0)
-	def onCloseButtonClick(self, event):
-		index = self.parent.GetSelection()
-		self.parent.DeletePage(index)
-		self.parent.SendSizeEvent()
+
 	def onEntropyCheck(self, event):
 		self.persistent_entropy = self.chx_entropy.IsChecked()
 
@@ -799,12 +801,6 @@ class AppPanelRipser(PanelRipser,BasePanel):
 		wx.adv.NotificationMessage('Done', message="Done")
 		self.diagrams = diagrams
 		self.updateFigure(0)
-
-
-	def onCloseButtonClick(self, event):
-		index = self.parent.GetSelection()
-		self.parent.DeletePage(index)
-		self.parent.SendSizeEvent()
 
 	def onWindowSizeSliderChange(self, event):
 		self.overlap_slider.SetMax(self.window_size_slider.GetValue())
@@ -934,10 +930,6 @@ class AppPanelCorrMatDist(PanelCorrMatDist,BasePanel):
 		self.diagrams = diagrams
 		self.updateFigure(0)
 
-	def onCloseButtonClick(self, event):
-		index = self.parent.GetSelection()
-		self.parent.DeletePage(index)
-		self.parent.SendSizeEvent()
 	def onWindowSizeSliderChange(self, event):
 		self.overlap_slider.SetMax(self.window_size_slider.GetValue())
 
@@ -1029,10 +1021,6 @@ class AppPanelCorrMatHoles(PanelCorrMatHoles,BasePanel):
 		self.diagrams = diagrams
 		self.updateFigure(0)
 
-	def onCloseButtonClick(self, event):
-		index = self.parent.GetSelection()
-		self.parent.DeletePage(index)
-		self.parent.SendSizeEvent()
 	def onEntropyCheck(self, event):
 		mainSizer = self.GetSizer()
 		# First child is canvasSizer, the second is settingsSizer
@@ -1104,10 +1092,6 @@ class AppPanelSpikes(PanelSpikes,BasePanel):
 		self.diagrams = diagrams
 		self.updateFigure(0)
 
-	def onCloseButtonClick(self, event):
-		index = self.parent.GetSelection()
-		self.parent.DeletePage(index)
-		self.parent.SendSizeEvent()
 	def onWindowSizeSliderChange(self, event):
 		self.overlap_slider.SetMax(self.window_size_slider.GetValue())
 
@@ -1163,10 +1147,6 @@ class AppPanelMiniBatchKMeans(PanelMiniBatchKMeans,BasePanel):
 		self.diagrams = diagrams
 		self.updateFigure(0)
 
-	def onCloseButtonClick(self, event):
-		index = self.parent.GetSelection()
-		self.parent.DeletePage(index)
-		self.parent.SendSizeEvent()
 	def onWindowSizeSliderChange(self, event):
 		self.overlap_slider.SetMax(self.window_size_slider.GetValue())
 
@@ -1219,10 +1199,6 @@ class AppPanelAffinityPropagation(PanelAffinityPropagation,BasePanel):
 		self.diagrams = diagrams
 		self.updateFigure(0)
 
-	def onCloseButtonClick(self, event):
-		index = self.parent.GetSelection()
-		self.parent.DeletePage(index)
-		self.parent.SendSizeEvent()
 	def onWindowSizeSliderChange(self, event):
 		self.overlap_slider.SetMax(self.window_size_slider.GetValue())
 
@@ -1277,10 +1253,6 @@ class AppPanelMeanShift(PanelMeanShift,BasePanel):
 		self.diagrams = diagrams
 		self.updateFigure(0)
 
-	def onCloseButtonClick(self, event):
-		index = self.parent.GetSelection()
-		self.parent.DeletePage(index)
-		self.parent.SendSizeEvent()
 	def onWindowSizeSliderChange(self, event):
 		self.overlap_slider.SetMax(self.window_size_slider.GetValue())
 
@@ -1336,10 +1308,6 @@ class AppPanelSpectralClustering(PanelSpectralClustering,BasePanel):
 		self.diagrams = diagrams
 		self.updateFigure(0)
 
-	def onCloseButtonClick(self, event):
-		index = self.parent.GetSelection()
-		self.parent.DeletePage(index)
-		self.parent.SendSizeEvent()
 	def onWindowSizeSliderChange(self, event):
 		self.overlap_slider.SetMax(self.window_size_slider.GetValue())
 
@@ -1397,10 +1365,6 @@ class AppPanelWard(PanelWard,BasePanel):
 		self.diagrams = diagrams
 		self.updateFigure(0)
 
-	def onCloseButtonClick(self, event):
-		index = self.parent.GetSelection()
-		self.parent.DeletePage(index)
-		self.parent.SendSizeEvent()
 	def onWindowSizeSliderChange(self, event):
 		self.overlap_slider.SetMax(self.window_size_slider.GetValue())
 
@@ -1458,10 +1422,6 @@ class AppPanelAgglomerativeClustering(PanelAgglomerativeClustering,BasePanel):
 		self.diagrams = diagrams
 		self.updateFigure(0)
 
-	def onCloseButtonClick(self, event):
-		index = self.parent.GetSelection()
-		self.parent.DeletePage(index)
-		self.parent.SendSizeEvent()
 	def onWindowSizeSliderChange(self, event):
 		self.overlap_slider.SetMax(self.window_size_slider.GetValue())
 
@@ -1514,10 +1474,6 @@ class AppPanelDBSCAN(PanelDBSCAN,BasePanel):
 		self.diagrams = diagrams
 		self.updateFigure(0)
 
-	def onCloseButtonClick(self, event):
-		index = self.parent.GetSelection()
-		self.parent.DeletePage(index)
-		self.parent.SendSizeEvent()
 	def onWindowSizeSliderChange(self, event):
 		self.overlap_slider.SetMax(self.window_size_slider.GetValue())
 
@@ -1572,10 +1528,6 @@ class AppPanelOPTICS(PanelOPTICS,BasePanel):
 		self.diagrams = diagrams
 		self.updateFigure(0)
 
-	def onCloseButtonClick(self, event):
-		index = self.parent.GetSelection()
-		self.parent.DeletePage(index)
-		self.parent.SendSizeEvent()
 	def onWindowSizeSliderChange(self, event):
 		self.overlap_slider.SetMax(self.window_size_slider.GetValue())
 
@@ -1631,10 +1583,6 @@ class AppPanelBirch(PanelBirch,BasePanel):
 		self.diagrams = diagrams
 		self.updateFigure(0)
 
-	def onCloseButtonClick(self, event):
-		index = self.parent.GetSelection()
-		self.parent.DeletePage(index)
-		self.parent.SendSizeEvent()
 	def onWindowSizeSliderChange(self, event):
 		self.overlap_slider.SetMax(self.window_size_slider.GetValue())
 
@@ -1690,10 +1638,6 @@ class AppPanelGaussianMixture(PanelGaussianMixture,BasePanel):
 		self.diagrams = diagrams
 		self.updateFigure(0)
 
-	def onCloseButtonClick(self, event):
-		index = self.parent.GetSelection()
-		self.parent.DeletePage(index)
-		self.parent.SendSizeEvent()
 	def onWindowSizeSliderChange(self, event):
 		self.overlap_slider.SetMax(self.window_size_slider.GetValue())
 
