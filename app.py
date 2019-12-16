@@ -560,6 +560,79 @@ class AppFrame(MainFrame):
 				self.Bind(wx.EVT_MENU,data_GaussianMixture.onMenuItemClickGaussianMixture,id=id_GaussianMixture)
 				self.GaussianMixture.Append(data_GaussianMixture)
 
+
+class ExportCategory():
+	def __init__(self,parent_menu, name):
+		self.name = name
+		self.parent_menu = parent_menu
+		self.menu = wx.Menu()
+		self.menu_item = parent_menu.AppendSubMenu(self.menu,self.name)
+		self.menu.Append(wx.MenuItem(self.menu, id=0,text="EXECUTE BEFORE EXPORT DATA"))
+		self.exports = {}
+
+
+	def add_export(self,name,data):
+		id = len(self.exports)
+		if id == 0:
+			self.clear_exports()
+		self.exports[name] = data
+		menu = wx.MenuItem(self.menu, id=id,text=name)
+		self.menu.Bind(wx.EVT_MENU,partial(self.export_file_dialog,name),menu)
+		self.menu.Append(menu)
+
+
+	def clear_exports(self):
+		for item in self.menu.GetMenuItems():
+			self.menu.DestroyItem(item.Id)
+			self.menu.Unbind(wx.EVT_MENU)
+		name = "Export All"
+		item = wx.MenuItem(self.menu, id=-1,text=name)
+		self.menu.Bind(wx.EVT_MENU,self.export_folder_dialog,item)
+		self.menu.Append(item)
+
+	def export_folder_dialog(self,event):
+		dialog = wx.DirDialog (None, "Choose output directory", "", wx.DD_DEFAULT_STYLE | wx.DD_DIR_MUST_EXIST)
+		if dialog.ShowModal() == wx.ID_CANCEL:
+			return
+
+		self.export_folder(dialog.GetPath())
+
+
+	def export_folder(self,path):
+		for name in self.exports:
+			np.savetxt(os.path.join(path,name),self.exports[name])
+
+		wx.adv.NotificationMessage('Saved successfully', message="Saved successfully")
+
+	def export_file_dialog(self,name,event):
+		dialog = wx.FileDialog(None, "Save file", wildcard="Csv files (*.csv)|*.csv",style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
+		if dialog.ShowModal() == wx.ID_CANCEL:
+			return
+		self.export_file(dialog.GetPath(),name)
+
+
+	def export_file(self,path,name):
+		np.savetxt(path,self.exports[name])
+		wx.adv.NotificationMessage('Saved successfully', message="Saved successfully")
+
+
+
+
+	'''
+	def save_data(self,name,event):
+		dialog = wx.DirDialog (None, "Choose output directory", "", wx.DD_DEFAULT_STYLE | wx.DD_DIR_MUST_EXIST)
+		if dialog.ShowModal() == wx.ID_CANCEL:
+			return
+
+		path = dialog.GetPath()
+		np.savetxt(os.path.join(path,name),self.exports[name])
+		wx.adv.NotificationMessage('Saved successfully', message="Saved successfully")
+	'''
+
+	def __exit__(self, exc_type, exc_value, traceback):
+		print('exited')
+
+
 class BasePanel():
 	def __init__(self, name, parent,data):
 		self.parent = parent
@@ -567,7 +640,7 @@ class BasePanel():
 		self.data = data['data']
 		self.path = data['path']
 		self.diagrams = {}
-		self.exports = {}
+		self.categories = {}
 		self.name = name
 		self.tab_name = str(self.id) + ": " + self.name
 		#name: data
@@ -578,7 +651,7 @@ class BasePanel():
 
 		self.menu = wx.Menu()
 		self.menu_item = self.parent.export.AppendSubMenu(self.menu,self.tab_name)
-		self.menu.Append(wx.MenuItem(self.menu, id=0,text="EXECUTE BEFORE EXPORT DATA"))
+		self.menu.Append(wx.MenuItem(self.menu, id=0,text="NO EXPORT AVAILABLE"))
 
 		self.figure = None
 		self.canvas = None
@@ -588,26 +661,23 @@ class BasePanel():
 
 		print(self.name + " tab created")
 
-	def save_data(self,name,event):
-		print('clicked '+ name)
-		dialog = wx.DirDialog (None, "Choose output directory", "", wx.DD_DEFAULT_STYLE | wx.DD_DIR_MUST_EXIST)
-		if dialog.ShowModal() == wx.ID_CANCEL:
-			return
+	def add_category(self,name):
+		if len(self.categories) == 0:
+			self.clear_categories()
+		category = ExportCategory(self.menu,name)
+		self.categories[name] = category
 
-		path = dialog.GetPath()
-		np.savetxt(os.path.join(path,name),self.exports[name])
-		wx.adv.NotificationMessage('Saved successfully', message="Saved successfully")
+	def add_export(self,category_name,name,data):
+		category = self.categories[category_name]
+		category.add_export(name,data)
 
-	def add_export(self,name,data):
-		id = len(self.exports)
-		self.exports[name] = data
-		menu = wx.MenuItem(self.menu, id=id,text=name)
-		self.menu.Bind(wx.EVT_MENU,partial(self.save_data,name))
-		self.menu.Append(menu)
-
-	def clear_exports(self):
+	def clear_categories(self):
 		for item in self.menu.GetMenuItems():
 			self.menu.DestroyItem(item.Id)
+
+	def clear_exports(self,category_name):
+		category = self.categories[category_name]
+		category.clear_exports()
 
 	def onCloseButtonClick(self, event):
 		self.parent.export.DestroyItem(self.menu_item)
@@ -754,8 +824,11 @@ class AppPanelRipser(PanelRipser,BasePanel):
 		self.window_size_slider.Bind(wx.EVT_SCROLL,self.onWindowSizeSliderChange)
 		self.window_size_slider.SetMax(self.data.shape[0])
 
+		self.add_category('Windows')
+
 	def onExecuteButtonClick(self, event):
-		self.clear_exports()
+		self.clear_exports('Windows')
+
 		overlap = self.overlap_slider.GetValue()
 		window_size = self.window_size_slider.GetValue()
 		distance_matrix = self.chx_distance_matrix.IsChecked()
@@ -770,7 +843,7 @@ class AppPanelRipser(PanelRipser,BasePanel):
 			plt.figure(figure.number)
 			plot_diagrams(dgms)
 			diagrams['window'+str(i)] = figure
-			self.add_export('window'+str(i),dgms)
+			self.add_export('Windows','window'+str(i),dgms)
 			i+=1
 
 		wx.adv.NotificationMessage('Done', message="Done")
