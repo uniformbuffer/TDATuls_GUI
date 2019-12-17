@@ -56,17 +56,18 @@ class AppPanelLowerStar(PanelLowerStar,BasePanel):
 			lsf_dgm0 = doLowerStarFiltration(self.data[window,signal_index])
 			plt.plot(lsf_dgm0)
 			diagrams['window'+str(i)+': lower star filtration'] = figure
-
+			self.add_export('Lower Star','Window'+str(i),lsf_dgm0)
 			if self.chx_entropy.IsChecked():
 				# Persistent Entropy
 				L = []
 				L.append(lsf_dgm0)
 				dmg = np.array(L)
 				ent = persentropy(dmg)[0]
-
+				self.add_export('Persistent Entropy','Window'+str(i),ent)
 				# Normalized Persistent Entropy
 				pent = persentropy(dmg,normalize=True)[0]
 				norm_pers.append(pent)
+				self.add_export('Normalized Persistent Entropy','Window'+str(i),pent)
 			i += 1
 
 		if self.chx_entropy.IsChecked():

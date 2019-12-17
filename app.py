@@ -45,7 +45,9 @@ from sklearn.decomposition import PCA
 # Internals
 from TDATuls import *
 from noname import *
+from export import *
 
+#Panels
 from panels.affinity_propagation_panel import AppPanelAffinityPropagation
 from panels.agglomerative_clustering_panel import AppPanelAgglomerativeClustering
 from panels.birch_panel import AppPanelBirch
@@ -61,8 +63,6 @@ from panels.ripser_panel import AppPanelRipser
 from panels.spectral_clustering_panel import AppPanelSpectralClustering
 from panels.spikes_panel import AppPanelSpikes
 from panels.ward_panel import AppPanelWard
-
-from export import *
 
 #se la periodicità del segnale che vedo nella rappresentazione dopo le sliding windows si ripete per tutte le serie di punti piu o meno nelle stesse posizioni (correlazione verticale delle sliding window) significa che in quei punti qualcosa sta succedendo (si suppone proteine che vanno in folding)
 from functools import partial

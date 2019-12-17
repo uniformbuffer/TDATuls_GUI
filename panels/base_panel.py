@@ -73,7 +73,7 @@ class BasePanel():
 
 		self.menu = wx.Menu()
 		self.menu_item = self.parent.export.AppendSubMenu(self.menu,self.tab_name)
-		self.menu.Append(wx.MenuItem(self.menu, id=0,text="NO EXPORT AVAILABLE"))
+		self.menu.Append(wx.MenuItem(self.menu, id=0,text="EXECUTE BEFORE EXPORT"))
 
 		self.figure = None
 		self.canvas = None
@@ -83,13 +83,12 @@ class BasePanel():
 
 		print(self.name + " tab created")
 
-	def add_category(self,name):
-		if len(self.categories) == 0:
-			self.clear_categories()
-		category = ExportCategory(self.menu,name)
-		self.categories[name] = category
-
 	def add_export(self,category_name,name,data):
+		if not (category_name in self.categories):
+			if len(self.categories) == 0:
+				self.clear_categories()
+			category = ExportCategory(self.menu,category_name)
+			self.categories[category_name] = category
 		category = self.categories[category_name]
 		category.add_export(name,data)
 
@@ -98,8 +97,9 @@ class BasePanel():
 			self.menu.DestroyItem(item.Id)
 
 	def clear_exports(self,category_name):
-		category = self.categories[category_name]
-		category.clear_exports()
+		if category_name in self.categories:
+			category = self.categories[category_name]
+			category.clear_exports()
 
 	def onCloseButtonClick(self, event):
 		self.parent.export.DestroyItem(self.menu_item)

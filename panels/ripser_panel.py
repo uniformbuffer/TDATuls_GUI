@@ -19,7 +19,7 @@ class AppPanelRipser(PanelRipser,BasePanel):
 		self.window_size_slider.Bind(wx.EVT_SCROLL,self.onWindowSizeSliderChange)
 		self.window_size_slider.SetMax(self.data.shape[0])
 
-		self.add_category('Windows')
+		#self.add_category('Windows')
 
 	def onExecuteButtonClick(self, event):
 		self.clear_exports('Windows')
@@ -38,7 +38,8 @@ class AppPanelRipser(PanelRipser,BasePanel):
 			plt.figure(figure.number)
 			plot_diagrams(dgms)
 			diagrams['window'+str(i)] = figure
-			self.add_export('Windows','window'+str(i),dgms)
+			for k in range(0,len(dgms)):
+				self.add_export('Windows','Window'+str(i)+" - Homology:"+str(k),dgms[k])
 			i+=1
 
 		wx.adv.NotificationMessage('Done', message="Done")

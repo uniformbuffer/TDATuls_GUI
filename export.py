@@ -1,6 +1,10 @@
 import wx
 from wx.adv import NotificationMessage
 from functools import partial
+import os
+# Numpy
+import numpy as np
+from numpy import genfromtxt
 
 class ExportCategory():
 	def __init__(self,parent_menu, name):
