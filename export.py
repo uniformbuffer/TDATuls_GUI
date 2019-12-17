@@ -10,30 +10,27 @@ class ExportCategory():
 	def __init__(self,parent_menu, name):
 		self.name = name
 		self.parent_menu = parent_menu
-		self.menu = wx.Menu()
-		self.menu_item = parent_menu.AppendSubMenu(self.menu,self.name)
-		self.menu.Append(wx.MenuItem(self.menu, id=0,text="EXECUTE BEFORE EXPORT DATA"))
 		self.exports = {}
-
+		if name != "":
+			self.menu = wx.Menu()
+			self.menu_item = parent_menu.AppendSubMenu(self.menu,self.name)
+			self.menu.Append(wx.MenuItem(self.menu, id=0,text="EXECUTE BEFORE EXPORT DATA"))
 
 	def add_export(self,name,data):
 		id = len(self.exports)
-		if id == 0:
-			self.clear_exports()
 		self.exports[name] = data
-		menu = wx.MenuItem(self.menu, id=id,text=name)
-		self.menu.Bind(wx.EVT_MENU,partial(self.export_file_dialog,name),menu)
-		self.menu.Append(menu)
 
-
-	def clear_exports(self):
-		for item in self.menu.GetMenuItems():
-			self.menu.DestroyItem(item.Id)
-			self.menu.Unbind(wx.EVT_MENU)
-		name = "Export All"
-		item = wx.MenuItem(self.menu, id=-1,text=name)
-		self.menu.Bind(wx.EVT_MENU,self.export_folder_dialog,item)
-		self.menu.Append(item)
+		if self.name == "":
+			menu = wx.MenuItem(self.parent_menu, id=id,text=name)
+			self.parent_menu.Bind(wx.EVT_MENU,partial(self.export_file_dialog,name),menu)
+			self.parent_menu.Append(menu)
+		else:
+			if id == 0:
+				for item in self.menu.GetMenuItems():
+					self.menu.DestroyItem(item.Id)
+			menu = wx.MenuItem(self.menu, id=id,text=name)
+			self.menu.Bind(wx.EVT_MENU,partial(self.export_file_dialog,name),menu)
+			self.menu.Append(menu)
 
 	def export_folder_dialog(self,event):
 		dialog = wx.DirDialog (None, "Choose output directory", "", wx.DD_DEFAULT_STYLE | wx.DD_DIR_MUST_EXIST)

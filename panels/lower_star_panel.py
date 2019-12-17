@@ -41,6 +41,8 @@ class AppPanelLowerStar(PanelLowerStar,BasePanel):
 		self.ch_signal.SetSelection(0)
 
 	def onExecuteButtonClick(self, event):
+		self.clear_exports()
+
 		window_size = self.window_size_slider.GetValue()
 		overlap = self.overlap_slider.GetValue()
 		signal_index = self.ch_signal.GetCurrentSelection()
@@ -73,8 +75,10 @@ class AppPanelLowerStar(PanelLowerStar,BasePanel):
 		if self.chx_entropy.IsChecked():
 			figure = plt.figure()
 			plt.figure(figure.number)
-			plt.plot(np.arange(len(windows)),norm_pers)
+			combined = np.hstack((np.arange(len(windows)),norm_pers))
+			plt.plot(combined)
 			diagrams['normalized persistent entropy'] = figure
+			self.add_export('','Combined Normalized Persistent Entropy',combined)
 
 		wx.adv.NotificationMessage('Done', message="Done")
 		self.diagrams = diagrams

@@ -22,7 +22,7 @@ class AppPanelRipser(PanelRipser,BasePanel):
 		#self.add_category('Windows')
 
 	def onExecuteButtonClick(self, event):
-		self.clear_exports('Windows')
+		self.clear_exports()
 
 		overlap = self.overlap_slider.GetValue()
 		window_size = self.window_size_slider.GetValue()

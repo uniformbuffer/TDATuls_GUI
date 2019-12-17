@@ -96,10 +96,13 @@ class BasePanel():
 		for item in self.menu.GetMenuItems():
 			self.menu.DestroyItem(item.Id)
 
-	def clear_exports(self,category_name):
-		if category_name in self.categories:
-			category = self.categories[category_name]
-			category.clear_exports()
+	def clear_exports(self):
+		self.categories = {}
+		for item in self.menu.GetMenuItems():
+			self.menu.DestroyItem(item.Id)
+		#if category_name in self.categories:
+		#	category = self.categories[category_name]
+		#	category.clear_exports()
 
 	def onCloseButtonClick(self, event):
 		self.parent.export.DestroyItem(self.menu_item)
