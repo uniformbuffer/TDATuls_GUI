@@ -27,7 +27,7 @@ class AppPanelSpikes(PanelSpikes,BasePanel):
 		diagrams = {}
 
 		spikes_list = spikes(self.data,window=(window_size,overlap),threshold=threshold)
-
+		self.add_export('','Spikes',spikes_list)
 		print('Plotting results...')
 		cols = np.ceil(np.sqrt(spikes_list.shape[1]))
 		rows = np.ceil(spikes_list.shape[1]/cols)

@@ -56,6 +56,7 @@ class AppPanelCorrMatDist(PanelCorrMatDist,BasePanel):
 			WCorr.append(wcorr)
 		#print('WCorr',len(WCorr))
 		corrmatdist = np.zeros(shapes) #14x14
+		self.add_export('','Correlation Matrix Distances',corrmatdist)
 		#print(corrmatdist.shape)
 		#for i,wc1 in enumerate(WCorr):
 		#	if i < 14:
@@ -108,10 +109,12 @@ class AppPanelCorrMatDist(PanelCorrMatDist,BasePanel):
 		figure = plt.figure()
 		plt.figure(figure.number)
 		D = pairwise_distances(corrmatdist)
+		self.add_export('','Pairwise Distances',D)
 		#print('D',D)
 		hoDgms = doRipsFiltration(D,maxHomDim=2,distance_matrix=True)
 		#print('Ripser',hoDgms)
 		Pers = persentropy(hoDgms)
+		self.add_export('','Persistent Entropy',Pers)
 		#print('Persentropy',Pers)
 		plot_diagrams(hoDgms)
 		diagrams['correlation_matrix'] = figure
