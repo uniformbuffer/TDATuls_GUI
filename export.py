@@ -14,7 +14,7 @@ class ExportCategory():
 		if name != "":
 			self.menu = wx.Menu()
 			self.menu_item = parent_menu.AppendSubMenu(self.menu,self.name)
-			self.menu.Append(wx.MenuItem(self.menu, id=0,text="EXECUTE BEFORE EXPORT DATA"))
+			self.menu.Append(wx.MenuItem(self.menu, id=1,text="EXECUTE BEFORE EXPORT DATA"))
 
 	def add_export(self,name,data):
 		id = len(self.exports)
