@@ -49,7 +49,7 @@ from export import *
 from functools import partial
 
 
-ID = -1
+ID = 0
 def get_id():
 	global ID
 	ID += 1
@@ -77,7 +77,7 @@ class BasePanel():
 
 		self.menu = wx.Menu()
 		self.menu_item = self.parent.export.AppendSubMenu(self.menu,self.tab_name)
-		self.menu.Append(wx.MenuItem(self.menu, id=0,text="EXECUTE BEFORE EXPORT"))
+		self.menu.Append(wx.MenuItem(self.menu, id=1,text="EXECUTE BEFORE EXPORT"))
 
 		self.figure = None
 		self.canvas = None
