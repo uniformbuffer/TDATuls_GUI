@@ -17,7 +17,7 @@ class ExportCategory():
 			self.menu.Append(wx.MenuItem(self.menu, id=1,text="EXECUTE BEFORE EXPORT DATA"))
 
 	def add_export(self,name,data):
-		id = len(self.exports)
+		id = len(self.exports) + 1
 		self.exports[name] = data
 
 		if self.name == "":
@@ -25,7 +25,7 @@ class ExportCategory():
 			self.parent_menu.Bind(wx.EVT_MENU,partial(self.export_file_dialog,name),menu)
 			self.parent_menu.Append(menu)
 		else:
-			if id == 0:
+			if id == 1:
 				for item in self.menu.GetMenuItems():
 					self.menu.DestroyItem(item.Id)
 			menu = wx.MenuItem(self.menu, id=id,text=name)
