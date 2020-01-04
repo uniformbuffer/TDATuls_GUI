@@ -54,7 +54,6 @@ class ExportCategory():
 
 
 	def export_file(self,path,name):
-		if path.
 		np.savetxt(path,self.exports[name],delimiter=';')
 		wx.adv.NotificationMessage('Saved successfully', message="Saved successfully")
 
