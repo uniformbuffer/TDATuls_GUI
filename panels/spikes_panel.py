@@ -17,7 +17,7 @@ class AppPanelSpikes(PanelSpikes,BasePanel):
 
 		# Slider window size
 		self.window_size_slider.Bind(wx.EVT_SCROLL,self.onWindowSizeSliderChange)
-		self.window_size_slider.SetMax(self.data.shape[0])
+		self.window_size_slider.SetMax(self.data.shape[1])
 
 	def onExecuteButtonClick(self, event):
 		overlap = self.overlap_slider.GetValue()

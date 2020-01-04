@@ -17,7 +17,7 @@ class AppPanelRipser(PanelRipser,BasePanel):
 
 		# Slider window size
 		self.window_size_slider.Bind(wx.EVT_SCROLL,self.onWindowSizeSliderChange)
-		self.window_size_slider.SetMax(self.data.shape[0])
+		self.window_size_slider.SetMax(self.data.shape[1])
 
 		#self.add_category('Windows')
 
@@ -29,11 +29,11 @@ class AppPanelRipser(PanelRipser,BasePanel):
 		distance_matrix = self.chx_distance_matrix.IsChecked()
 		max_hom_dim = self.spn_max_hom_dim.GetValue()
 		metric = self.ch_metric.GetString(self.ch_metric.GetCurrentSelection())
-		windows = calculate_windows(window_size,overlap,self.data.shape[0])
+		windows = calculate_windows(window_size,overlap,self.data.shape[1])
 		diagrams = {}
 		i = 0
 		for window in windows:
-			dgms = doRipsFiltration(self.data[window],max_hom_dim,distance_matrix,metric)#['dgms']
+			dgms = doRipsFiltration(self.data[:,window],max_hom_dim,distance_matrix,metric)#['dgms']
 			figure = plt.figure()
 			plt.figure(figure.number)
 			plot_diagrams(dgms)

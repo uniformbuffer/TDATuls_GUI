@@ -61,8 +61,8 @@ class BasePanel():
 		self.id = get_id()
 		self.data = data['data']
 
-		if len(self.data.shape) < 2:
-			self.data = self.data.reshape((self.data.shape[1],1)).transpose()
+	#	if len(self.data.shape) < 2:
+	#		self.data = self.data.reshape((self.data.shape[0],1)).transpose()
 
 		self.path = data['path']
 		self.diagrams = {}

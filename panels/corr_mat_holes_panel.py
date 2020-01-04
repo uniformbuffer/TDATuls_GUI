@@ -20,7 +20,7 @@ class AppPanelCorrMatHoles(PanelCorrMatHoles,BasePanel):
 
 		# Slider window size
 		self.window_size_slider.Bind(wx.EVT_SCROLL,self.onWindowSizeSliderChange)
-		self.window_size_slider.SetMax(self.data.shape[0])
+		self.window_size_slider.SetMax(self.data.shape[1])
 
 		self.updateFigure(0)
 
@@ -39,7 +39,7 @@ class AppPanelCorrMatHoles(PanelCorrMatHoles,BasePanel):
 	def onExecuteButtonClick(self, event):
 		overlap = self.overlap_slider.GetValue()
 		window_size = self.window_size_slider.GetValue()
-		windows = calculate_windows(window_size,overlap,self.data.shape[0])
+		windows = calculate_windows(window_size,overlap,self.data.shape[1])
 		output_path = self.txt_open_folder.GetValue()
 		if not os.path.isdir(output_path):
 			wx.adv.NotificationMessage('Error', message="Output directory does not exist")

@@ -17,7 +17,7 @@ class AppPanelCorrMatDist(PanelCorrMatDist,BasePanel):
 
 		# Slider window size
 		self.window_size_slider.Bind(wx.EVT_SCROLL,self.onWindowSizeSliderChange)
-		self.window_size_slider.SetMax(self.data.shape[0])
+		self.window_size_slider.SetMax(self.data.shape[1])
 
 	def onExecuteButtonClick(self, event):
 		overlap = self.overlap_slider.GetValue()
@@ -36,19 +36,19 @@ class AppPanelCorrMatDist(PanelCorrMatDist,BasePanel):
 		#### CORRELATION MATRICES AND Persistent Entropy ####
 		#X = data.transpose()
 
-		windows = calculate_windows(window_size,overlap,self.data.shape[0])
+		windows = calculate_windows(window_size,overlap,self.data.shape[1])
 		diagrams = {}
 		WCorr = []
-		shapes = (self.data.shape[1],self.data.shape[1])
+		shapes = (self.data.shape[0],self.data.shape[0])
 		for window in windows:
 			#w is 14x100
 			#print(window)
-			wcorr = np.zeros((self.data.shape[1],self.data.shape[1])) #14x14
+			wcorr = np.zeros((self.data.shape[0],self.data.shape[0])) #14x14
 			#print(wcorr.shape)
-			for i in range(self.data.shape[1]):
-				for j in range(self.data.shape[1]):
+			for i in range(self.data.shape[0]):
+				for j in range(self.data.shape[0]):
 					#print(self.data[window].shape,self.data[window][:,i].shape)
-					coeff,pvalue = st.pearsonr(self.data[window][:,i],self.data[window][:,j])
+					coeff,pvalue = st.pearsonr(self.data[i,window],self.data[i,window])
 					if coeff > 0 and pvalue < 0.05:
 						#print('Written ('+str(i)+','+str(j)+') = '+str(coeff))
 						wcorr[i,j] = coeff

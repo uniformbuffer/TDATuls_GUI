@@ -152,7 +152,7 @@ def importCSVFile(file):
 	if try_header(first_line,delimiter):
 		data = genfromtxt(file,delimiter=delimiter,skip_header=1)
 	else:
-		data = genfromtxt(file)
+		data = genfromtxt(file,delimiter=delimiter)
 
 	dataDict = {}
 	dataDict["path"] = os.path.realpath(file.name)

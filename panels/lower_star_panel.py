@@ -27,13 +27,13 @@ class AppPanelLowerStar(PanelLowerStar,BasePanel):
 		# Overlap slider
 		# SpinCtrl window size
 		self.window_size_slider.Bind(wx.EVT_SCROLL,self.onWindowSizeSliderChange)
-		self.window_size_slider.SetMax(self.data.shape[0])
+		self.window_size_slider.SetMax(self.data.shape[1])
 		self.window_size = self.window_size_slider.GetValue()
 
 		# Choice for selecting the signal
 		if self.data.dtype.names == None:
 			list = []
-			for i in range(0,self.data.shape[1]):
+			for i in range(0,self.data.shape[0]):
 				list.append(str(i))
 			self.ch_signal.SetItems(list)
 		else:
@@ -46,7 +46,7 @@ class AppPanelLowerStar(PanelLowerStar,BasePanel):
 		window_size = self.window_size_slider.GetValue()
 		overlap = self.overlap_slider.GetValue()
 		signal_index = self.ch_signal.GetCurrentSelection()
-		windows = calculate_windows(window_size,overlap,self.data.shape[0])
+		windows = calculate_windows(window_size,overlap,self.data.shape[1])
 		diagrams = {}
 
 		norm_pers = []
@@ -55,7 +55,7 @@ class AppPanelLowerStar(PanelLowerStar,BasePanel):
 			#Lower Star Filtration
 			figure = plt.figure()
 			plt.figure(figure.number)
-			lsf_dgm0 = doLowerStarFiltration(self.data[window,signal_index])
+			lsf_dgm0 = doLowerStarFiltration(self.data[signal_index,window])
 			plt.plot(lsf_dgm0)
 			diagrams['window'+str(i)+': lower star filtration'] = figure
 			self.add_export('Lower Star','Window'+str(i),lsf_dgm0)

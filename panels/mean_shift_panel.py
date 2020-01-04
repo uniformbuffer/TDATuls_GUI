@@ -18,7 +18,7 @@ class AppPanelMeanShift(PanelMeanShift,BasePanel):
 		# Choice for selecting the signal
 		if self.data.dtype.names == None:
 			list = []
-			for i in range(0,self.data.shape[1]):
+			for i in range(0,self.data.shape[0]):
 				list.append(str(i))
 			self.ch_signal.SetItems(list)
 		else:
@@ -31,7 +31,7 @@ class AppPanelMeanShift(PanelMeanShift,BasePanel):
 
 		diagrams = {}
 		name = 'MeanShift'
-		data = self.data[:,signal_index]
+		data = self.data[signal_index]
 		time_line = np.arange(len(data))
 		timed_data = np.vstack((time_line,data)).transpose()
 
