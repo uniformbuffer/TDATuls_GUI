@@ -64,9 +64,9 @@ from panels.spectral_clustering_panel import AppPanelSpectralClustering
 from panels.spikes_panel import AppPanelSpikes
 from panels.ward_panel import AppPanelWard
 
-#se la periodicità del segnale che vedo nella rappresentazione dopo le sliding windows si ripete per tutte le serie di punti piu o meno nelle stesse posizioni (correlazione verticale delle sliding window) significa che in quei punti qualcosa sta succedendo (si suppone proteine che vanno in folding)
-from functools import partial
 
+from functools import partial
+import sys
 
 #from ripser import PanelRipser
 
@@ -114,7 +114,8 @@ def are_all_strings(values):
 def get_delimiter(line):
 	delimiter = try_delimiters(line)
 	if delimiter == None:
-		die('Unable to detect dataset delimiter: supported delimiters are "," and ";"')
+		print('Unable to detect dataset delimiter: supported delimiters are "," and ";"')
+		sys.exit()
 	return delimiter
 
 def try_header(line,delimiter):
